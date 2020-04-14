@@ -11,7 +11,10 @@
   "dependencies": {
     "think-cache": "^1.1.1",
     "think-cache-file": "^1.1.1",
+    "think-model": "^1.4.2",
+    "think-model-mysql": "^1.1.2",
     "think-session": "^1.1.5",
+    "think-session-cookie": "^1.1.3",
     "think-session-file": "^1.1.2",
     "think-view": "^1.0.12",
     "think-view-nunjucks": "^1.0.10",

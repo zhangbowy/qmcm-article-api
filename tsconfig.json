@@ -9,7 +9,12 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "outDir": "app",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "thinkjs": [
+        "src/index"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts"

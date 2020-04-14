@@ -1,6 +1,7 @@
 import Base from './base.js';
 export default class extends Base {
   indexAction() {
-    return this.display();
+    // return this.display();
+    return this.success([], '走错路发现世界,走对路发现自己');
   }
 }

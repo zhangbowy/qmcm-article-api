@@ -1,4 +1,4 @@
 // production config, it will load in production enviroment
 export = {
-  workers: 5
+  workers: 1,
 };

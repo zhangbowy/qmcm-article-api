@@ -3,6 +3,7 @@ import path from 'path';
 import nunjucks from 'think-view-nunjucks';
 import fileSession from 'think-session-file';
 import fileCache from 'think-cache-file';
+const cookie = require('think-session-cookie');
 
 export const cache  = {
   type: 'file',
@@ -16,21 +17,37 @@ export const cache  = {
     gcInterval: 24 * 60 * 60 * 1000 // gc interval
   }
 };
-
-export const session = {
-  type: 'file',
+// export const session = {
+//   type: 'file',
+//   common: {
+//     cookie: {
+//       name: 'thinkjs'
+//       // keys: ['werwer', 'werwer'],
+//       // signed: true
+//     }
+//   },
+//   file: {
+//     handle: fileSession,
+//     sessionPath: path.join(think.ROOT_PATH, 'runtime/session')
+//   }
+// };
+exports.session = {
+  type: 'cookie',
   common: {
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
     cookie: {
-      name: 'thinkjs'
-      // keys: ['werwer', 'werwer'],
-      // signed: true
+      name: 'token',
+      keys: ['thinkjs'],
+      signed: true
     }
   },
-  file: {
-    handle: fileSession,
-    sessionPath: path.join(think.ROOT_PATH, 'runtime/session')
+  cookie: {
+    handle: cookie,
+    cookie: {
+      encrypt: true //encrypt cookie data
+    }
   }
-};
+}
 
 export const view = {
   type: 'nunjucks',
