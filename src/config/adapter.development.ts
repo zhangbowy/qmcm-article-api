@@ -1,6 +1,7 @@
 import 'thinkjs3-ts';
 import path from 'path';
 const mysql = require('think-model-mysql');
+const redisCache = require('think-cache-redis');
 import { think } from "thinkjs";
 const isDev = think.env === "development";
 /**
@@ -26,3 +27,17 @@ exports.model = {
         acquireWaitTimeout: 3000
     }
 };
+
+exports.cache = {
+    type: 'redis',
+    common: {
+        timeout: 24 * 3600 * 1000 // millisecond
+    },
+    redis: {
+        handle: redisCache,
+        host: '192.168.31.3',
+        port: '6379',
+        password: '',
+        log_connect: true
+    }
+}
