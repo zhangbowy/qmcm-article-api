@@ -11,6 +11,7 @@
   "dependencies": {
     "think-cache": "^1.1.1",
     "think-cache-file": "^1.1.1",
+    "think-cache-redis": "^1.2.5",
     "think-model": "^1.4.2",
     "think-model-mysql": "^1.1.2",
     "think-session": "^1.1.5",

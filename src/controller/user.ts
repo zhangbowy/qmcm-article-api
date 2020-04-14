@@ -1,7 +1,6 @@
 import Base from './base.js';
 // tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
-
 export default class extends Base {
     async indexAction(): Promise<void> {
         const page: number = this.get('page') || 1;
@@ -19,13 +18,21 @@ export default class extends Base {
          * 根据ID查用户
          */
         const res = await (this.model('user') as UserModel).getUserById(id);
-        return this.success(res, '1');
+        // @ts-ignore
+        const data = await this.cache('zhangbo', undefined,  'redis');
+        return this.success(data, '1');
     }
     /**
      * 登录
      */
     async loginAction(): Promise<void> {
         await this.session('token', 'zhangbo');
+        await this.cache('zhangbo', 'zhaomengna1', {
+            type: 'redis',
+            redis: {
+                timeout: 24 * 60 * 60 * 1000
+            }
+        });
         this.success([], "登录成功!");
     }
     /**
