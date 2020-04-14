@@ -1,9 +1,7 @@
 import 'thinkjs3-ts';
-import path from 'path';
 const mysql = require('think-model-mysql');
 const redisCache = require('think-cache-redis');
 import { think } from "thinkjs";
-const isDev = think.env === "development";
 /**
  * 开发环境数据库配置
  */
