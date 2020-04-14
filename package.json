@@ -1,0 +1,47 @@
+{
+  "name": "yuncixiu-api-v3",
+  "description": "云刺綉Api",
+  "version": "1.0.0",
+  "author": "zhangbo <xiaobo21@163.com>",
+  "scripts": {
+    "start": "node development.js",
+    "compile": "npm run lint && tsc",
+    "lint": "tslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "think-cache": "^1.1.1",
+    "think-cache-file": "^1.1.1",
+    "think-session": "^1.1.5",
+    "think-session-file": "^1.1.2",
+    "think-view": "^1.0.12",
+    "think-view-nunjucks": "^1.0.10",
+    "thinkjs": "^3.2.11",
+    "thinkjs3-ts": "^1.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^2.5.3",
+    "@types/koa": "*",
+    "node-notifier": "^5.0.2",
+    "think-watcher": "^3.0.0",
+    "think-inspect": "0.0.2",
+    "think-typescript": "^1.0.4",
+    "tslint": "^5.8.0"
+  },
+  "repository": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "readmeFilename": "README.md",
+  "thinkjs": {
+    "metadata": {
+      "name": "yuncixiu-api-v3",
+      "description": "云刺綉Api",
+      "author": "zhangbo <xiaobo21@163.com>"
+    },
+    "projectName": "demo1",
+    "template": "typescript",
+    "clone": false,
+    "isMultiModule": false
+  }
+}
