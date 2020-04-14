@@ -12,7 +12,7 @@ export default class extends Base {
      */
     async uploadImgAction() {
         const file = this.file('image');
-        console.log(file,'file')
+        console.log(file,'file');
         if (!file || !file.type) {
            return  this.fail(-1, '图片不能为空', []);
         }

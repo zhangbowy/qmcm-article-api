@@ -1,4 +1,4 @@
-import Base from './base.js';
+import Base from './../base.js';
 export default class extends Base {
     async categoryAddAction() {
         const page: number = this.get('page') || 1;
@@ -7,7 +7,7 @@ export default class extends Base {
         // tslint:disable-next-line:no-console
         console.log(error, 'error');
         const offset = (page - 1) * 10;
-        const res = await this.model('j_log').where({error: ['like', '%' + error + '%']}).page(offset, limit).select();
-        return this.success(res, '请求成功!');
+        // const res = await this.model('j_log').where({error: ['like', '%' + error + '%']}).page(offset, limit).select();
+        return this.success({}, '请求成功!');
     }
 }
