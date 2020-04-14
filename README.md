@@ -1,6 +1,6 @@
+# yuncixiu-api-v3.0
 
-Application created by [ThinkJS](http://www.thinkjs.org)
-
+api with think js 
 ## Install dependencies
 
 ```
@@ -20,3 +20,4 @@ Use pm2 to deploy app on production enviroment.
 ```
 pm2 startOrReload pm2.json
 ```
+
