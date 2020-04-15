@@ -34,7 +34,8 @@ export const cache  = {
 exports.session = {
   type: 'cookie',
   common: {
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    // maxAge: 1000 * 60 * 60 * 24, // 1 day
+    maxAge: 1000 * 60 * 60 , // 1 min
     cookie: {
       name: 'token',
       keys: ['thinkjs'],

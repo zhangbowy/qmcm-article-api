@@ -1,5 +1,6 @@
 import 'thinkjs3-ts';
-import path from 'path';
+import { think } from 'thinkjs';
+import * as path from 'path';
 const isDev = think.env === 'development';
 
 export = [

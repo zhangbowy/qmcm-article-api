@@ -2,38 +2,30 @@ import Base from './base.js';
 // tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
 export default class extends Base {
-    async indexAction(): Promise<void> {
-        const page: number = this.get('page') || 1;
-        const limit = this.get('limit') || 10;
-        const error =  this.get('error') || "";
-        // tslint:disable-next-line:no-console
-        console.log(error, 'error');
-        const offset = (page - 1) * 10;
-        const res = await this.model('user').page(offset, limit).select();
-        return this.success(res, '请求成功!');
-    }
-    async getUserAction(): Promise<void> {
-        const id: number = 42;
-        /**
-         * 根据ID查用户
-         */
-        const res = await (this.model('user') as UserModel).getUserById(id);
-        // @ts-ignore
-        const data = await this.cache('zhangbo', undefined,  'redis');
-        return this.success(data, '1');
-    }
     /**
      * 登录
      */
     async loginAction(): Promise<void> {
-        await this.session('token', 'zhangbo');
-        await this.cache('zhangbo', 'zhaomengna1', {
-            type: 'redis',
-            redis: {
-                timeout: 24 * 60 * 60 * 1000
+        const phone = this.post('phone');
+        const pwd = this.post('passWord');
+        if (!phone || !pwd) {
+           return  this.fail(-1, "用户名或密码不能为空!", []);
+        }
+        const res = await this.model('admin').where({phone}).find();
+        if (!think.isEmpty(res)) {
+            const bufferPwd = new Buffer(res.pwd, 'binary' ).toString('utf-8');
+            if (pwd === bufferPwd) {
+                await  this.session('token', res.id);
+                return  this.success([], "登录成功!");
             }
-        });
-        this.success([], "登录成功!");
+            return  this.fail(-1, "用户名或密码错误!", []);
+        }
+        return  this.fail(-1, "用户名或密码错误!", []);
+    }
+    async infoAction(): Promise<void> {
+        const id: string = await  this.session('token');
+        const res = await (this.model('user') as UserModel).getUserById(id);
+        return this.success(res, '请求成功!');
     }
     /**
      * 登出
@@ -41,5 +33,11 @@ export default class extends Base {
     async logOutAction(): Promise<void> {
         await this.session('token', null);
         this.success([], "登出成功!");
+    }
+    /**
+     * checkLogin
+     */
+    async checkLoginAction(): Promise<void> {
+        this.success([], "已登录!");
     }
 }

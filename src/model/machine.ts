@@ -3,7 +3,7 @@ interface GetUserParams {
     id: number;
 }
 export default class extends think.Model {
-    async getUserById($id: string) {
+    async getMachineById($id: string) {
         return await this.where({id: $id}).find();
     }
 }

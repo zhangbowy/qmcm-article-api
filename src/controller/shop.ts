@@ -1,4 +1,4 @@
-import Base from './../base.js';
+import Base from './base.js';
 export default class extends Base {
     async categoryAddAction() {
         const page: number = this.get('page') || 1;

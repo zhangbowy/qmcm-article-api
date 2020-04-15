@@ -12,14 +12,28 @@ export default class extends Base {
      */
     async uploadImgAction() {
         const file = this.file('image');
-        console.log(file,'file');
+        // tslint:disable-next-line:no-console prefer-const
+        let currentPath;
+        let resultPath;
+        // tslint:disable-next-line:no-console
+        console.log(file, 'file');
         if (!file || !file.type) {
            return  this.fail(-1, '图片不能为空', []);
+        }
+        if (!this.post('type') || think.isEmpty(this.post('type'))) {
+            return  this.fail(-1, '上传类型不能为空', []);
+        }
+        // tslint:disable-next-line:triple-equals
+        if (this.post('type') == 'shop_logo') {
+            currentPath = 'www/static/shop_logo/';
+            resultPath = 'static/shop_logo/';
+        } else {
+            return  this.fail(-1, '上传类型不存在', []);
         }
         if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
             const fileName = think.uuid('v4');
             const gs = file.type.substring(6, file.type.length);
-            const filepath = path.join(think.ROOT_PATH, 'www/static/card/' + fileName + '.' + gs);
+            const filepath = path.join(think.ROOT_PATH, currentPath + fileName + '.' + gs);
             await think.mkdir(path.dirname(filepath));
             const readStream = fs.createReadStream(file.path);
             const writeStream = fs.createWriteStream(filepath);
@@ -27,7 +41,7 @@ export default class extends Base {
             await readStream.on('end', function() {
                 fs.unlinkSync((this.files as any).upload.path);
             });
-            return this.success({url: 'static/card/' + fileName + '.' + gs});
+            return this.success({url: resultPath + fileName + '.' + gs}, "上传成功!");
         } else {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
