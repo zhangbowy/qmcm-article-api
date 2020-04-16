@@ -1,16 +1,24 @@
 import Base from './base.js';
 import {think} from "thinkjs";
-const fs = require('fs');
 const path = require('path');
-const rename = think.promisify(fs.rename, fs);
+var COS = require('cos-nodejs-sdk-v5');
+const fs = require('fs');
 const util = require('util');
+var cos = new COS({
+    SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
+    SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
+});
+const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
     private files: FileList;
     /**
      * 上传图片
      * @params image file
+     * @params type 上传类型
+     * @return IMAGE PATH
      */
     async uploadImgAction() {
+
         const file = this.file('image');
         // tslint:disable-next-line:no-console prefer-const
         let currentPath;
@@ -47,26 +55,45 @@ export default class extends Base {
         }
     }
     /**
-     * 上传DST EMB
+     * 上传oss
      * @params dst file
-     * @params order_no 订单号
      */
-    async uploadOrderFile() {
+    async uploadOssAction() {
         const file = this.file('image');
         if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
             const fileName = think.uuid('v4');
             const gs = file.type.substring(6, file.type.length);
-            const filepath = path.join(think.ROOT_PATH, 'www/static/card/' + fileName + '.' + gs);
-            await think.mkdir(path.dirname(filepath));
+            // const filepath = path.join(think.ROOT_PATH, 'www/static/card/' + );
+            // await think.mkdir(path.dirname(filepath));
             const readStream = fs.createReadStream(file.path);
-            const writeStream = fs.createWriteStream(filepath);
-            readStream.pipe(writeStream);
-            await readStream.on('end', function() {
-                fs.unlinkSync((this.files as any).upload.path);
-            });
-            return this.success({url: 'static/card/' + fileName + '.' + gs});
+            // @ts-ignore
+            const shop_id = (await this.session('token')).shop_id;
+            let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+            let filePath =`${shop_id}/${day}/${fileName}.${gs}`;
+            let res = await upload(file.path,filePath);
+            // fs.unlinkSync((this.files as any).upload.path);
+            return this.success({url: 'gallary/' + fileName + '.' + gs,res});
         } else {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
     }
+}
+function upload($file: string,$path: string) {
+    return new Promise((resolve,rejected) =>
+    {
+        cos.putObject({
+            Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+            Region: 'ap-guangzhou',    /* 地区 */
+            Key: '/gallary/'+ $path,
+            // StorageClass: 'STANDARD',
+            Body: fs.createReadStream($file),
+            onProgress: function(progressData:any) {
+                console.log(JSON.stringify(progressData));
+            }
+        }, function(err: object, data: object) {
+            console.log(err || data);
+            resolve(data);
+        });
+    })
+
 }

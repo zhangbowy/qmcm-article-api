@@ -7,6 +7,7 @@ export default class extends Base {
         // tslint:disable-next-line:no-console
         console.log(error, 'error');
         const offset = (page - 1) * 10;
+        // tslint:disable-next-line:max-line-length
         // const res = await this.model('j_log').where({error: ['like', '%' + error + '%']}).page(offset, limit).select();
         return this.success({}, '请求成功!');
     }

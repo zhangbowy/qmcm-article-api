@@ -9,6 +9,7 @@
     "lint": "tslint \"src/**/*.ts\""
   },
   "dependencies": {
+    "cos-nodejs-sdk-v5": "^2.5.20",
     "think-cache": "^1.1.1",
     "think-cache-file": "^1.1.1",
     "think-cache-redis": "^1.2.5",

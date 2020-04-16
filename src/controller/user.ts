@@ -15,7 +15,7 @@ export default class extends Base {
         if (!think.isEmpty(res)) {
             const bufferPwd = new Buffer(res.pwd, 'binary' ).toString('utf-8');
             if (pwd === bufferPwd) {
-                await  this.session('token', res.id);
+                await  this.session('token', res);
                 return  this.success([], "登录成功!");
             }
             return  this.fail(-1, "用户名或密码错误!", []);
@@ -38,6 +38,7 @@ export default class extends Base {
      * checkLogin
      */
     async checkLoginAction(): Promise<void> {
-        this.success([], "已登录!");
+        a=b
+        this.success(think.datetime(new Date().getTime(), 'YYYY-MM-DD'), "已登录!");
     }
 }

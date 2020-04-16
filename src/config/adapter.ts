@@ -1,10 +1,10 @@
-import 'thinkjs3-ts';
+// import 'thinkjs3-ts';
 import path from 'path';
 import nunjucks from 'think-view-nunjucks';
 import fileSession from 'think-session-file';
 import fileCache from 'think-cache-file';
 const cookie = require('think-session-cookie');
-
+import { think } from "thinkjs";
 export const cache  = {
   type: 'file',
   common: {
