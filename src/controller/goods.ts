@@ -1,7 +1,7 @@
 import Base from './base.js';
 const path = require('path');
 import ItemModel from './../model/item';
-import SkuModel from "../model/sku_list";
+import GalleryModel from "../model/gallery";
 import {think} from "thinkjs";
 export default class extends Base {
     /**
@@ -124,7 +124,6 @@ export default class extends Base {
         let res: any = await model.editGoods(id, params);
         return this.success(res, '请求成功!');
     }
-
     /**
      * 刪除商品
      */
@@ -137,5 +136,17 @@ export default class extends Base {
             return this.fail(-1, '商品不存在!', res);
         }
         return this.success(res, '刪除成功!');
+    }
+    /**
+     * 腾讯云Oss上传图片列表
+     */
+    async galleryAction() {
+        const page: number = this.post('currentPage') || 1;
+        const limit: number = this.post('pageSize') || 10;
+        const model = this.model('gallery') as GalleryModel;
+        // @ts-ignore
+        const shop_id = (await this.session('token')).shop_id;
+        const data = await model.list({page, limit, shop_id});
+        return this.success(data, '请求成功!');
     }
 }

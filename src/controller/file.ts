@@ -1,5 +1,6 @@
 import Base from './base.js';
 import {think} from "thinkjs";
+import GalleryModel from "../model/gallery";
 const path = require('path');
 var COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
@@ -8,6 +9,14 @@ var cos = new COS({
     SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
     SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
 });
+
+interface UploadRes {
+    Location: string;
+    statusCode: number;
+    headers?: any;
+    ETag: string
+}
+
 const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
     private files: FileList;
@@ -69,10 +78,22 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = (await this.session('token')).shop_id;
             let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-            let filePath =`${shop_id}/${day}/${fileName}.${gs}`;
-            let res = await upload(file.path,filePath);
+            let filePath =`/gallary/${shop_id}/${day}/${fileName}.${gs}`;
+            let res: any = await upload(file.path,filePath);
+            const model = this.model('gallery') as GalleryModel;
+            let imageParams: any ={
+                oss_path : res.Location,
+                region: 'ap-guangzhou',
+                img_name:`${fileName}.${gs}`,
+                img_init_name:file.name,
+                path:filePath,
+                fullPath:"",
+                shop_id
+            };
+            await model.addImage(imageParams);
             // fs.unlinkSync((this.files as any).upload.path);
             return this.success({url: 'gallary/' + fileName + '.' + gs,res});
+            return this.success(imageParams);
         } else {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
@@ -84,7 +105,7 @@ function upload($file: string,$path: string) {
         cos.putObject({
             Bucket: 'cos-cx-n1-1257124629', /* 桶 */
             Region: 'ap-guangzhou',    /* 地区 */
-            Key: '/gallary/'+ $path,
+            Key:  $path,
             // StorageClass: 'STANDARD',
             Body: fs.createReadStream($file),
             onProgress: function(progressData:any) {
@@ -94,6 +115,25 @@ function upload($file: string,$path: string) {
             console.log(err || data);
             resolve(data);
         });
+    })
+
+}
+function deleteFile($fileList: any[]) {
+    return new Promise((resolve,rejected) =>
+    {
+        cos.deleteMultipleObject({
+            Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+
+            Region: 'ap-guangzhou',    /* 地区 */
+            Objects: [
+                {Key: 'exampleobject'},
+                {Key: 'exampleobject2'},
+            ]
+        }, function(err: object, data: object) {
+            console.log(err || data);
+            resolve(data);
+        });
+
     })
 
 }

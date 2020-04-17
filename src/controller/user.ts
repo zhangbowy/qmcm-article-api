@@ -38,7 +38,6 @@ export default class extends Base {
      * checkLogin
      */
     async checkLoginAction(): Promise<void> {
-        a=b
         this.success(think.datetime(new Date().getTime(), 'YYYY-MM-DD'), "已登录!");
     }
 }

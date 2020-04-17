@@ -22,7 +22,8 @@ exports.model = {
         user: 'cx03',//用户名
         password: 'yuncixiu03',//密码
         dateStrings: true,
-        acquireWaitTimeout: 3000
+        // acquireWaitTimeout: 3000,
+        debounce: false,
     }
 };
 

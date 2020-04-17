@@ -80,17 +80,17 @@ module.exports = class extends think.Logic {
         }
     }
     async deleteGoodsAction() {
-        const rules = {
-            id: {
-                number: true,       // 字段类型为 String 类型
-                required: true,     // 字段必填
-                method: 'post'       // 指定获取数据的方式
-            }
-        }
-        const flag = this.validate(rules);
-        if (!flag) {
-            // @ts-ignore
-            return this.fail(-1, '商品Id不能为空', this.validateErrors);
-        }
+        // const rules = {
+        //     id: {
+        //         number: true,       // 字段类型为 String 类型
+        //         required: true,     // 字段必填
+        //         method: 'post'       // 指定获取数据的方式
+        //     }
+        // }
+        // const flag = this.validate(rules);
+        // if (!flag) {
+        //     // @ts-ignore
+        //     return this.fail(-1, '商品Id不能为空', this.validateErrors);
+        // }
     }
 };
