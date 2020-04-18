@@ -14,19 +14,22 @@ export default class extends Base {
     /**
      * 图库列表
      */
-    async indexAction() {
+    async indexAction(): Promise<Object>  {
         const page: number = this.post('currentPage') || 1;
         const limit: number = this.post('pageSize') || 10;
         const gallery_group_id: number = Number(this.post('gallery_group_id'));
+        const img_name: number =this.post('img_name') || "";
         const model = this.model('gallery') as GalleryModel;
         const groupModel = this.model('gallery_group') as GroupModel;
         const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
-        const data = await model.list({page, limit, shop_id,gallery_group_id:group_list});
-        // const data = await model.getNeedsTree(gallery_group_id);
+        const data = await model.list({page, limit, shop_id,gallery_group_id:group_list,img_name});
         return this.success(data, '请求成功!');
     }
+    /**
+     * test
+     */
     async getNeedsTreeAction()
     {
         // @ts-ignore
@@ -37,7 +40,7 @@ export default class extends Base {
     /**
      * 上传图片 ----> OSS
      */
-    async uploadImgAction() {
+    async uploadImgAction(): Promise<Object>  {
         const file = this.file('image');
         if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
             const fileName = think.uuid('v4');
@@ -50,6 +53,9 @@ export default class extends Base {
             let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
             let filePath =`/gallary/${shop_id}/${day}/${fileName}.${gs}`;
             const oss = await think.service('oss');
+            /**
+             * 上传到腾讯OSS
+             */
             let res: any = await oss.upload(file.path,filePath);
             const model = this.model('gallery') as GalleryModel;
             const gallery_group_id: number = this.post('gallery_group_id') || 0;
@@ -63,10 +69,15 @@ export default class extends Base {
                 shop_id,
                 gallery_group_id
             };
-            await model.addImage(imageParams);
+            /**
+             * 存库
+             */
+            const data  = await model.addImage(imageParams);
+            if (data) {
+                return this.success({url: 'gallary/' + fileName + '.' + gs,res});
+            }
             // fs.unlinkSync((this.files as any).upload.path);
-            return this.success({url: 'gallary/' + fileName + '.' + gs,res});
-            return this.success(imageParams);
+            return this.fail(-1,'上传失败,请稍后再试!',[]);
         } else {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
@@ -75,7 +86,7 @@ export default class extends Base {
      * 删除图片
      * @params id 图片ID 多个,隔开
      */
-    async deleteAction() {
+    async deleteAction(): Promise<Object> {
         const id: string = (this.post('id')).toString();
         const model = this.model('gallery') as GalleryModel;
         // @ts-ignore
@@ -93,23 +104,46 @@ export default class extends Base {
         }
         let data =  await model.deleteImg(id);
          // @ts-ignore
-        // return this.success(data, '请求成功!');
         if(data) {
             const  oss  = think.service('oss');
             let del = await oss.deleteFile(arr);
             if(del.statusCode && del.statusCode == 200)
             {
-                return this.success({del,data}, '请求成功!');
+                return this.success({del,data}, '删除成功!');
             }
             return   this.fail(-1, '删除失败!',del);
         }
+    }
+    /**
+     * 编辑图片
+     * @params id
+     * @params gallery_group_id 分组Id
+     * @params img_name 图片名称
+     */
+    async editAction(): Promise<Object> {
+        const id: number = this.post('id');
+        const gallery_group_id: number = this.post('gallery_group_id');
+        const img_name: string = this.post('img_name');
+        const model = this.model('gallery') as GalleryModel;
+        // @ts-ignore
+        const shop_id = (await this.session('token')).shop_id;
+        let params: any = {
+            gallery_group_id,
+            img_name
+        };
+        const data: any = await model.editImg(id,params);
+        if (data) {
+            return this.success(data, '修改成功!');
+        }
+        return this.fail(-1, '图片不存在!',data);
+
     }
     /**
      * 给图片设置分组
      * @params id 图片ID 多个,隔开
      * @params gallery_group_id 分组Id
      */
-    async setGroupAction() {
+    async setGroupAction(): Promise<Object> {
         const id: number = this.post('id');
         const gallery_group_id: number = this.post('gallery_group_id');
         const model = this.model('gallery') as GalleryModel;
@@ -121,14 +155,12 @@ export default class extends Base {
     /**
      * 图库分类列表
      */
-    async groupListAction() {
-        // const page: number = this.post('currentPage') || 1;
-        // const limit: number = this.post('pageSize') || 10;
+    async groupListAction(): Promise<Object> {
         const model = this.model('gallery_group') as GroupModel;
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
         const data = await model.list({shop_id});
-        let res = updateGroup(data,0)
+        let res = updateGroup(data,0);
         return this.success(res, '请求成功!');
     }
     /**
@@ -137,7 +169,7 @@ export default class extends Base {
      * @params parent_id 上级ID
      * @params level 当前层级
      */
-    async addGroupAction() {
+    async addGroupAction(): Promise<Object> {
         const group_name: string = this.post('group_name');
         const parent_id: number = this.post('parent_id');
         const level: number = this.post('level');
@@ -148,10 +180,14 @@ export default class extends Base {
             parent_id,
             level,
             shop_id
-        }
+        };
         const model = this.model('gallery_group') as GroupModel;
         const data = await model.addGruop(params);
-        return this.success(data, '请求成功!');
+        if (data) {
+            return this.success(data, '添加成功!');
+        }
+        return this.fail(-1, '添加失败!', []);
+
     }
     /**
      * 编辑图库分组
@@ -159,7 +195,7 @@ export default class extends Base {
      * @params parent_id 上级ID
      * @params level 当前层级
      */
-    async editGroupAction() {
+    async editGroupAction(): Promise<Object> {
         const id: number = this.post('group_id');
         const group_name: string = this.post('group_name');
         const parent_id: number = this.post('parent_id');
@@ -173,15 +209,17 @@ export default class extends Base {
         };
         const model = this.model('gallery_group') as GroupModel;
         const data:any = await model.editGroup(id,params);
-        return this.success(data, '请求成功!');
+        if (data) {
+            return this.success(data, '编辑成功!');
+        }
+        return this.fail(-1, '编辑失败!', data);
     }
     /**
      * 删除图库分组
      * @params id 分组ID
      */
-    async deleteGroupAction($id: number) {
-
-        const id: number = this.post('group_id');
+    async deleteGroupAction($id: number): Promise<Object> {
+        const gallery_group_id: number = this.post('gallery_group_id');
         // @ts-ignore
         const shop_id: number = (await this.session('token')).shop_id;
         const model = this.model('gallery_group') as GroupModel;
@@ -189,15 +227,22 @@ export default class extends Base {
         /**
          * 删除分组
          */
-        const data:any = await model.deleteGroup(id);
-        /**
-         * 清除分组Id
-         */
-        const res = await galleryModel.deletePid(id);
-        return this.success([], '删除成功!');
+        const data:any = await model.deleteGroup(gallery_group_id);
+        if (data) {
+            /**
+             * 清除分组Id
+             */
+            const groupModel = this.model('gallery_group') as GroupModel;
+            const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
+            const res = await galleryModel.deletePid(group_list);
+            return this.success([], '删除成功!');
+        }
+        return this.fail(-1, '分组不存在!', []);
     }
 }
-
+/**
+ * 递归分类
+ */
 function updateGroup(data:any, root:any) {
         var idTxt:any = idTxt || 'group_id';
         var pidTxt:any = pidTxt || 'parent_id';
@@ -218,7 +263,5 @@ function updateGroup(data:any, root:any) {
                 return node
             }
         }
-
-        // 使用根节点
         return getNode(root)
 }

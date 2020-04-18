@@ -21,27 +21,25 @@ export default class extends think.Model {
     async addGruop($data: AddGruopParams) {
         return await this.add($data);
     }
-
     async deleteGroup($id: number) {
         return this.where({id: $id}).delete();
     }
     async editGroup($id: number,$data: any) {
         return this.where({id: $id}).update($data);
     }
-
     async getNeedsTree($group_id: number){
         if($group_id == 0)
         {
             return  [0]
         }
         let res = await this.select();
-        let hash = {}
+        let hash = {};
         for(let item of res)
         {
             hash[item.id] = item.parent_id
         }
         var bmid = $group_id;
-        console.log(hash,'hash');
+        // console.log(hash,'hash');
         var pids = new Set([bmid]);
         do {
             var len = pids.size;

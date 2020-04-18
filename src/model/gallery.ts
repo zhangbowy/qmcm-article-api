@@ -2,27 +2,12 @@ import { think } from 'thinkjs';
 interface GetUserParams {
     id: number;
 }
-interface addImageParams {
-    name: string;
-    category?: number;
-    pwd: string;
-    old_price: number;
-    current_price: number;
-    sum_stock: number;
-    weight: number;
-    min_buy: number;
-    max_buy: number;
-    sort?: number;
-    images: string;
-    sku_show?: any[];
-    sku_list?: any[];
-    detail?: string;
-}
 interface GoodsListParams {
     page?: number;
     limit?: number;
     shop_id: number;
     gallery_group_id?: any;
+    img_name?: string | number
 }
 export default class extends think.Model {
     async list($data: GoodsListParams) {
@@ -33,28 +18,34 @@ export default class extends think.Model {
         if($data.gallery_group_id == -1)
         {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).cache(0).countSelect({cache: false});
+            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id,img_name:['like',`%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
         }
         else
         {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id,gallery_group_id: ['in', $data.gallery_group_id]}).page(page, limit).countSelect({cache: false});
+            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id,gallery_group_id: ['in', $data.gallery_group_id],img_name:['like',`%${$data.img_name}%`]}).page(page, limit).countSelect({cache: false});
         }
     }
-    async addImage($data: addImageParams) {
+    async addImage($data: any) {
         return await this.add($data);
     }
     /**
      * 清除分组Id
      */
-    async deletePid($id: number) {
-        return this.where({gallery_group_id: $id}).update({gallery_group_id: 0});
+    async deletePid($ids: any) {
+        return this.where({gallery_group_id: ['IN', $ids]}).update({gallery_group_id: 0});
     }
     /**
      * 图片设置分组
      */
     async setGroup($ids: number,$group_id: number) {
         return this.where({id: ['IN', $ids]}).update({gallery_group_id:$group_id});
+    }
+    /**
+     * 编辑图片
+     */
+    async editImg($id: number,$data: any) {
+        return this.where({id: $id}).update($data);
     }
     // /**
     //  * id

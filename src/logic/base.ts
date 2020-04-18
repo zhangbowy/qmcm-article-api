@@ -10,9 +10,13 @@ module.exports = class extends think.Logic {
     }
     __before() {
         this.header("Access-Control-Allow-Origin", this.header("origin") || "*");
-        this.header("Access-Control-Allow-Headers", ["x-requested-with", 'token', 'content-type']);
+        this.header("Access-Control-Allow-Headers", ["x-requested-with",'origin', 'token', 'content-type']);
         this.header("Access-Control-Request-Method", "GET,POST,PUT,DELETE,OPTIONS");
         this.header('Access-Control-Allow-Credentials', true);
-        this.allowMethods = 'post';
+        // this.allowMethods = 'post';
     }
+    __call() {
+        return this.fail(404,'404');
+    }
+
 };

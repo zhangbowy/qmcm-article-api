@@ -12,7 +12,10 @@ export default class extends think.Controller {
       // await this.ctx.state.userInfo = 1
       // await  this.session('token', await  this.session('token'));
       // tslint:disable-next-line:no-console
-      console.log(this.session('token'));
+      // console.log(this.session('token'));
     }
+  }
+  __call() {
+    return this.fail(404,'404');
   }
 }
