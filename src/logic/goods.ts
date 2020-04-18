@@ -79,7 +79,7 @@ module.exports = class extends think.Logic {
             return this.fail(-1, '商品Id不能为空', this.validateErrors);
         }
     }
-    async deleteGoodsAction() {
+    deleteGoodsAction() {
         // const rules = {
         //     id: {
         //         number: true,       // 字段类型为 String 类型
@@ -92,5 +92,91 @@ module.exports = class extends think.Logic {
         //     // @ts-ignore
         //     return this.fail(-1, '商品Id不能为空', this.validateErrors);
         // }
+    }
+    addCategoryAction() {
+        const rules = {
+            category_name: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            parent_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            image_path: {
+                required: true,
+                // trim: true,
+                method: 'post'
+            },
+            link: {
+                required: true,
+                // trim: true,
+                method: 'post'
+            }
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    editCategoryAction() {
+        const rules = {
+            id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            category_name: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            parent_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            image_path: {
+                required: true,
+                // trim: true,
+                method: 'post'
+            },
+            link: {
+                required: true,
+                // trim: true,
+                method: 'post'
+            }
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    delCategoryAction() {
+        const rules = {
+            id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            }
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
     }
 };

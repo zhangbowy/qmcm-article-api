@@ -1,6 +1,7 @@
 import 'thinkjs3-ts';
 import { think } from 'thinkjs';
 import * as path from 'path';
+const cors = require('koa-cors');
 const isDev = think.env === 'development';
 
 export = [
@@ -10,6 +11,10 @@ export = [
       logRequest: isDev,
       sendResponseTime: isDev
     }
+  },
+  {
+    handle: cors,
+    options: {}
   },
   {
     handle: 'resource',

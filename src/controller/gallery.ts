@@ -2,7 +2,7 @@ import Base from './base.js';
 const path = require('path');
 import GroupModel from './../model/gallery_group';
 import GalleryModel from "../model/gallery";
-import {think} from "thinkjs";
+import { think } from "thinkjs";
 const fs = require('fs');
 interface AddParams {
     group_name: string;
@@ -27,6 +27,7 @@ export default class extends Base {
         const data = await model.list({page, limit, shop_id,gallery_group_id:group_list,img_name});
         return this.success(data, '请求成功!');
     }
+
     /**
      * test
      */
@@ -37,6 +38,7 @@ export default class extends Base {
         // const data = await model.list({page, limit, shop_id,gallery_group_id});
         // return this.success(data, '请求成功!');
     }
+
     /**
      * 上传图片 ----> OSS
      */
@@ -82,12 +84,13 @@ export default class extends Base {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
     }
+
     /**
      * 删除图片
      * @params id 图片ID 多个,隔开
      */
     async deleteAction(): Promise<Object> {
-        const id: string = (this.post('id')).toString();
+        const id: any = JSON.parse(this.post('id'));
         const model = this.model('gallery') as GalleryModel;
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
@@ -114,6 +117,7 @@ export default class extends Base {
             return   this.fail(-1, '删除失败!',del);
         }
     }
+
     /**
      * 编辑图片
      * @params id
@@ -138,6 +142,7 @@ export default class extends Base {
         return this.fail(-1, '图片不存在!',data);
 
     }
+
     /**
      * 给图片设置分组
      * @params id 图片ID 多个,隔开
@@ -152,6 +157,7 @@ export default class extends Base {
         const data: any = await model.setGroup(id,gallery_group_id);
         return this.success(data, '请求成功!');
     }
+
     /**
      * 图库分类列表
      */
@@ -163,6 +169,7 @@ export default class extends Base {
         let res = updateGroup(data,0);
         return this.success(res, '请求成功!');
     }
+
     /**
      * 添加图库分组
      * @params group_name 分组名称
@@ -187,8 +194,8 @@ export default class extends Base {
             return this.success(data, '添加成功!');
         }
         return this.fail(-1, '添加失败!', []);
-
     }
+
     /**
      * 编辑图库分组
      * @params id 分组ID
@@ -196,7 +203,7 @@ export default class extends Base {
      * @params level 当前层级
      */
     async editGroupAction(): Promise<Object> {
-        const id: number = this.post('group_id');
+        const id: number = this.post('gallery_group_id');
         const group_name: string = this.post('group_name');
         const parent_id: number = this.post('parent_id');
         const level: number = this.post('level');
@@ -214,6 +221,7 @@ export default class extends Base {
         }
         return this.fail(-1, '编辑失败!', data);
     }
+
     /**
      * 删除图库分组
      * @params id 分组ID
@@ -240,6 +248,7 @@ export default class extends Base {
         return this.fail(-1, '分组不存在!', []);
     }
 }
+
 /**
  * 递归分类
  */

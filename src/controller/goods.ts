@@ -1,6 +1,7 @@
 import Base from './base.js';
 const path = require('path');
 import ItemModel from './../model/item';
+import cateModel from './../model/item_category';
 import GalleryModel from "../model/gallery";
 import {think} from "thinkjs";
 export default class extends Base {
@@ -137,16 +138,91 @@ export default class extends Base {
         }
         return this.success(res, '刪除成功!');
     }
+
     /**
-     * 腾讯云Oss上传图片列表
+     * 商品分类列表
      */
-    async galleryAction() {
+    async categoryListAction() {
         const page: number = this.post('currentPage') || 1;
         const limit: number = this.post('pageSize') || 10;
-        const model = this.model('gallery') as GalleryModel;
+        const cateModel = this.model('item_category') as cateModel;
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
-        const data = await model.list({page, limit, shop_id});
+        const data = await cateModel.categoryList({page, limit, shop_id});
         return this.success(data, '请求成功!');
     }
+
+    /**
+     * 添加分类
+     */
+    async addCategoryAction() {
+        // @ts-ignore
+        const shop_id = (await this.session('token')).shop_id;
+        const category_name: number = this.post('category_name');
+        const parent_id: number = this.post('parent_id') || 0;
+        const image_path: number = this.post('image_path');
+        const link: number = this.post('link');
+        const params:object = {
+            category_name,
+            parent_id,
+            image_path,
+            link,
+            shop_id
+        };
+        const res = await this.model('item_category').add(params);
+        if (res) {
+            return this.success(res, '添加成功!')
+        }
+        return this.fail(-1, '添加失败!')
+    }
+
+    /**
+     * 编辑分类
+     */
+    async editCategoryAction() {
+        // @ts-ignore
+        const shop_id = (await this.session('token')).shop_id;
+        const id: number = this.post('id');
+        const category_name: number = this.post('category_name');
+        const parent_id: number = this.post('parent_id') || 0;
+        const image_path: number = this.post('image_path');
+        const link: number = this.post('link');
+        const params:object = {
+            category_name,
+            parent_id,
+            image_path,
+            link,
+        };
+        const res: any = await this.model('item_category').where({id,shop_id}).update(params);
+        if (res) {
+            return this.success(res, '编辑成功!')
+        }
+        return this.fail(-1, '分类不存在!')
+    }
+
+    /**
+     * 删除分类
+     */
+    async delCategory() {
+        // @ts-ignore
+        const shop_id = (await this.session('token')).shop_id;
+        const id: number = this.post('id');
+        // const res: any = await this.model('item_category').where({id,shop_id}).delete();
+        // if (res) {
+        //     return this.success(res, '编辑成功!')
+        // }
+        // return this.fail(-1, '分类不存在!')
+    }
+    // /**
+    //  * 腾讯云Oss上传图片列表
+    //  */
+    // async galleryAction() {
+    //     const page: number = this.post('currentPage') || 1;
+    //     const limit: number = this.post('pageSize') || 10;
+    //     const model = this.model('gallery') as GalleryModel;
+    //     // @ts-ignore
+    //     const shop_id = (await this.session('token')).shop_id;
+    //     const data = await model.list({page, limit, shop_id});
+    //     return this.success(data, '请求成功!');
+    // }
 }

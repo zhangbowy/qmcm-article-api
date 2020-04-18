@@ -89,7 +89,7 @@ module.exports = class extends think.Logic {
             },
             group_name: {
                 required: true,     // 字段必填
-                trim: true,         // 字段需要trim处理
+                // trim: true,         // 字段需要trim处理
                 method: 'post'       // 指定获取数据的方式
             }
 
@@ -104,22 +104,21 @@ module.exports = class extends think.Logic {
        }
     }
     deleteAction() {
-        try {
-            const rules = {
-                id: {
-                    // number: true,       // 字段类型为 String 类型
-                    required: true,     // 字段必填
-                    method: 'post'       // 指定获取数据的方式
-                }
-            }
-            const flag = this.validate(rules,'11111');
-            if (!flag) {
-                // @ts-ignore
-                return this.fail(-1, '图片Id不能为空', this.validateErrors);
-            }
-        }catch (e) {
-            return this.fail(-1,'参数校验未通过!', e);
-        }
+            // const rules = {
+            //     id: {
+            //         // number: true,       // 字段类型为 String 类型
+            //         required: true,     // 字段必填
+            //         method: 'post'       // 指定获取数据的方式
+            //     }
+            // }
+            // const msgs: object = {
+            //     required: '{name}不能为空'
+            // };
+            // if (!this.validate(rules, msgs)) { // 校验不通过
+            //     const keys: string[] = Object.keys(this.validateErrors);
+            //     const msg: string = this.validateErrors[keys[0]];
+            //     return this.fail(-1, msg);
+            // }
     }
     editAction() {
         const rules = {

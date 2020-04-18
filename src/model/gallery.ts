@@ -50,7 +50,7 @@ export default class extends think.Model {
     // /**
     //  * id
     //  */
-    async findImageById($ids: string) {
+    async findImageById($ids: any) {
         return this.where({id: ['IN', $ids]}).select();
     }
     async deleteImg($ids: string) {
