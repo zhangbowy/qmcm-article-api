@@ -155,7 +155,7 @@ export default class extends Base {
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
         const data: any = await model.setGroup(id,gallery_group_id);
-        return this.success(data, '请求成功!');
+        return this.success([], '请求成功!');
     }
 
     /**
@@ -250,7 +250,7 @@ export default class extends Base {
 }
 
 /**
- * 递归分类
+ * 递归分类列表
  */
 function updateGroup(data:any, root:any) {
         var idTxt:any = idTxt || 'group_id';

@@ -45,4 +45,35 @@ module.exports = class extends think.Service {
         })
 
     }
+    uploadFiles($files: any[]) {
+        return new Promise((resolve,reject) => {
+            // const filePath1 = "temp-file-to-upload" // 本地文件路径
+            // const filePath2 = "temp-file-to-upload" // 本地文件路径
+            // files: [{
+            //     Bucket: 'examplebucket-1250000000',
+            //     Region: 'COS_REGION',
+            //     Key: 'exampleobject',
+            //     FilePath: filePath1,
+            // }, {
+            //     Bucket: 'examplebucket-1250000000',
+            //     Region: 'COS_REGION',
+            //     Key: '2.jpg',
+            //     FilePath: filePath2,
+            // }],
+            cos.uploadFiles({
+                $files,
+                SliceSize: 1024 * 1024,
+                onProgress: function (info: any) {
+                    var percent = parseInt(String(info.percent * 10000)) / 100;
+                    var speed = parseInt(String(info.speed / 1024 / 1024 * 100)) / 100;
+                    console.log('进度：' + percent + '%; 速度：' + speed + 'Mb/s;');
+                },
+                onFileFinish: function (err: any, data: any, options: any) {
+                    console.log(options.Key + '上传' + (err ? '失败' : '完成'));
+                },
+            }, function (err: any, data: any) {
+                console.log(err || data);
+            });
+        })
+    }
 }

@@ -5,6 +5,7 @@ import cateModel from './../model/item_category';
 import GalleryModel from "../model/gallery";
 import {think} from "thinkjs";
 export default class extends Base {
+
     /**
      * 商品列表
      */
@@ -17,6 +18,7 @@ export default class extends Base {
         const data = await model.goodsList({page, limit, shop_id});
         return this.success(data, '请求成功!');
     }
+
     /**
      * 添加商品
      */
@@ -74,6 +76,7 @@ export default class extends Base {
 
         return this.fail(-1, '添加失敗', []);
     }
+
     /**
      * 商品详情
      */
@@ -85,6 +88,7 @@ export default class extends Base {
         const res = await model.getGoodById(id);
         return this.success(res, '请求成功!');
     }
+
     /**
      * 编辑商品
      */
@@ -125,6 +129,7 @@ export default class extends Base {
         let res: any = await model.editGoods(id, params);
         return this.success(res, '请求成功!');
     }
+
     /**
      * 刪除商品
      */

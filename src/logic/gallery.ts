@@ -1,5 +1,6 @@
 import { think } from 'thinkjs';
-module.exports = class extends think.Logic {
+import base from './base'
+module.exports = class extends base {
     constructor(ctx: any) {
         super(ctx);
     }
@@ -19,6 +20,9 @@ module.exports = class extends think.Logic {
             const msg: string = this.validateErrors[keys[0]];
             return this.fail(-1, msg);
         }
+    }
+    groupListAction() {
+
     }
     setGroupAction() {
         const rules = {
