@@ -22,7 +22,7 @@ export default class extends think.Model {
         return await this.add($data);
     }
     async deleteGroup($id: number) {
-        return this.where({id: $id}).delete();
+        return this.where({id: ['in',$id]}).delete();
     }
     async editGroup($id: number,$data: any) {
         return this.where({id: $id}).update($data);

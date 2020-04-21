@@ -60,9 +60,10 @@ module.exports = class extends think.Service {
             //     Key: '2.jpg',
             //     FilePath: filePath2,
             // }],
+     /* 地区 */
             cos.uploadFiles({
-                $files,
-                SliceSize: 1024 * 1024,
+                files: $files,
+                SliceSize: 1024,
                 onProgress: function (info: any) {
                     var percent = parseInt(String(info.percent * 10000)) / 100;
                     var speed = parseInt(String(info.speed / 1024 / 1024 * 100)) / 100;
@@ -73,6 +74,9 @@ module.exports = class extends think.Service {
                 },
             }, function (err: any, data: any) {
                 console.log(err || data);
+                if (data) {
+                  resolve(data);
+                }
             });
         })
     }

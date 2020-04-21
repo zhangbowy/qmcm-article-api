@@ -13,6 +13,7 @@ export default class extends think.Logic {
         this.header("Access-Control-Allow-Headers", ["x-requested-with",'origin', 'token', 'content-type']);
         this.header("Access-Control-Request-Method", "GET,POST,PUT,DELETE,OPTIONS");
         this.header('Access-Control-Allow-Credentials', true);
+        this.header('X-Powered-By', 'thinkphp5.0');
         // this.allowMethods = 'post';
     }
     __call() {

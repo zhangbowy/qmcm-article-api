@@ -106,6 +106,84 @@ export default class extends Base {
     }
 
     /**
+     * 首页轮播图
+     */
+    async getSliderAction(): Promise<void> {
+        let res = await this.model('slider').order('sort DESC').select();
+        if (res) {
+            return this.success(res, '请求成功!');
+        }
+    }
+
+    /**
+     * 添加首页轮播图
+     * @params {image_path} 图片路径
+     * @params {link} 链接
+     * @params {sort}
+     */
+    async addSliderAction(): Promise<void>  {
+        let image_path = this.post('image_path');
+        let link = this.post('link');
+        let slider_name = this.post('slider_name');
+        let sort = this.post('sort') || 0;
+        // @ts-ignore
+        let params = {
+            link,
+            image_path,
+            sort,
+            slider_name
+        };
+        // @ts-ignore
+        let res:object = await this.model('slider').add(params);
+        if (res) {
+            return this.success(res, '添加成功!');
+        }
+        return this.fail(-1, '添加失败!');
+    }
+
+    /**
+     * 编辑首页轮播图
+     * @params {id} id
+     * @params {image_path} 图片路径
+     * @params {link} 链接
+     * @params {sort}
+     */
+    async editSliderAction(): Promise<void> {
+        let id = this.post('id');
+        let image_path = this.post('image_path');
+        let link = this.post('link');
+        let sort = this.post('sort') || 0;
+        let slider_name = this.post('slider_name');
+        // @ts-ignore
+        let params = {
+            link,
+            image_path,
+            sort,
+            slider_name
+        };
+        // @ts-ignore
+        let res:object = await this.model('slider').where({id:id}).update(params);
+        if (res) {
+            return this.success(res, '编辑成功!');
+        }
+        return this.fail(-1, '编辑失败!');
+    }
+
+    /**
+     * 删除首页轮播图
+     * @params {id} 轮播图id
+     */
+    async delSliderAction(): Promise<void> {
+        let id = this.post('id');
+        // @ts-ignore
+        let res:object = await this.model('slider').where({id}).delete();
+        if (res) {
+            return this.success(res, '删除成功!');
+        }
+        return this.fail(-1, '删除失败!');
+    }
+
+    /**
      * 角色列表
      */
     async roleListAction(): Promise<void> {

@@ -4,6 +4,7 @@ import ItemModel from './../model/item';
 import cateModel from './../model/item_category';
 import GalleryModel from "../model/gallery";
 import {think} from "thinkjs";
+import item_category from "./../model/item_category";
 export default class extends Base {
 
     /**
@@ -147,14 +148,15 @@ export default class extends Base {
     /**
      * 商品分类列表
      */
-    async categoryListAction() {
+    async getCategoryAction() {
         const page: number = this.post('currentPage') || 1;
         const limit: number = this.post('pageSize') || 10;
         const cateModel = this.model('item_category') as cateModel;
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
         const data = await cateModel.categoryList({page, limit, shop_id});
-        return this.success(data, '请求成功!');
+        let res =  updateCategory(data,0);
+        return this.success(res, '请求成功!');
     }
 
     /**
@@ -165,20 +167,28 @@ export default class extends Base {
         const shop_id = (await this.session('token')).shop_id;
         const category_name: number = this.post('category_name');
         const parent_id: number = this.post('parent_id') || 0;
-        const image_path: number = this.post('image_path');
+        const image_path: number = this.post('image_path') || "";
+        const logo: number = this.post('logo');
         const link: number = this.post('link');
         const params:object = {
             category_name,
             parent_id,
             image_path,
             link,
-            shop_id
+            shop_id,
+            logo
         };
+        if (parent_id != 0) {
+            const res = await this.model('item_category').where({id:parent_id}).find();
+            if(Object.keys(res).length == 0) {
+               return this.fail(-1, '该上级分类不存在!')
+            }
+        }
         const res = await this.model('item_category').add(params);
         if (res) {
             return this.success(res, '添加成功!')
         }
-        return this.fail(-1, '添加失败!')
+        return this.fail(-1, '添加失败!');
     }
 
     /**
@@ -192,11 +202,13 @@ export default class extends Base {
         const parent_id: number = this.post('parent_id') || 0;
         const image_path: number = this.post('image_path');
         const link: number = this.post('link');
+        const logo: number = this.post('logo');
         const params:object = {
             category_name,
             parent_id,
             image_path,
             link,
+            logo
         };
         const res: any = await this.model('item_category').where({id,shop_id}).update(params);
         if (res) {
@@ -208,26 +220,50 @@ export default class extends Base {
     /**
      * 删除分类
      */
-    async delCategory() {
+    async delCategoryAction() {
         // @ts-ignore
         const shop_id = (await this.session('token')).shop_id;
-        const id: number = this.post('id');
-        // const res: any = await this.model('item_category').where({id,shop_id}).delete();
-        // if (res) {
-        //     return this.success(res, '编辑成功!')
-        // }
-        // return this.fail(-1, '分类不存在!')
+        const id: number = Number(this.post('id'));
+        let category = await this.model('item_category').where({id:id}).find();
+        if (Object.keys(category).length == 0)
+        {
+            return this.fail(-1,'分类不存在')
+        }
+        let model = this.model('item_category') as item_category;
+        let ids = await model.getChild(id);
+        let res:number = await this.model('item_category').where({id:['in',ids],shop_id}).delete();
+        if (res) {
+            const data: any = await this.model('item').where({id:['in',ids],shop_id}).update({category_id:0});
+            return this.success("", '删除成功!')
+        } else {
+            return this.fail(-1, '分类不存在!');
+        }
     }
-    // /**
-    //  * 腾讯云Oss上传图片列表
-    //  */
-    // async galleryAction() {
-    //     const page: number = this.post('currentPage') || 1;
-    //     const limit: number = this.post('pageSize') || 10;
-    //     const model = this.model('gallery') as GalleryModel;
-    //     // @ts-ignore
-    //     const shop_id = (await this.session('token')).shop_id;
-    //     const data = await model.list({page, limit, shop_id});
-    //     return this.success(data, '请求成功!');
-    // }
+
 }
+/**
+ * 递归分类列表
+ */
+function updateCategory(data:any, root:any) {
+    var idTxt:any = idTxt || 'id';
+    var pidTxt:any = pidTxt || 'parent_id';
+    var pushTxt:any = pushTxt || 'children';
+    // 递归方法
+    function getNode(id:any) {
+        var node = [];
+        var ids = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i][pidTxt] == id) {
+                data[i][pushTxt] = getNode(data[i][idTxt]);
+                node.push(data[i])
+            }
+        }
+        if (node.length == 0) {
+            return
+        } else {
+            return node
+        }
+    }
+    return getNode(root)
+}
+

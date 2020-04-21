@@ -232,16 +232,16 @@ export default class extends Base {
         const shop_id: number = (await this.session('token')).shop_id;
         const model = this.model('gallery_group') as GroupModel;
         const galleryModel = this.model('gallery') as GalleryModel;
+        const group_list: any  = await model.getNeedsTree(gallery_group_id);
+
         /**
          * 删除分组
          */
-        const data:any = await model.deleteGroup(gallery_group_id);
+        const data:any = await model.deleteGroup(group_list);
         if (data) {
             /**
              * 清除分组Id
              */
-            const groupModel = this.model('gallery_group') as GroupModel;
-            const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
             const res = await galleryModel.deletePid(group_list);
             return this.success([], '删除成功!');
         }

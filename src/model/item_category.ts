@@ -29,7 +29,8 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
-        return this.setRelation(false).fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).countSelect();
+        // return this.setRelation(false).fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).countSelect();
+        return this.fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).select()
         // return this.order({created_at: 'DESC'}).where({del: 0}).field('shop_id,shop_name,logo,system_end_time,created_at').page(page, limit).countSelect();
     }
 
@@ -57,4 +58,32 @@ export default class extends think.Model {
     async editGoods($id: number,$data: any) {
         return this.where({id: $id}).update($data);
     }
+
+    async  getChild($group_id:any) {
+        if($group_id == 0)
+        {
+            return  [0]
+        }
+        let res = await this.select();
+        let hash = {};
+        for(let item of res)
+        {
+            hash[item.id] = item.parent_id
+        }
+        var bmid = $group_id;
+        // console.log(hash,'hash');
+        var pids = new Set([bmid]);
+        do {
+            var len = pids.size;
+
+            for(var id in hash) {
+                if (pids.has(hash[id])) {
+                    pids.add(Number(id));
+                    delete hash[id];
+                }
+            }
+        } while (pids.size>len);
+        return Array.from(pids);
+    }
+
 }
