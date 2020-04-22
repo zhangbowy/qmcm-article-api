@@ -53,7 +53,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = (await this.session('token')).shop_id;
             let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-            let filePath =`/gallary/${shop_id}/${day}/${fileName}.${gs}`;
+            let filePath = `/gallary/${shop_id}/${day}/${fileName}.${gs}`;
             const oss = await think.service('oss');
             /**
              * 上传到腾讯OSS
@@ -62,7 +62,7 @@ export default class extends Base {
             const model = this.model('gallery') as GalleryModel;
             const gallery_group_id: number = this.post('gallery_group_id') || 0;
             let imageParams: any ={
-                oss_path : res.Location,
+                oss_path : 'http://' + res.Location,
                 region: 'ap-guangzhou',
                 img_name:`${fileName}.${gs}`,
                 img_init_name:file.name,

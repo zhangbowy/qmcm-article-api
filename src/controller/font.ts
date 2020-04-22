@@ -55,44 +55,45 @@ export default class extends Base {
             // handle any errors
         }
     }
+    /**
+     * 删除字体
+     * @params { font_id } 字体预览图压缩包
+     */
     async deleteFontAction() {
-        let font_id = this.post('font_id');
-        let font = await this.model('fonts').where({font_id:font_id}).find();
+        try {
+            let font_id = this.post('font_id');
+            let font = await this.model('fonts').where({font_id:font_id}).find();
 
-        if ((Object.keys(font)).length == 0) {
-            return   this.fail(-1, '字体不存在!',[]);
-        }
-        let arr: any = [];
-        let fontContent = JSON.parse(font.font_content);
-        for (let k in fontContent) {
-            let obj = {
-                Key:fontContent[k]
-            };
-            arr.push(obj)
-        }
-        console.log(arr);
-        let data =  await this.model('fonts').where({font_id}).delete();
-        // @ts-ignore
-        if(data) {
-            const  oss  = think.service('oss');
-            let del = await oss.deleteFile(arr);
-            if(del.statusCode && del.statusCode == 200)
-            {
-                return this.success({del,data}, '删除成功!');
+            if ((Object.keys(font)).length == 0) {
+                return   this.fail(-1, '字体不存在!',[]);
             }
-            return   this.fail(-1, '删除失败!',del);
+            let arr: any = [];
+            let fontContent = JSON.parse(font.font_content);
+            for (let k in fontContent) {
+                let obj = {
+                    Key:fontContent[k]
+                };
+                arr.push(obj)
+            }
+            console.log(arr);
+            let data =  await this.model('fonts').where({font_id}).delete();
+            // @ts-ignore
+            if(data) {
+                const  oss  = think.service('oss');
+                let del = await oss.deleteFile(arr);
+                if(del.statusCode && del.statusCode == 200)
+                {
+                    return this.success({del,data}, '删除成功!');
+                }
+                return   this.fail(-1, '删除失败!',del);
+            }
+        }catch (e) {
+            return   this.fail(-1, e);
         }
-    }
-    indexAction() {
-        // return this.display();
-        // return this.redirect('http://www.wkdao.com', '走错路发现世界,走对路发现自己');
-        const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
-        return this.success([], "请求成功!");
-        return  this.download(filepath);
     }
 }
 
- function exportFile($file: any,$filePath?: any) {
+function exportFile($file: any,$filePath?: any) {
 
     let obj = [
         "0.PNG",

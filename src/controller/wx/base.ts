@@ -1,10 +1,26 @@
 import { think } from 'thinkjs';
 export default class extends think.Controller {
   async __before() {
-    this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
-    this.header('Access-Control-Allow-Headers', 'x-requested-with');
-    this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
-    this.header('Access-Control-Allow-Credentials', true);
+    // this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
+    // this.header('Access-Control-Allow-Headers', ["x-requested-with",'origin', 'token', 'content-type']);
+    // this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
+    // this.header('Access-Control-Allow-Credentials', true);
+    try {
+      let Origin = this.ctx.req.headers.origin;
+      if(!Origin) {
+        return this.fail(1001,'域名未配置!')
+      }
+      let res: any = await this.model('shops').where({domain:Origin}).find();
+      if (Object.keys(res).length == 0)
+      {
+        return  this.redirect('http://www.wkdao.com')
+      }
+      this.ctx.state.shop_id = res.shop_id
+    }catch (e) {
+     return  this.fail(1001, e)
+
+    }
+
     if (this.ctx.path.indexOf('/user/login') === -1) {
       if (!await this.session('token')) {
         // return this.fail(402, '未登录!', []);
