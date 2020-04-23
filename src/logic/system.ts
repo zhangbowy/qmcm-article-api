@@ -1,5 +1,6 @@
 import { think } from 'thinkjs';
-export default class extends think.Logic {
+import base from './base'
+export default class extends base {
   embTemplateAction() {
     const rules = {
       template_type: {
