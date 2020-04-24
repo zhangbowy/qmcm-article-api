@@ -42,7 +42,7 @@ export default class extends Base {
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
         this.success([],'登录成功')!
-        this.redirect('http://cxapi.tecqm.club/static/dist')
+        this.redirect('http://cixiu.makebugs.cn/index.html')
         // this.redirect('http://192.168.31.181:8080/')
     }
     infoAction() {
