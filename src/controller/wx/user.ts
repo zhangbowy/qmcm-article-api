@@ -43,6 +43,7 @@ export default class extends Base {
         });
         this.success([],'登录成功')!
         this.redirect('http://cxapi.tecqm.club/static/dist')
+        // this.redirect('http://192.168.31.181:8080/')
     }
 
 }
