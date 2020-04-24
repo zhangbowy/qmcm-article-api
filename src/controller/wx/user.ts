@@ -41,7 +41,7 @@ export default class extends Base {
             maxAge:1000*1000*1000*1000,
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
-        this.success([],'登录成功')!
+        this.success([],'登录成功');
         this.redirect('http://cxapi.tecqm.club/static/dist')
         // this.redirect('http://192.168.31.181:8080/')
     }
@@ -50,5 +50,18 @@ export default class extends Base {
     }
     checkLoginAction() {
         return  this.success('已登录')
+    }
+
+    /**
+     *
+     */
+    async loginDevAction() {
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcGVuaWQiOiJvSVBoYjBhOTh5d3lURHRjT0xwT2hTcExLS1NRIiwibmlja25hbWUiOiJXYXkgQmFjayBIb21lIiwic2V4IjoxLCJsYW5ndWFnZSI6InpoX0NOIiwiY2l0eSI6IuiKnOa5liIsInByb3ZpbmNlIjoi5a6J5b69IiwiY291bnRyeSI6IuS4reWbvSIsImhlYWRpbWd1cmwiOiJodHRwOi8vdGhpcmR3eC5xbG9nby5jbi9tbW9wZW4vdmlfMzIvUTBqNFR3R1RmVExKeGliUHVSaWI1eEFLMlZTQ2cwaWN6YUE4UTJkUGZXWmljdmprUDMzYThXc2FUQ1BaU3VVUXZkdWNpYlNpYlRNMTJBNEZNcmxOdmNpYTN5aWFGQS8xMzIiLCJwcml2aWxlZ2UiOltdLCJpYXQiOjE1ODc3MTE4NzR9.iCGvRAiXAyfn8jo80YciE25qx4SWSkGTTeIi1_l3bs0"
+        await this.cookie('token', token,{
+            maxAge:1000*1000*1000*1000,
+            expires:new Date().getTime() + 1000*1000*1000*1000
+        });
+
+        return  this.success('登录成功!')
     }
 }
