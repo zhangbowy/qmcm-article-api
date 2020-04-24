@@ -9,13 +9,12 @@ export default class extends think.Controller {
       // 根据token值获取用户id
       this.ctx.state.token = this.cookie('token') || '';
       const tokenSerivce = think.service('wx/token');
-      this.ctx.state.userId = await tokenSerivce.parse1(this.ctx.state.token);
+      this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
       if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
-        if(this.ctx.state.userId == null)
+        if(this.ctx.state.userInfo == null)
         {
           return this.fail(402,'未授权登录')
         }
-      } else {
         let Origin = this.ctx.req.headers.origin;
         if(!Origin) {
           return this.fail(1001,'域名未配置!')
@@ -26,6 +25,8 @@ export default class extends think.Controller {
           return  this.redirect('http://www.wkdao.com')
         }
         this.ctx.state.shop_id = res.shop_id
+      } else {
+
       }
     }catch (e) {
      return  this.fail(1001, e)
