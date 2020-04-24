@@ -33,7 +33,7 @@ export default class extends Base {
          * 判断是否新用户
          */
          let info = await this.model('user').where({openid:openId}).find();
-         let userInfo
+         let userInfo;
         if (Object.keys(info).length > 0) {
             let params: object = {
                 nickname:res.nickname,
@@ -75,15 +75,23 @@ export default class extends Base {
         this.redirect('http://cixiu.makebugs.cn/index.html')
         // this.redirect('http://192.168.31.181:8080/')
     }
+
+    /**
+     * 获取用户信息
+     */
     infoAction() {
         return  this.success(this.ctx.state.userInfo)
     }
+
+    /**
+     * 判断是否登录
+     */
     checkLoginAction() {
         return  this.success('已登录')
     }
 
     /**
-     *
+     * 开发的Dev
      */
     async loginDevAction() {
         let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcGVuaWQiOiJvSVBoYjBhOTh5d3lURHRjT0xwT2hTcExLS1NRIiwibmlja25hbWUiOiJXYXkgQmFjayBIb21lIiwic2V4IjoxLCJsYW5ndWFnZSI6InpoX0NOIiwiY2l0eSI6IuiKnOa5liIsInByb3ZpbmNlIjoi5a6J5b69IiwiY291bnRyeSI6IuS4reWbvSIsImhlYWRpbWd1cmwiOiJodHRwOi8vdGhpcmR3eC5xbG9nby5jbi9tbW9wZW4vdmlfMzIvUTBqNFR3R1RmVExKeGliUHVSaWI1eEFLMlZTQ2cwaWN6YUE4UTJkUGZXWmljdmprUDMzYThXc2FUQ1BaU3VVUXZkdWNpYlNpYlRNMTJBNEZNcmxOdmNpYTN5aWFGQS8xMzIiLCJwcml2aWxlZ2UiOltdLCJpYXQiOjE1ODc3MTE4NzR9.iCGvRAiXAyfn8jo80YciE25qx4SWSkGTTeIi1_l3bs0"
@@ -93,5 +101,21 @@ export default class extends Base {
         });
 
         return  this.success('登录成功!')
+    }
+
+    /**
+     * 收货地址
+     */
+    async addressAction() {
+        /**
+         * 店铺ID
+         */
+        let shop_id = this.ctx.state.shop_id;
+        /**
+         * 用户id
+         */
+        let id = this.ctx.state.userInfo.id;
+        let res = await this.model('address').select();
+        this.success(res, '请求成功!');
     }
 }

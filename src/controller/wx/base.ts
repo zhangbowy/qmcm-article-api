@@ -14,15 +14,15 @@ export default class extends think.Controller {
         {
           return this.fail(402,'未登录')
         }
-        // let Origin = this.ctx.req.headers.host;
-        // if(!Origin) {
-        //   return this.fail(1001,'域名未配置!')
-        // }
-        // let res: any = await this.model('shops').where({domain:Origin}).find();
-        // if (Object.keys(res).length == 0)
-        // {
-        //   return  this.redirect('http://www.wkdao.com')
-        // }
+        let Origin = this.ctx.req.headers.origin;
+        if(!Origin) {
+          return this.fail(1001,'域名未配置!')
+        }
+        let res: any = await this.model('shops').where({domain:Origin}).find();
+        if (Object.keys(res).length == 0)
+        {
+          return this.fail(1001,'店铺不存在!')
+        }
         this.ctx.state.shop_id = 15
       } else {
         console.log(this.ctx.state.userInfo);
