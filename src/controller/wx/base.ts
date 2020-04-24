@@ -14,16 +14,16 @@ export default class extends think.Controller {
         {
           return this.fail(402,'未登录')
         }
-        let Origin = this.ctx.req.headers.host;
-        if(!Origin) {
-          return this.fail(1001,'域名未配置!')
-        }
-        let res: any = await this.model('shops').where({domain:Origin}).find();
-        if (Object.keys(res).length == 0)
-        {
-          return  this.redirect('http://www.wkdao.com')
-        }
-        this.ctx.state.shop_id = res.shop_id
+        // let Origin = this.ctx.req.headers.host;
+        // if(!Origin) {
+        //   return this.fail(1001,'域名未配置!')
+        // }
+        // let res: any = await this.model('shops').where({domain:Origin}).find();
+        // if (Object.keys(res).length == 0)
+        // {
+        //   return  this.redirect('http://www.wkdao.com')
+        // }
+        this.ctx.state.shop_id = 15
       } else {
         console.log(this.ctx.state.userInfo);
         // if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
