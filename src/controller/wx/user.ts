@@ -34,6 +34,8 @@ export default class extends Base {
         let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
         let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
         console.log(userInfo);
-        this.success(userInfo,'请求成功')
+        let tokenFuc =  this.service('wx/token');
+        let token = tokenFuc.create(userInfo)
+        this.success(token,'请求成功')
     }
 }
