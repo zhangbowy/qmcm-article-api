@@ -10,7 +10,7 @@ export default class extends think.Controller {
       this.ctx.state.token = this.cookie('token') || '';
       const tokenSerivce = think.service('wx/token');
       this.ctx.state.userId = await tokenSerivce.parse1(this.ctx.state.token);
-      if(this.ctx.path.indexOf('/user/login') === -1 && this.ctx.path.indexOf('/user/auth') === -1 ) {
+      if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
         let Origin = this.ctx.req.headers.origin;
         if(!Origin) {
           return this.fail(1001,'域名未配置!')
