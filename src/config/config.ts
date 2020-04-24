@@ -7,8 +7,8 @@ export = {
   defaultErrno: 1, // errcode字段
   validateDefaultErrno: -1,
   wx:{
-    appid:'wx8d8e2dd3ce250894'
-
+    appid:'wx8d8e2dd3ce250894',
+    appSecret:'767be27192a424108a8c6907bdaf1549'
   }
 
 };

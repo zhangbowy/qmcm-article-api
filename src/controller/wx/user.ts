@@ -16,10 +16,11 @@ export default class extends Base {
             return this.fail(-1., 'code不能为空')
         }
         const appid = this.config('wx').appid;
+        const secret = this.config('wx').appSecret;
         /**
          * 通过code换取 access_token
          */
-        let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=SECRET&code=${code}&grant_type=authorization_code`
+        let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`
 
         const res = await this.fetch(url).then(res => res.json());
         if (res && res.errcode) {
@@ -28,12 +29,11 @@ export default class extends Base {
         /**
          * 拉取用户信息
          */
-        let access_token = res.access_token
-        let openId = res.openid
-        let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN
-`
-         let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
-        console.log(userInfo)
+        let access_token = res.access_token;
+        let openId = res.openid;
+        let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
+        let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
+        console.log(userInfo);
         this.success(userInfo,'请求成功')
     }
 }
