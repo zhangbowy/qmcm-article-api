@@ -1,5 +1,6 @@
 import Base from './base.js';
 import {think} from "thinkjs";
+import {ancestorWhere} from "tslint";
 const path = require('path');
 export default class extends Base {
     /**
@@ -34,6 +35,16 @@ export default class extends Base {
         let openId = res.openid;
         let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
         let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
+        let params: object = {
+            nickname:userInfo.nickname,
+            sex:userInfo.sex,
+            province:userInfo.province,
+            city:userInfo.city,
+            country:userInfo.country,
+            headimgurl:userInfo.headimgurl,
+            openid:userInfo.openid
+        }
+        await this.model('user').add(params);
         console.log(userInfo);
         let tokenFuc =  think.service('wx/token');
         let token = await tokenFuc.create1(userInfo);
