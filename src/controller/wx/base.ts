@@ -26,7 +26,11 @@ export default class extends think.Controller {
         }
         this.ctx.state.shop_id = res.shop_id
       } else {
-
+        console.log(this.ctx.state.userInfo )
+        if(this.ctx.state.userInfo != null)
+        {
+          return this.success('','已登录')
+        }
       }
     }catch (e) {
      return  this.fail(1001, e)

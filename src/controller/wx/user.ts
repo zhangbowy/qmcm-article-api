@@ -37,7 +37,9 @@ export default class extends Base {
         console.log(userInfo);
         let tokenFuc =  think.service('wx/token');
         let token = await tokenFuc.create1(userInfo);
-        await this.cookie('token', token);
+        await this.cookie('token', token,{
+            timeout: 7 * 24 * 3600
+        });
         this.success([],'登录成功')!
         // this.redirect(this.ctx.header['origin'])
     }
