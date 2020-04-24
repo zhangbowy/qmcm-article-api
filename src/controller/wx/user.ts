@@ -42,7 +42,7 @@ export default class extends Base {
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
         this.success([],'登录成功')!
-        this.redirect(this.ctx.header['origin'])
+        this.redirect('http://cxapi.tecqm.club/static/dist')
     }
 
 }
