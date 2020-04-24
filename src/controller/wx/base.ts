@@ -6,16 +6,19 @@ export default class extends think.Controller {
     // this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     // this.header('Access-Control-Allow-Credentials', true);
     try {
-      let Origin = this.ctx.req.headers.origin;
-      if(!Origin) {
-        return this.fail(1001,'域名未配置!')
+      if(this.ctx.path.indexOf('/user/login') === -1 && this.ctx.path.indexOf('/user/auth') === -1 ) {
+        let Origin = this.ctx.req.headers.origin;
+        if(!Origin) {
+          return this.fail(1001,'域名未配置!')
+        }
+        let res: any = await this.model('shops').where({domain:Origin}).find();
+        if (Object.keys(res).length == 0)
+        {
+          return  this.redirect('http://www.wkdao.com')
+        }
+        this.ctx.state.shop_id = res.shop_id
       }
-      let res: any = await this.model('shops').where({domain:Origin}).find();
-      if (Object.keys(res).length == 0)
-      {
-        return  this.redirect('http://www.wkdao.com')
-      }
-      this.ctx.state.shop_id = res.shop_id
+
     }catch (e) {
      return  this.fail(1001, e)
 
