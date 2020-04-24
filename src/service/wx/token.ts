@@ -18,7 +18,7 @@ module.exports = class extends think.Service {
         return result.user_id;
     }
 
-    async create(userInfo: any) {
+    async create1(userInfo: any) {
         const token = jwt.sign(userInfo, secret);
         return token;
     }

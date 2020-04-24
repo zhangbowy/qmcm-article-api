@@ -36,7 +36,7 @@ export default class extends Base {
         let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
         console.log(userInfo);
         let tokenFuc =  think.service('wx/token');
-        let token = tokenFuc.create(userInfo)
+        let token = await tokenFuc.create1(userInfo)
         this.success(token,'请求成功')
     }
 }
