@@ -26,8 +26,8 @@ export default class extends think.Controller {
         }
         this.ctx.state.shop_id = res.shop_id
       } else {
-        console.log(this.ctx.state.userInfo )
-        if(this.ctx.state.userInfo != null)
+        console.log(this.ctx.state.userInfo );
+        if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
         {
           return this.success('','已登录')
         }
