@@ -1,4 +1,5 @@
 import Base from './base.js';
+import {think} from "thinkjs";
 const path = require('path');
 export default class extends Base {
     /**
@@ -8,7 +9,6 @@ export default class extends Base {
         const appid = this.config('wx').appid;
         const redirectUrl = "http://cxapi.tecqm.club/wx/user/auth";
         let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
-        this.header('Origin', 'http://cxapi.tecqm.club');
         return this.success(url);
     }
     async authAction() {
@@ -21,7 +21,7 @@ export default class extends Base {
         /**
          * 通过code换取 access_token
          */
-        let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`
+        let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
 
         const res = await this.fetch(url).then(res => res.json());
         if (res && res.errcode) {
@@ -35,7 +35,7 @@ export default class extends Base {
         let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
         let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
         console.log(userInfo);
-        let tokenFuc =  this.service('wx/token');
+        let tokenFuc =  think.service('wx/token');
         let token = tokenFuc.create(userInfo)
         this.success(token,'请求成功')
     }
