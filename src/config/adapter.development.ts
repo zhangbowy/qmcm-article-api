@@ -17,10 +17,10 @@ exports.model = {
         database: 'yuncixiu_v3', //数据库名
         prefix: '',//表前缀
         encoding: 'utf8',
-        host: '192.168.31.4',//host
+        host: '129.211.65.201',//host
         port: 3306,//端口
-        user: 'cx03',//用户名
-        password: 'yuncixiu03',//密码
+        user: 'root',//用户名
+        // password: 'yuncixiu03',//密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,
