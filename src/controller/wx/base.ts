@@ -11,6 +11,11 @@ export default class extends think.Controller {
       const tokenSerivce = think.service('wx/token');
       this.ctx.state.userId = await tokenSerivce.parse1(this.ctx.state.token);
       if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
+        if(this.ctx.state.userId == null)
+        {
+          return this.fail(402,'未授权登录')
+        }
+      } else {
         let Origin = this.ctx.req.headers.origin;
         if(!Origin) {
           return this.fail(1001,'域名未配置!')
@@ -21,11 +26,6 @@ export default class extends think.Controller {
           return  this.redirect('http://www.wkdao.com')
         }
         this.ctx.state.shop_id = res.shop_id
-      } else {
-        if(this.ctx.state.userId == null)
-        {
-          return this.fail(402,'未授权登录')
-        }
       }
     }catch (e) {
      return  this.fail(1001, e)
