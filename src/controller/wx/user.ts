@@ -38,6 +38,6 @@ export default class extends Base {
         let tokenFuc =  think.service('wx/token');
         let token = await tokenFuc.create1(userInfo);
         await this.cookie('token', token);
-        this.redirect('http://cxapi.tecqm.club/wx/user/auth')
+        this.redirect(this.ctx.header['origin'])
     }
 }

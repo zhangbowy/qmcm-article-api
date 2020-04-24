@@ -23,7 +23,7 @@ module.exports = class extends think.Service {
         return token;
     }
 
-    async parse(token: string) {
+    async parse1(token: string) {
         if (token) {
             try {
                 return jwt.verify(token, secret);

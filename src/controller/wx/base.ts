@@ -6,6 +6,10 @@ export default class extends think.Controller {
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
+      // 根据token值获取用户id
+      this.ctx.state.token = this.cookie('token') || '';
+      const tokenSerivce = think.service('wx/token');
+      this.ctx.state.userId = await tokenSerivce.parse1(this.ctx.state.token);
       if(this.ctx.path.indexOf('/user/login') === -1 && this.ctx.path.indexOf('/user/auth') === -1 ) {
         let Origin = this.ctx.req.headers.origin;
         if(!Origin) {
@@ -17,13 +21,15 @@ export default class extends think.Controller {
           return  this.redirect('http://www.wkdao.com')
         }
         this.ctx.state.shop_id = res.shop_id
+      } else {
+        if(this.ctx.state.userId == null)
+        {
+          return this.fail(402,'未授权登录')
+        }
       }
-
     }catch (e) {
      return  this.fail(1001, e)
-
     }
-
     if (this.ctx.path.indexOf('/user/login') === -1) {
       if (!await this.session('token')) {
         // return this.fail(402, '未登录!', []);
