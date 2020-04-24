@@ -14,7 +14,7 @@ export default class extends think.Controller {
         {
           return this.fail(402,'未登录')
         }
-        let Origin = this.ctx.req.headers.origin;
+        let Origin = this.ctx.req.headers.host;
         if(!Origin) {
           return this.fail(1001,'域名未配置!')
         }
