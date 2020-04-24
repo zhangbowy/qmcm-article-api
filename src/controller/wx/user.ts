@@ -16,7 +16,7 @@ export default class extends Base {
         let code:string = this.get('code');
         if(!code) {
             return this.fail(-1., 'code不能为空')
-        }
+        };
         const appid = this.config('wx').appid;
         const secret = this.config('wx').appSecret;
         /**
@@ -28,24 +28,43 @@ export default class extends Base {
         if (res && res.errcode) {
            return  this.success(res)
         }
-        /**
-         * 拉取用户信息
-         */
-        let access_token = res.access_token;
         let openId = res.openid;
-        let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
-        let userInfo = await this.fetch(getInfoUrl).then(res => res.json());
-        let params: object = {
-            nickname:userInfo.nickname,
-            sex:userInfo.sex,
-            province:userInfo.province,
-            city:userInfo.city,
-            country:userInfo.country,
-            headimgurl:userInfo.headimgurl,
-            openid:userInfo.openid
+        /**
+         * 判断是否新用户
+         */
+         let info = await this.model('user').where({openid:openId}).find();
+         let userInfo
+        if (Object.keys(info).length > 0) {
+            let params: object = {
+                nickname:res.nickname,
+                sex:res.sex,
+                province:res.province,
+                city:res.city,
+                country:res.country,
+                headimgurl:res.headimgurl,
+                openid:res.openid,
+                id:res.id
+            }
+            userInfo = params
+        } else {
+            /**
+             * 拉取用户信息
+             */
+            let access_token = res.access_token;
+            let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
+             userInfo = await this.fetch(getInfoUrl).then(res => res.json());
+            let params: object = {
+                nickname:userInfo.nickname,
+                sex:userInfo.sex,
+                province:userInfo.province,
+                city:userInfo.city,
+                country:userInfo.country,
+                headimgurl:userInfo.headimgurl,
+                openid:userInfo.openid
+            }
+            await this.model('user').add(params);
+            console.log(userInfo);
         }
-        await this.model('user').add(params);
-        console.log(userInfo);
         let tokenFuc =  think.service('wx/token');
         let token = await tokenFuc.create1(userInfo);
         await this.cookie('token', token,{
