@@ -6,32 +6,31 @@ export default class extends think.Controller {
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
-      // 根据token值获取用户id
-      // this.ctx.state.token = this.cookie('token') || '';
-      // const tokenSerivce = think.service('wx/token');
-      // this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
-      // if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
-      //   if(this.ctx.state.userInfo == null)
-      //   {
-      //     return this.fail(402,'未授权登录')
-      //   }
-      //   let Origin = this.ctx.req.headers.origin;
-      //   if(!Origin) {
-      //     return this.fail(1001,'域名未配置!')
-      //   }
-      //   let res: any = await this.model('shops').where({domain:Origin}).find();
-      //   if (Object.keys(res).length == 0)
-      //   {
-      //     return  this.redirect('http://www.wkdao.com')
-      //   }
-      //   this.ctx.state.shop_id = res.shop_id
-      // } else {
-      //   console.log(this.ctx.state.userInfo );
-      //   if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
-      //   {
-      //     return this.success('','已登录')
-      //   }
-      // }
+      this.ctx.state.token = this.cookie('token') || '';
+      const tokenSerivce = think.service('wx/token');
+      this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
+      if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
+        if(this.ctx.state.userInfo == null)
+        {
+          return this.fail(402,'未登录')
+        }
+        let Origin = this.ctx.req.headers.origin;
+        if(!Origin) {
+          return this.fail(1001,'域名未配置!')
+        }
+        let res: any = await this.model('shops').where({domain:Origin}).find();
+        if (Object.keys(res).length == 0)
+        {
+          return  this.redirect('http://www.wkdao.com')
+        }
+        this.ctx.state.shop_id = res.shop_id
+      } else {
+        console.log(this.ctx.state.userInfo);
+        // if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
+        // {
+        //   return this.success('','已登录')
+        // }
+      }
     }catch (e) {
      return  this.fail(1001, e)
     }

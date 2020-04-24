@@ -45,5 +45,7 @@ export default class extends Base {
         this.redirect('http://cxapi.tecqm.club/static/dist')
         // this.redirect('http://192.168.31.181:8080/')
     }
-
+    checkLoginAction() {
+        return  this.success('已登录')
+    }
 }
