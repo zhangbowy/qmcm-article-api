@@ -1,15 +1,9 @@
 import Base from './base.js';
 import {think} from "thinkjs";
-import GalleryModel from "../model/gallery";
 const path = require('path');
-var COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
 const util = require('util');
 const AdmZip = require('adm-zip');
-var cos = new COS({
-    SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
-    SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
-});
 
 interface UploadRes {
     Location: string;
@@ -67,9 +61,8 @@ export default class extends Base {
 
     /**
      * 上传代码
-     * @params image file
-     * @params type 上传类型
-     * @return IMAGE PATH
+     * @params {file} 代码
+     * @params {type} 上传类型 1、手机端 2、pc后台  3、设计师后台
      */
     async uploadCodeAction() {
 
