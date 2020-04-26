@@ -91,6 +91,8 @@ export default class extends Base {
             } else  {
                 filepath = path.join('/root/release/admin/');
             }
+            deleteFolder(filepath)
+
             // const filepath = path.join(think.ROOT_PATH,'www/static/demo/');
             console.log(filepath,'filepath111111111111111')
             let path1 = path.dirname(filepath);
