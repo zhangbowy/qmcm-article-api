@@ -105,12 +105,10 @@ export default class extends Base {
             await zip.extractAllTo(filepath, true);
             let verPath =  path.join(filepath,day+"/");
             console.log(verPath,'verPath');
-            let ver = path.dirname(verPath);
-            console.log(ver);
             /**
              * 上传时间
              */
-            await think.mkdir(ver);
+            await think.mkdir(verPath);
             return this.success([], "操作成功!");
         } else {
             this.fail(-1, '请上传正确的zip格式文件', []);
