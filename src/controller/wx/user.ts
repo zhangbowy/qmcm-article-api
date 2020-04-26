@@ -72,7 +72,7 @@ export default class extends Base {
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
         // this.success([],'登录成功')!
-        this.redirect('http://cixiu.makebugs.cn/index.html')
+        this.redirect('http://cxgh.tecqm.club')
         // this.redirect('http://192.168.31.181:8080/')
     }
 
