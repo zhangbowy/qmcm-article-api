@@ -88,13 +88,13 @@ export default class extends Base {
             } else  {
                 filepath = path.join('/root/release/admin/');
             }
-             deleteFolder(filepath);
+            deleteFolder(filepath);
             var zip = new AdmZip(file.path);
             console.log(filepath,'filepath');
             let path1 = path.dirname(filepath);
             await think.mkdir(path1);
             let day = await think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
-
+            await think.timeout(2000);
             await zip.extractAllTo(filepath, true);
             let verPath =  path.join(filepath,day+"/");
             console.log(verPath,'verPath');
