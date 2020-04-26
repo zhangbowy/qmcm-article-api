@@ -102,6 +102,11 @@ export default class extends Base {
             console.log(filepath,'filepath111111111111111');
             let path1 = path.dirname(filepath);
             think.mkdir(path1);
+            let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+            /**
+             * 上传时间
+             */
+            think.mkdir(path1+day);
             zip.extractAllTo(filepath, true);
             return this.success([], "操作成功!");
         } else {
