@@ -5,6 +5,7 @@ const path = require('path');
 var COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
 const util = require('util');
+const AdmZip = require('adm-zip');
 var cos = new COS({
     SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
     SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
@@ -63,11 +64,63 @@ export default class extends Base {
             this.fail(-1, '请上传png或jpg格式的图片', []);
         }
     }
+
+    async uploadCodeAction() {
+
+        const file = this.file('file');
+        let typeArr = [1,2];
+        const type = this.post('type');
+        if (!typeArr.includes(type)) {
+            return  this.fail(-1, '文件不能为空', []);
+        }
+        let currentPath;
+        let resultPath;
+        if (!file || !file.type) {
+            return  this.fail(-1, '文件不能为空', []);
+        }
+        if (!this.post('type') || think.isEmpty(this.post('type'))) {
+            return  this.fail(-1, '上传类型不能为空', []);
+        }
+        // tslint:disable-next-line:triple-equals
+        if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
+            var zip = new AdmZip(file.path);
+            let aaa = zip.getEntries();
+            let filepath;
+            if( type == 1) {
+                filepath = path.join('/root/release/ghao/');
+            } else  {
+                filepath = path.join('/root/release/admin/');
+            }
+            // const filepath = path.join(think.ROOT_PATH,'www/static/demo/');
+            console.log(filepath,'filepath111111111111111')
+            let path1 = path.dirname(filepath);
+            think.mkdir(path1);
+            zip.extractAllTo(filepath, true);
+            return this.success([], "操作成功!");
+        } else {
+            this.fail(-1, '请上传正确的zip格式文件', []);
+        }
+    }
     /**
      * 上传oss
      * @params dst file
      */
     async uploadOssAction() {
 
+    }
+}
+function deleteFolder(path: any) {
+    let files = [];
+    if (fs.existsSync(path)) {
+        files = fs.readdirSync(path);
+        files.forEach(function (file:any, index: any) {
+            let curPath = path + "/" + file;
+            if (fs.statSync(curPath).isDirectory()) {
+                deleteFolder(curPath);
+            } else {
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
     }
 }
