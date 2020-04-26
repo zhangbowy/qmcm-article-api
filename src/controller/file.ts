@@ -65,13 +65,19 @@ export default class extends Base {
         }
     }
 
+    /**
+     * 上传代码
+     * @params image file
+     * @params type 上传类型
+     * @return IMAGE PATH
+     */
     async uploadCodeAction() {
 
         const file = this.file('file');
         let typeArr = [1,2];
         const type = Number(this.post('type'));
         if (!typeArr.includes(type)) {
-            return  this.fail(-1, '文件不能为空', []);
+            return  this.fail(-1, 'type不正确', []);
         }
         let currentPath;
         let resultPath;
@@ -83,18 +89,17 @@ export default class extends Base {
         }
         // tslint:disable-next-line:triple-equals
         if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
-            var zip = new AdmZip(file.path);
-            let aaa = zip.getEntries();
             let filepath;
             if( type == 1) {
                 filepath = path.join('/root/release/ghao/');
             } else  {
                 filepath = path.join('/root/release/admin/');
             }
-            deleteFolder(filepath)
-
+            deleteFolder(filepath);
+            var zip = new AdmZip(file.path);
+            let aaa = zip.getEntries();
             // const filepath = path.join(think.ROOT_PATH,'www/static/demo/');
-            console.log(filepath,'filepath111111111111111')
+            console.log(filepath,'filepath111111111111111');
             let path1 = path.dirname(filepath);
             think.mkdir(path1);
             zip.extractAllTo(filepath, true);
