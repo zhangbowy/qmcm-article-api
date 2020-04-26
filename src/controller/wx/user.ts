@@ -34,6 +34,9 @@ export default class extends Base {
          */
          let info = await this.model('user').where({openid:openId}).find();
          let userInfo;
+        /**
+         * 老用户
+         */
         if (Object.keys(info).length > 0) {
             let params: object = {
                 nickname:res.nickname,
@@ -48,7 +51,7 @@ export default class extends Base {
             userInfo = params
         } else {
             /**
-             * 拉取用户信息
+             * 新用户 拉取用户信息
              */
             let access_token = res.access_token;
             let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
@@ -62,42 +65,68 @@ export default class extends Base {
                 headimgurl:userInfo.headimgurl,
                 openid:userInfo.openid
             }
-            await this.model('user').add(params);
+            let id = await this.model('user').add(params);
+            userInfo.id = id;
             console.log(userInfo);
         }
         let tokenFuc =  think.service('wx/token');
+        /**
+         * 生成token
+         */
         let token = await tokenFuc.create1(userInfo);
+        /**
+         * 下发到cookies
+         */
         await this.cookie('token', token,{
             maxAge:1000*1000*1000*1000,
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
-        // this.success([],'登录成功')!
+        /**
+         * 重定向到首页
+         */
         this.redirect('http://cxgh.tecqm.club')
-        // this.redirect('http://192.168.31.181:8080/')
     }
 
     /**
      * 获取用户信息
      */
-    infoAction() {
-        return  this.success(this.ctx.state.userInfo)
+    async infoAction() {
+        return  this.success(this.ctx.state.userInfo,'请求成功!')
     }
 
     /**
      * 判断是否登录
      */
-    checkLoginAction() {
-        return  this.success('已登录')
+    async checkLoginAction() {
+        return  this.success([],'已登录')
     }
 
     /**
      * 开发的Dev
      */
     async loginDevAction() {
-        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcGVuaWQiOiJvSVBoYjBhOTh5d3lURHRjT0xwT2hTcExLS1NRIiwibmlja25hbWUiOiJXYXkgQmFjayBIb21lIiwic2V4IjoxLCJsYW5ndWFnZSI6InpoX0NOIiwiY2l0eSI6IuiKnOa5liIsInByb3ZpbmNlIjoi5a6J5b69IiwiY291bnRyeSI6IuS4reWbvSIsImhlYWRpbWd1cmwiOiJodHRwOi8vdGhpcmR3eC5xbG9nby5jbi9tbW9wZW4vdmlfMzIvUTBqNFR3R1RmVExKeGliUHVSaWI1eEFLMlZTQ2cwaWN6YUE4UTJkUGZXWmljdmprUDMzYThXc2FUQ1BaU3VVUXZkdWNpYlNpYlRNMTJBNEZNcmxOdmNpYTN5aWFGQS8xMzIiLCJwcml2aWxlZ2UiOltdLCJpYXQiOjE1ODc3MTE4NzR9.iCGvRAiXAyfn8jo80YciE25qx4SWSkGTTeIi1_l3bs0"
+        const res = await this.model('user').where({id:92}).find()
+        let params: object = {
+            nickname:res.nickname,
+            sex:res.sex,
+            province:res.province,
+            city:res.city,
+            country:res.country,
+            headimgurl:res.headimgurl,
+            openid:res.openid,
+            id:res.id
+        }
+        let tokenFuc =  think.service('wx/token');
+        /**
+         * 生成token
+         */
+        let token = await tokenFuc.create1(params);
+        let Origin =this.ctx.req.headers.origin || this.ctx.req.headers.host;
         await this.cookie('token', token,{
             maxAge:1000*1000*1000*1000,
-            expires:new Date().getTime() + 1000*1000*1000*1000
+            expires:new Date().getTime() + 1000*1000*1000*1000,
+            // HttpOnly:false,
+            // domain:'192.168.31.181'
         });
 
         return  this.success('登录成功!')
@@ -107,15 +136,159 @@ export default class extends Base {
      * 收货地址
      */
     async addressAction() {
-        /**
-         * 店铺ID
-         */
-        let shop_id = this.ctx.state.shop_id;
-        /**
-         * 用户id
-         */
-        let id = this.ctx.state.userInfo.id;
-        let res = await this.model('address').select();
-        this.success(res, '请求成功!');
+        try {
+            /**
+             * 店铺ID
+             */
+            let shop_id = this.ctx.state.shop_id;
+            /**
+             * 用户id
+             */
+            let id = this.ctx.state.userInfo.id;
+            let res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id,shop_id,del:0}).select();
+            this.success(res, '请求成功!');
+        }catch (e) {
+            this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 添加收货地址
+     * @params {shop_id} 店铺id
+     * @params {user_id} 用户id
+     * @params {name} 收货人姓名
+     * @params {phone} 手机号
+     * @params {province} 省份
+     * @params {province_code} 省份代码
+     * @params {city} 城市
+     * @params {city_code} 城市代码
+     * @params {area} 区/县
+     * @params {area_code} 区县代码
+     * @params {address} 地址
+     * @params {is_default}? 是否默认
+     * @params {post_code}? 邮政编码
+     */
+    async addAddressAction() {
+        try {
+            let shop_id = this.ctx.state.shop_id;
+            let user_id = this.ctx.state.userInfo.id;
+            const name = this.post('name');
+            const phone = this.post('phone');
+            const province = this.post('province');
+            const province_code = this.post('province_code');
+            const city = this.post('city');
+            const city_code = this.post('city_code');
+            const area = this.post('area');
+            const area_code = this.post('area_code');
+            const address = this.post('address');
+            const is_default = this.post('is_default') || 0;
+            const post_code = this.post('post_code');
+            let params: object = {
+                shop_id,
+                user_id,
+                name,
+                phone,
+                province,
+                province_code,
+                city,
+                city_code,
+                area,
+                area_code,
+                address,
+                is_default,
+                post_code
+            };
+            if (is_default) {
+                await this.model('address').where({shop_id, user_id,is_default:1}).update({is_default:0})
+            }
+            let res = await this.model('address').add(params);
+            if (res) {
+               return this.success(res, '添加成功!');
+            }
+            return this.fail(-1, '添加失败!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 编辑收货地址
+     * @params {shop_id} 店铺id
+     * @params {user_id} 用户id
+     * @params {name} 收货人姓名
+     * @params {phone} 手机号
+     * @params {province} 省份
+     * @params {province_code} 省份代码
+     * @params {city} 城市
+     * @params {city_code} 城市代码
+     * @params {area} 区/县
+     * @params {area_code} 区县代码
+     * @params {address} 地址
+     * @params {is_default}? 是否默认
+     */
+    async editAddressAction() {
+        try {
+            let shop_id = this.ctx.state.shop_id;
+            let user_id = this.ctx.state.userInfo.id;
+            let address_id = this.post('address_id');
+            const name = this.post('name');
+            const phone = this.post('phone');
+            const province = this.post('province');
+            const province_code = this.post('province_code');
+            const city = this.post('city');
+            const city_code = this.post('city_code');
+            const area = this.post('area');
+            const area_code = this.post('area_code');
+            const address = this.post('address');
+            const is_default = this.post('is_default') || 0;
+            const post_code = this.post('post_code');
+            let params: object = {
+                name,
+                phone,
+                province,
+                province_code,
+                city,
+                city_code,
+                area,
+                area_code,
+                address,
+                is_default,
+                post_code
+            };
+            /**
+             * 如果默认先把全部是1的 置为0
+             */
+            if (is_default) {
+                await this.model('address').where({shop_id, user_id,is_default:1}).update({is_default:0})
+            }
+            let res: any = await this.model('address').where({ shop_id, user_id, address_id}).update(params);
+            if (res) {
+               return this.success(res, '编辑成功!');
+            }
+            return this.fail(-1, '编辑失败');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 删除收货地址
+     * @params {shop_id} 店铺Id
+     * @params {user_id} 用户id
+     * @params {address_id} 地址id
+     */
+    async delAddressAction() {
+        try {
+            const shop_id: number = this.ctx.state.shop_id;
+            const user_id: number = this.ctx.state.userInfo.id;
+            const address_id: number = this.post('address_id');
+            const res: any = await this.model('address').where({shop_id, user_id, address_id,del: 0}).update({del:1});
+            if (res) {
+                return this.success(res, '删除成功!');
+            }
+            return this.fail(-1, '该地址不存在!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
     }
 }

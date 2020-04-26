@@ -76,6 +76,19 @@ export default class extends Base {
         let res =  updateCategory(data,0);
         return this.success(res, '请求成功!');
     }
+    // /**
+    //  * 商品分类列表
+    //  */
+    // async getCategoryAction() {
+    //     const page: number = this.post('currentPage') || 1;
+    //     const limit: number = this.post('pageSize') || 10;
+    //     const cateModel = this.model('item_category') as cateModel;
+    //     // @ts-ignore
+    //     const shop_id = (await this.session('token')).shop_id;
+    //     const data = await cateModel.categoryList({page, limit, shop_id});
+    //     let res =  updateCategory(data,0);
+    //     return this.success(res, '请求成功!');
+    // }
 
 }
 /**

@@ -7,8 +7,8 @@ export default class extends Base {
     async indexAction(): Promise<void> {
         let slider: any[] = await this.model('slider').order('sort DESC').select();
         let category: any[] = await this.model('item_category').where({parent_id:0,del:0}).select();
-        let region1: any[] = await this.model('region').select();
-        let region = updateRegion(region1,0)
+        let region1: any[] = await this.model('region').field('id,pid,name,level,citycode as city_code,yzcode as yz_code').select();
+        let region = updateRegion(region1,0);
         let resObj:object = {
             slider,
             category,
