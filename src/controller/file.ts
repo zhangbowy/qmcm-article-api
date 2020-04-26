@@ -97,9 +97,7 @@ export default class extends Base {
             }
              deleteFolder(filepath);
             var zip = new AdmZip(file.path);
-            let aaa = zip.getEntries();
-            // const filepath = path.join(think.ROOT_PATH,'www/static/demo/');
-            console.log(filepath,'filepath111111111111111');
+            console.log(filepath,'filepath');
             let path1 = path.dirname(filepath);
             await think.mkdir(path1);
             let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
@@ -107,7 +105,8 @@ export default class extends Base {
              * 上传时间
              */
             zip.extractAllTo(filepath, true);
-            await think.mkdir(path1+day);
+            let ver = path.dirname(filepath+day);
+            await think.mkdir(ver);
             return this.success([], "操作成功!");
         } else {
             this.fail(-1, '请上传正确的zip格式文件', []);
