@@ -69,7 +69,7 @@ export default class extends Base {
 
         const file = this.file('file');
         let typeArr = [1,2];
-        const type = this.post('type');
+        const type = Number(this.post('type'));
         if (!typeArr.includes(type)) {
             return  this.fail(-1, '文件不能为空', []);
         }
