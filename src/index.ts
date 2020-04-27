@@ -12,5 +12,5 @@ import 'think-model';
 import 'think-cache';
 import 'think-session';
 import 'think-fetch';
-
+import 'think-svg-captcha';
 export const think = ThinkJS.think;

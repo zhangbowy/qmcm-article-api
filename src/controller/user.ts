@@ -1,6 +1,9 @@
 import Base from './base.js';
 // tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
+// @ts-ignore
+import ThinkSvgCaptcha from 'think-svg-captcha';
+
 export default class extends Base {
     /**
      * 登录
@@ -37,7 +40,26 @@ export default class extends Base {
     /**
      * checkLogin
      */
-    async checkLoginAction(): Promise<void> {
-        this.success(think.datetime(new Date().getTime(), 'YYYY-MM-DD'), "已登录!");
+    async getCaptchaAction(): Promise<void> {
+        const defaultOptions = {
+            size: 4, // size of random string
+            ignoreChars: '', // filter out some characters
+            noise: 1, // number of noise lines
+            color: false, // default grey, true if background option is set
+            background: '#ffffff', // background color of the svg image
+            width: 150, // width of captcha
+            height: 50, // height of captcha
+            // fontPath: './fonts/Comismsh.ttf', // your font path
+            fontSize: 40, // captcha text size
+            charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
+        }
+        let captcha = new ThinkSvgCaptcha(defaultOptions);
+
+        let c= captcha.create();
+        await this.cookie('captcha',c.text);
+        this.ctx.type = 'image/svg+xml';
+        return this.ctx.body = c.data
+        // captcha.svgCaptcha(text);
     }
+
 }

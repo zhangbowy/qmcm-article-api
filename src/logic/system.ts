@@ -45,8 +45,6 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-
-
   addEmbPriceAction() {
     const rules = {
       id: {
@@ -89,7 +87,6 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-
   delEmbPriceAction() {
     const rules = {
       id: {
@@ -112,7 +109,6 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-
   delSliderAction() {
     const rules = {
       id: {
@@ -168,6 +164,145 @@ export default class extends base {
         required: true,
         trim: true,
         method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  getSliderAction() {
+  }
+  getCityAction() {
+  }
+  expTemplateAction() {
+  }
+  addExpTemplateAction() {
+    const rules = {
+      express_template_type: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      express_template_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      first_number: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      first_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      continue_number: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      continue_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      is_full_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  editExpTemplateAction() {
+    const rules = {
+      express_template_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      express_template_type: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      express_template_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      first_number: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      first_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      continue_number: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      continue_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      is_full_amount: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  delExpTemplateAction() {
+    const rules = {
+      express_template_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  expTemplateDetailAction() {
+    const rules = {
+      express_template_id: {
+        required: true,
+        trim: true,
+        method: 'get'
       },
     };
     const msgs: object = {
