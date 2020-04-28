@@ -39,14 +39,14 @@ export default class extends Base {
          */
         if (Object.keys(info).length > 0) {
             let params: object = {
-                nickname:res.nickname,
-                sex:res.sex,
-                province:res.province,
-                city:res.city,
-                country:res.country,
-                headimgurl:res.headimgurl,
-                openid:res.openid,
-                id:res.id
+                nickname:info.nickname,
+                sex:info.sex,
+                province:info.province,
+                city:info.city,
+                country:info.country,
+                headimgurl:info.headimgurl,
+                openid:info.openid,
+                id:info.id
             }
             userInfo = params
         } else {
