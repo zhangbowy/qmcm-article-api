@@ -77,7 +77,7 @@ export default class extends Base {
         /**
          * 下发到cookies
          */
-        await this.cookie('token', token,{
+        await this.cookie('user_sign', token,{
             maxAge:1000*1000*1000*1000,
             expires:new Date().getTime() + 1000*1000*1000*1000
         });
