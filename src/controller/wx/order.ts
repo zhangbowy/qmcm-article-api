@@ -193,7 +193,11 @@ export default class extends Base {
                                 /**
                                  * 判断库存
                                  */
-                                if (cart_v.buy_num > sku_v.num) {
+                                if ( sku_v.num  == 0) {
+                                    return  sku_v.sku_id+'库存不足'
+                                    break;
+                                }
+                                if (cart_v.buy_num > sku_v.num ) {
                                     return  sku_v.sku_id+'购买数量超出库存' + sku_v.num;
                                     break;
                                 }
