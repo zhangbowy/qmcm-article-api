@@ -10,7 +10,7 @@ module.exports = class extends think.Service {
             return 0;
         }
 
-        const result = await this.parse(token);
+        const result = await this.parse1(token);
         if (think.isEmpty(result) || result.user_id <= 0) {
             return 0;
         }
@@ -35,7 +35,7 @@ module.exports = class extends think.Service {
     }
 
     async verify(token: any) {
-        const result = await this.parse(token);
+        const result = await this.parse1(token);
         if (think.isEmpty(result)) {
             return false;
         }

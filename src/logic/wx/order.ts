@@ -1,17 +1,81 @@
 import { think } from 'thinkjs';
 import base from './../base'
 export default class extends base {
-    loginAction() {
+    listAction() {
 
     }
-    authAction() {
+    detailAction() {
+        const rules = {
+            order_no: {
+                required: true,
+                method: 'get'
+            },
 
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
     }
-    infoAction() {
+    cancelAction() {
+        const rules = {
+            order_no: {
+                required: true,
+                method: 'post'
+            },
 
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
     }
-    checkLoginAction() {
-
+    payAction() {
+        const address_id: any = this.post('address_id');
+        const order_type: any = this.post('shopping_type') || 1;
+        const pay_type: any = this.post('pay_type') || 1;
+        const rules = {
+            address_id: {
+                required: true,
+                method: 'post'
+            },
+            cart_list: {
+                required: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    calculationAction() {
+        const rules = {
+            cart_list: {
+                required: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
     }
     loginDevAction() {
 

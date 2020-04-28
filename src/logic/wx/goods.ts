@@ -7,4 +7,7 @@ export default class extends base {
   detailAction() {
 
   }
+  getCategoryAction() {
+
+  }
 }

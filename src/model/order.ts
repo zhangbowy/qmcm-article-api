@@ -9,16 +9,23 @@ interface AddUserParams {
 }
 
 export default class extends think.Model {
-    async getUserById($id: number) {
-        return await this.where({id: $id}).find();
+    get relation() {
+        return {
+            order_item: {
+                type: think.Model.HAS_MANY,
+                Model: 'order_item',
+                fKey: 'order_id',
+                key: 'id',
+                // field: 'shop_id,phone,name',
+                // where: {role_type: ['NOTIN', '1'], del: 0},
+            },
+            user: {
+                type: think.Model.HAS_ONE,
+                Model: 'user',
+                fKey: 'id',
+                key: 'user_id',
+            }
+        };
     }
-    async getUserByPhone($phone: number) {
-        return await this.where({phone: $phone}).find();
-    }
-    async addAdmin($data: AddUserParams) {
-        return await this.add($data);
-    }
-    async editAdmin($id: number, $data: AddUserParams) {
-        return this.where({shop_id: $id}).update($data);
-    }
+
 }

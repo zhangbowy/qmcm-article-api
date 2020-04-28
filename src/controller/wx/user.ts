@@ -9,7 +9,7 @@ export default class extends Base {
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
         const redirectUrl = "http://cxapi.tecqm.club/wx/user/auth";
-        let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
+        let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
         return this.success(url);
     }
     async authAction() {
@@ -122,7 +122,7 @@ export default class extends Base {
          */
         let token = await tokenFuc.create1(params);
         let Origin =this.ctx.req.headers.origin || this.ctx.req.headers.host;
-        await this.cookie('token', token,{
+        await this.cookie('user_sign', token,{
             maxAge:1000*1000*1000*1000,
             expires:new Date().getTime() + 1000*1000*1000*1000,
             // HttpOnly:false,

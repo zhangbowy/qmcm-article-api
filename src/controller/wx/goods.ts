@@ -71,7 +71,7 @@ export default class extends Base {
         const limit: number = this.post('pageSize') || 10;
         const cateModel = this.model('item_category') as cateModel;
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.shop_id;
         const data = await cateModel.categoryList({page, limit, shop_id});
         let res =  updateCategory(data,0);
         return this.success(res, '请求成功!');

@@ -6,7 +6,7 @@ export default class extends think.Controller {
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
-      this.ctx.state.token = this.cookie('token') || '';
+      this.ctx.state.token = this.cookie('user_sign') || '';
       const tokenSerivce = think.service('wx/token');
       this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
       if(this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
