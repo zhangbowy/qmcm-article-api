@@ -4,6 +4,9 @@ export default class extends base {
   orderListAction() {
 
   }
+  orderCountAction() {
+
+  }
   orderDetailAction() {
     const rules = {
       order_no: {
@@ -22,14 +25,49 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-  addSliderAction() {
+  testAction() {
+
+  }
+  expressListAction() {
+
+  }
+  orderTraceAction() {
     const rules = {
-      image_path: {
+      order_item_id: {
         required: true,
         trim: true,
         method: 'post'
       },
-      link: {
+
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  sendGoodsAction() {
+    const rules = {
+      order_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      order_item_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      express_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      express_number: {
         required: true,
         trim: true,
         method: 'post'
@@ -44,4 +82,40 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+  confirmPaymentAction() {
+    const rules = {
+      order_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  confirmReceivedAction() {
+    const rules = {
+      order_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+
 }

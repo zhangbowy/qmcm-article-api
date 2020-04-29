@@ -35,11 +35,14 @@ export default class extends Base {
      */
     async logOutAction(): Promise<void> {
         await this.session('token', null);
-        this.success([], "登出成功!");
+        return this.success([], "登出成功!");
     }
     /**
      * checkLogin
      */
+    async checkLoginAction() {
+        return this.success([], "已登录!");
+    }
     async getCaptchaAction(): Promise<void> {
         const defaultOptions = {
             size: 4, // size of random string
