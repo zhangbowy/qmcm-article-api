@@ -11,9 +11,8 @@ export = {
     appSecret:'767be27192a424108a8c6907bdaf1549',
   },
   express: {
-    // 快递物流信息查询使用的是快递鸟接口，
     appid: '1365636', // 对应快递鸟用户后台 用户ID EBusinessID
     appkey: 'f4292d9e-5328-42c5-8395-517a9f9f32e8', //AppKey
-    request_url: 'http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx'
+    request_url: 'http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx' //快递鸟实时物流接口
   }
 };

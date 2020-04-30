@@ -80,6 +80,23 @@ export default class extends base {
     loginDevAction() {
 
     }
+    confirmReceivedAction() {
+        const rules = {
+            order_no: {
+                required: true,
+                method: 'post'
+            },
+
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
     delAddressAction() {
         const rules = {
             address_id: {
@@ -97,7 +114,6 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
-
     /**
      * 收货地址 logic
      */
@@ -155,7 +171,6 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
-
     /**
      * 编辑收货地址
      */
@@ -202,6 +217,22 @@ export default class extends base {
                 method: 'post'
             },
 
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    orderTraceAction() {
+        const rules = {
+            order_item_id: {
+                required: true,
+                method: 'post'
+            },
         };
         const msgs: object = {
             required: '{name}不能为空'

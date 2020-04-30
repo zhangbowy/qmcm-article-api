@@ -1,6 +1,7 @@
 import Base from './base.js';
 import {ancestorWhere} from "tslint";
 import express_template from "../../model/express_template";
+import {think} from "thinkjs";
 const path = require('path');
 const _ = require('lodash');
 
@@ -42,9 +43,9 @@ export default class extends Base {
             if (Object.keys(res).length == 0) {
                 return this.fail(-1, '该订单不存在!')
             }
-            this.success(res,'请求成功!');
+            return this.success(res,'请求成功!');
         }catch (e) {
-            this.fail(-1, e);
+            return this.fail(-1, e);
         }
     }
 
@@ -88,6 +89,7 @@ export default class extends Base {
             /**
              * 创建订单存库
              */
+            let _order_type =  getOrderType(order_type);
             let order_id = await this.model('order').add({
                 user_id,
                 order_type,
@@ -102,7 +104,7 @@ export default class extends Base {
                 shop_id,
                 buyer_message,
                 _status: '待付款',
-                _order_type: '普通订单'
+                _order_type: _order_type,
             });
             if (order_id) {
                 let item_list = item_info.item_list;
@@ -446,6 +448,109 @@ export default class extends Base {
         let new_sku_list: any = JSON.stringify(sku_list);
         return await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list});
     }
+
+
+    /**
+     * 确认收货
+     * @param {order_no} order_no
+     */
+    async confirmReceivedAction() {
+        try {
+            const order_no: any = this.post('order_no');
+            // @ts-ignore
+            const user_id: any = this.ctx.state.userInfo.id;
+            const shop_id: any = this.ctx.state.shop_id;
+            let orderInfo: any = await this.model('order').where({shop_id, order_no, user_id}).find();
+            if (think.isEmpty(orderInfo)) {
+
+                return this.fail(-1, '该订单不存在')
+            }
+            if (orderInfo.status != 3) {
+                let msg: string = '';
+                switch (orderInfo.status) {
+                    case 4:
+                        msg = '该订单已完成!';
+                        break;
+                    case -2:
+                        msg = '该订单已关闭!';
+                        break;
+                    case 2:
+                        msg = '该订单已付款-待发货!';
+                        break;
+                    case 1:
+                        msg = '该订单未支付!';
+                        break;
+                    case 5 || 6:
+                        msg = '该订单询价中!';
+                        break;
+                }
+                return this.fail(-1, msg)
+            }
+            let _status = '已完成';
+            let res: any = await this.model('order').where({shop_id, order_no,user_id}).update({_status, status: 4});
+            if (res) {
+                return this.success(res, '请求成功!');
+            }
+        } catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+    /**
+     * 查询快递
+     * @param order_item_id 订单商品id
+     */
+    async orderTraceAction() {
+        /**
+         * 查询快递
+         * 调用pc端查快递方法
+         */
+        const orderController = this.controller('order');
+        await orderController.orderTraceAction();
+       // return  this.action('order', 'orderTrace');
+        // try {
+        //     const order_item_id = this.post('order_item_id');
+        //     let orderItem = await this.model('order_item').where({order_item_id}).find();
+        //     if (Object.keys(orderItem).length == 0) {
+        //         return this.fail(-1, '找不到这个订单商品');
+        //     }
+        //     let express_id = orderItem.express_id;
+        //     let express_number = orderItem.express_number;
+        //     if (orderItem.item_status == 1) {
+        //         return this.fail(-1, '该商品未发货!');
+        //     }
+        //     if (!express_id) {
+        //         return this.fail(-1, '快递公司未选择');
+        //     }
+        //
+        //     if (think.isEmpty(express_number)) {
+        //         return this.fail(-1, '快递单号未填写');
+        //     }
+        //     /**
+        //      * 快递列表
+        //      */
+        //     const express_info: any = await this.model('express_list').where({express_id}).find();
+        //     if (think.isEmpty(express_info)) {
+        //         return this.fail(-1, '快递编号不正确');
+        //     }
+        //     const express_code = express_info.express_code;
+        //     const express = think.service('express');
+        //     const res = await express.queryExpress(express_code, express_number);
+        //
+        //     const result: object = {
+        //         order_id: orderItem.order_id,
+        //         order_item_id: order_item_id,
+        //         express_number,
+        //         express_name: express_info.express_name,
+        //         isFinish:res.isFinish,
+        //         state:res.state,
+        //         _state:res._state,
+        //         traces:res.traces
+        //     };
+        //     return this.success(result, '请求成功!');
+        // } catch (e) {
+        //     return this.fail(-1, e);
+        // }
+    }
 }
 
 /**
@@ -460,4 +565,25 @@ function maxPrice($data: any) {
         }
     }
     return max;
+}
+
+/**
+ * 获取订单状态文字
+ */
+function getOrderType($type: any) {
+    let _order_type = '';
+    switch ($type) {
+        case 1:
+            _order_type = '普通订单';
+            break;
+        case 2:
+            _order_type = '一般定制订单';
+            break;
+        case 3 || 5:
+            _order_type = '特殊定制订单';
+            break;
+        case 4:
+            _order_type = '手绘订单';
+            break;
+    }
 }

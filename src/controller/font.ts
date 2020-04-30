@@ -16,6 +16,7 @@ export default class extends Base {
         return this.success(res, "请求成功!");
 
     }
+
     /**
      * 导入字体
      * @params font 字体预览图压缩包
@@ -55,6 +56,7 @@ export default class extends Base {
             // handle any errors
         }
     }
+
     /**
      * 删除字体
      * @params { font_id } 字体预览图压缩包

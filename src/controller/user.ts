@@ -30,6 +30,7 @@ export default class extends Base {
         const res = await (this.model('user') as UserModel).getUserById(id);
         return this.success(res, '请求成功!');
     }
+
     /**
      * 登出
      */
@@ -37,12 +38,17 @@ export default class extends Base {
         await this.session('token', null);
         return this.success([], "登出成功!");
     }
+
     /**
      * checkLogin
      */
     async checkLoginAction() {
         return this.success([], "已登录!");
     }
+
+    /**
+     * 验证码
+     */
     async getCaptchaAction(): Promise<void> {
         const defaultOptions = {
             size: 4, // size of random string

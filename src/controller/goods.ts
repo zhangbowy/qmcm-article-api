@@ -59,6 +59,14 @@ export default class extends Base {
             const images = JSON.stringify(this.post('images'));
             const thumb_image_path = this.post('images')[0];
             const sku_show = JSON.stringify(this.post('sku_show'));
+            /**
+             * 快递费
+             */
+            const express_fee = this.post('express_fee');
+            /**
+             * 快递模板
+             */
+            const express_template_id = this.post('express_template_id');
             const sku_list = JSON.stringify(this.post('sku_list'));
             const detail = this.post('detail');
             if(min_buy < 1) {
@@ -85,7 +93,9 @@ export default class extends Base {
                 shop_id,
                 sku_list,
                 detail,
-                thumb_image_path
+                thumb_image_path,
+                express_fee,
+                express_template_id
             };
             const model = this.model('item') as ItemModel;
             const res = await model.addGoods(params);
@@ -94,7 +104,7 @@ export default class extends Base {
             }
             return this.fail(-1, '添加失敗', []);
         }catch (e) {
-            return this.fail(-1, '异常错误', e);
+            return this.fail(-1, e);
         }
     }
 
@@ -154,6 +164,14 @@ export default class extends Base {
             const sku_show = JSON.stringify(this.post('sku_show'));
             const sku_list = JSON.stringify(this.post('sku_list'));
             const detail = this.post('detail');
+            /**
+             * 快递费
+             */
+            const express_fee = this.post('express_fee');
+            /**
+             * 快递模板
+             */
+            const express_template_id = this.post('express_template_id');
             const params: any = {
                 name,
                 category_id,
@@ -169,7 +187,9 @@ export default class extends Base {
                 sku_list,
                 shop_id,
                 detail,
-                thumb_image_path
+                thumb_image_path,
+                express_fee,
+                express_template_id
             };
             const model = this.model('item') as ItemModel;
             let res: any = await model.editGoods(id, params);
@@ -300,6 +320,7 @@ export default class extends Base {
            this.getLevel(res.parent_id,timer)
         }
     }
+
     /**
      * 编辑分类
      * @params { id } 商品分类id

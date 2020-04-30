@@ -81,7 +81,7 @@ export default class extends Base {
             // fs.unlinkSync((this.files as any).upload.path);
             return this.fail(-1,'上传失败,请稍后再试!',[]);
         } else {
-            this.fail(-1, '请上传png或jpg格式的图片', []);
+            return this.fail(-1, '请上传png或jpg格式的图片', []);
         }
     }
 
@@ -114,7 +114,7 @@ export default class extends Base {
             {
                 return this.success({del,data}, '删除成功!');
             }
-            return   this.fail(-1, '删除失败!',del);
+            return this.fail(-1, '删除失败!',del);
         }
     }
 
