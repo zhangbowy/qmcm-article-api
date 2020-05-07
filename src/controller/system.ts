@@ -231,7 +231,7 @@ export default class extends Base {
             let express_template_id: number = this.get('express_template_id');
             let res = await this.model('express_template').where({shop_id, express_template_id}).find();
             if (Object.keys(res).length > 0) {
-                res.region_rules = JSON.parse(res.region_rules)
+                res.region_rules = JSON.parse(res.region_rules);
                return  this.success(res,'请求成功!')
             }
             return  this.fail(-1,'该物流模板不存在!')
@@ -373,17 +373,346 @@ export default class extends Base {
     }
 
     /**
+     * 定制分类列表
+     */
+    async customCategoryAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const res = await this.model('custom_category').order('created_at DESC').where({shop_id,del: 0}).select();
+            return this.success(res, '请求成功!')
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 添加定制分类
+     * @param {shop_id} 店铺id
+     * @param {custom_category_name} 定制分类名称
+     * @param {design_width} 设计区域宽度
+     * @param {disign_height} 设计区域高度
+     * @param {design_top} 设计区域据图片顶部距离
+     * @param {design_left} 设计区域据图片左边距离
+     * @param {design_bg} 背景
+     * @param {scale} 比例
+     */
+    async addCustomCateAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_name = this.post('custom_category_name');
+            const design_width = this.post('design_width');
+            const disign_height = this.post('disign_height');
+            const design_top = this.post('design_top');
+            const design_left = this.post('design_left');
+            const design_bg = this.post('design_bg');
+            const design_bg_width = this.post('design_bg_width');
+            const design_bg_height = this.post('design_bg_height');
+
+            const params = {
+                shop_id,
+                custom_category_name,
+                design_width,
+                disign_height,
+                design_top,
+                design_left,
+                design_bg,
+                design_bg_width,
+                design_bg_height
+            };
+            const res = await this.model('custom_category').add(params);
+            if (!res) {
+                return this.fail(-1, '添加失败!');
+            }
+            return this.success(res, '添加成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 编辑定制分类
+     * @param {shop_id} 店铺id
+     * @param {custom_category_id} 定制分类id
+     * @param {custom_category_name} 定制分类名称
+     * @param {design_width} 设计区域宽度
+     * @param {disign_height} 设计区域高度
+     * @param {design_top} 设计区域据图片顶部距离
+     * @param {design_left} 设计区域据图片左边距离
+     * @param {design_bg} 背景
+     * @param {scale} 比例
+     */
+    async editCustomCateAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_id = this.post('custom_category_id');
+            const custom_category_name = this.post('custom_category_name');
+            const design_width = this.post('design_width');
+            const disign_height = this.post('disign_height');
+            const design_top = this.post('design_top');
+            const design_left = this.post('design_left');
+            const design_bg = this.post('design_bg');
+            const design_bg_width = this.post('design_bg_width');
+            const design_bg_height = this.post('design_bg_height');
+
+            const params = {
+                custom_category_name,
+                design_width,
+                disign_height,
+                design_top,
+                design_left,
+                design_bg,
+                design_bg_width,
+                design_bg_height
+            };
+            const res: any = await this.model('custom_category').where({shop_id, custom_category_id}).update(params);
+            if (!res) {
+                return this.fail(-1, '编辑失败!');
+            }
+            return this.success(res, '编辑成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 删除定制分类
+     * @param {custom_category_id} 定制分类id
+     */
+    async delCustomCateAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_id: number = this.post('custom_category_id');
+            const machineList: any = await this.model('machine').where({shop_id, custom_category_id, del: 0}).select();
+            if(machineList.length > 0) {
+                let machine = '';
+                for(let v of machineList) {
+                    machine += v.name + ','
+                }
+                return this.fail(-1, `该定制分类已关联${machine}机器`)
+            }
+            const res: any = await this.model('custom_category').where({shop_id, custom_category_id}).update({del:1});
+            if (!res) {
+                return this.fail(-1, '该定制分类不存在!')
+            }
+            return this.success(res, '删除成功!')
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 关联机器
+     * @param {custom_category_id} 定制分类id
+     * @param {machine_id} 机器id
+     */
+    async relationMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_id: number = this.post('custom_category_id');
+            const categoryRes: any = await this.model('custom_category').where({shop_id, custom_category_id}).find();
+            if (think.isEmpty(categoryRes)) {
+                return this.fail(-1, '定制分类不存在!');
+            }
+            const machine_id: number = this.post('machine_id');
+            const res: any = await this.model('machine').where({shop_id, machine_id}).find();
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '机器不存在!');
+            }
+            if (!think.isEmpty(res.custom_category_id)) {
+                if (res.custom_category_id == custom_category_id) {
+                    return this.fail(-1, '该机器已关联至当前可定制分类!');
+                } else {
+                    const res1: any = await this.model('custom_category').where({shop_id, custom_category_id:res.custom_category_id}).find();
+
+                    return this.fail(-1, `该机器已关联至[${ res1.custom_category_name }]可定制分类!`);
+                }
+            } else {
+                const res: any = await this.model('machine').where({shop_id, machine_id}).update({custom_category_id});
+                if (!res) {
+                    return this.fail(-1, '关联失败!');
+                }
+                return this.success(res, '关联成功!')
+            }
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 解除关联机器
+     * @param {custom_category_id} 定制分类id
+     * @param {machine_id} 机器id
+     */
+    async unRelationMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_id: number = this.post('custom_category_id');
+            const categoryRes: any = await this.model('custom_category').where({shop_id, custom_category_id}).find();
+            if (think.isEmpty(categoryRes)) {
+                return this.fail(-1, '定制分类不存在!');
+            }
+            const machine_id: number = this.post('machine_id');
+            const res: any = await this.model('machine').where({shop_id, machine_id}).find();
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '机器不存在!');
+            }
+            if (!think.isEmpty(res.custom_category_id)) {
+                if (res.custom_category_id == custom_category_id) {
+                    const res: any = await this.model('machine').where({shop_id, machine_id}).update({custom_category_id:''});
+                    if (!res) {
+                        return this.fail(-1, '解除关联失败');
+                    }
+                    return this.success(res, '解除关联成功!');
+                } else {
+                    return this.fail(-1, `该机器已关联至[${ categoryRes.custom_category_name }]可定制分类!`);
+                }
+            } else {
+                return this.fail(-1, '该机器未关联可定制分类!');
+            }
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 根据定制分类id获取机器列表
+     * @param {custom_category_id} 定制分类id
+     */
+    async getMachineByIdAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const custom_category_id: number = this.get('custom_category_id');
+            const res: any = await this.model('machine').where({shop_id,del: 0, custom_category_id}).select();
+            return this.success(res, '请求成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 机器列表
+     * @return machineList
+     */
+    async getMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const page: number = this.get('currentPage') || 1;
+            const limit: number = this.get('pageSize') || 10;
+            const res: any = await this.model('machine').order('machine.created_at DESC').where({'machine.shop_id': shop_id, 'machine.del': 0}).page(page, limit).join({
+                table: 'custom_category',
+                join: 'left', //join 方式，有 left, right, inner 3 种方式
+                // as: 'c', // 表别名
+                on: ['custom_category_id', 'custom_category_id'] //ON 条件
+            }).countSelect();
+            return this.success(res, '请求成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 添加机器
+     * @param {machine_code} 机器编号
+     * @param {machine_name} 机器名称
+     * @param {desc} 机器描述
+     * @return boolean
+     */
+    async addMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const machine_code: string = this.post('machine_code');
+            const machine_name: string = this.post('machine_name');
+            const desc: string = this.post('desc');
+            const params = {
+                shop_id,
+                machine_code,
+                machine_name,
+                desc
+            };
+            const res = await this.model('machine').add(params);
+            if (!res) {
+                return this.fail(-1, '添加失败!');
+            }
+            return this.success(res, '添加成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 编辑机器
+     * @param {machine_id} 机器id
+     * @param {machine_code} 机器编号
+     * @param {machine_name} 机器名称
+     * @param {desc} 机器描述
+     * @return boolean
+     */
+    async editMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const machine_id: string = this.post('machine_id');
+            const machine_code: string = this.post('machine_code');
+            const machine_name: string = this.post('machine_name');
+            const desc: string = this.post('desc');
+            const params = {
+                machine_code,
+                machine_name,
+                desc
+            };
+            const res: any = await this.model('machine').where({machine_id, shop_id}).update(params);
+            if (!res) {
+                return this.fail(-1, '编辑失败!');
+            }
+            return this.success(res, '修改成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
+     * 删除机器
+     * @param {machine_id} 机器id
+     * @return boolean
+     */
+    async delMachineAction() {
+        try {
+            // @ts-ignore
+            const shop_id: number = (await this.session('token')).shop_id;
+            const machine_id: number = this.post('machine_id');
+            let res: any = await this.model('machine').where({machine_id,shop_id}).update({del:1});
+            if (res) {
+                return this.success(res, '删除成功!');
+            }
+            return this.fail(-1, '机器不存在!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
+
+    /**
      * 角色列表
      */
     async roleListAction(): Promise<void> {
 
     }
+
     /**
      * 角色详情
      */
     async getRoleInfo(): Promise<void> {
 
     }
+
     /**
      * 添加角色
      */

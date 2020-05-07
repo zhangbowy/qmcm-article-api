@@ -18,6 +18,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   editEmbTemplateAction() {
     const rules = {
       id: {
@@ -45,6 +46,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   addEmbPriceAction() {
     const rules = {
       id: {
@@ -87,6 +89,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   delEmbPriceAction() {
     const rules = {
       id: {
@@ -109,6 +112,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   delSliderAction() {
     const rules = {
       id: {
@@ -126,6 +130,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   editSliderAction() {
     const rules = {
       id: {
@@ -153,6 +158,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   addSliderAction() {
     const rules = {
       image_path: {
@@ -175,12 +181,16 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   getSliderAction() {
   }
+
   getCityAction() {
   }
+
   expTemplateAction() {
   }
+
   addExpTemplateAction() {
     const rules = {
       express_template_type: {
@@ -228,6 +238,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   editExpTemplateAction() {
     const rules = {
       express_template_id: {
@@ -280,6 +291,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   delExpTemplateAction() {
     const rules = {
       express_template_id: {
@@ -297,6 +309,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+
   expTemplateDetailAction() {
     const rules = {
       express_template_id: {
@@ -305,6 +318,287 @@ export default class extends base {
         method: 'get'
       },
     };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  customCategoryAction() {
+
+  }
+
+  addCustomCateAction() {
+    const rules = {
+      custom_category_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_width: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      disign_height: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_top: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_left: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg_width: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg_height: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  editCustomCateAction() {
+    const rules = {
+      custom_category_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      custom_category_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_width: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      disign_height: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_top: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_left: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg_width: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      design_bg_height: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  delCustomCateAction() {
+    const rules = {
+      custom_category_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  getMachineByIdAction() {
+    const rules = {
+      custom_category_id: {
+        required: true,
+        trim: true,
+        method: 'get'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  relationMachineAction() {
+    const rules = {
+      custom_category_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  unRelationMachineAction() {
+    const rules = {
+      custom_category_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  getMachineAction() {
+
+  }
+
+  delMachineAction() {
+    const rules = {
+      machine_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  addMachineAction() {
+    const rules = {
+      machine_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_code: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      desc: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+
+  editMachineAction() {
+    const rules = {
+      machine_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_name: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_code: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      desc: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    }
     const msgs: object = {
       required: '{name}不能为空'
     };

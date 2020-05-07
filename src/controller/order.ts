@@ -199,6 +199,7 @@ export default class extends Base {
       if (orderUpdate) {
         return this.success(res, '确认收货成功!');
       }
+      return this.fail(-1, '操作失败!');
     } catch (e) {
       return this.fail(-1, e);
     }

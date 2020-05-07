@@ -34,7 +34,7 @@ export default class extends Base {
                 let res1: any = await exportFile(file.path);
                 if (typeof res1 == 'string') {
                     deleteFolder(filepath);
-                    return this.fail(-1, res1)
+                    return this.fail(-1, res1);
                 }
                 const oss = await think.service('oss');
                 /**
@@ -49,7 +49,7 @@ export default class extends Base {
                 deleteFolder(filepath);
                 return this.success([], "导入成功!");
             } else {
-                return this.fail(-1, '导入文件格式必须为zip')
+                return this.fail(-1, '导入文件格式必须为zip');
 
             }
         } catch (err) {
@@ -67,7 +67,7 @@ export default class extends Base {
             let font = await this.model('fonts').where({font_id:font_id}).find();
 
             if ((Object.keys(font)).length == 0) {
-                return   this.fail(-1, '字体不存在!',[]);
+                return  this.fail(-1, '字体不存在!',[]);
             }
             let arr: any = [];
             let fontContent = JSON.parse(font.font_content);
@@ -75,7 +75,7 @@ export default class extends Base {
                 let obj = {
                     Key:fontContent[k]
                 };
-                arr.push(obj)
+                arr.push(obj);
             }
             console.log(arr);
             let data =  await this.model('fonts').where({font_id}).delete();

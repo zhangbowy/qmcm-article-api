@@ -5,6 +5,7 @@ const Color = require('color');
 const path = require('path');
 const fs = require('fs');
 export default class extends Base {
+
     /**
      * 修改圖片顏色
      */
@@ -20,26 +21,85 @@ export default class extends Base {
         let imageObj = {};
         let filePath = path.join(think.ROOT_PATH, 'www/1.png');
         // stream
-        let i =0
+        let i =0;
         for(let urlItem of urlList) {
             // const res = await this.fetch(urlItem);
             // const dest = fs.createWriteStream(filePath);
             // await res.body.pipe(dest).on('finish',async () =>{
             //     let data = res.body._readableState.buffer
                 //
-            let data = Buffer.from(urlItem,'base64')
-                let color1 = color.object();
-                // let color1 = color.ansi256().object()
-                // let data  = await fs.readFileSync(filePath)
-                let data1  = await sharp(data).tint(color1).png().toBuffer();
-                let img = 'data:image/png;base64,' + Buffer.from(data1, 'utf8').toString('base64');
-                imageObj[i] = img;
-                ++i
+            let data = Buffer.from(urlItem,'base64');
+            let color1 = color.object();
+            // let color1 = color.ansi256().object()
+            // let data  = await fs.readFileSync(filePath)
+            // let data1  = await sharp(data).tint(color1).png().toBuffer();
+            let data1  = await sharp(data).metadata();
+            // let img = 'data:image/png;base64,' + Buffer.from(data1, 'utf8').toString('base64');
+            imageObj[i] = data1;
+            ++i
             // });
 
         }
-        return this.success(imageObj)
+        return this.success(imageObj);
 
     }
 
+    async previewAction() {
+        let resPath = path.join(think.ROOT_PATH, 'www/1.png');
+        let icoPath = path.join(think.ROOT_PATH, 'www/2.png');
+        const res = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
+        const res1 = res.body.readableBuffer;
+        const res2 = res.body._writableState.getBuffer();
+        // const resPath1 = fs.createWriteStream(resPath);
+        let _this = this;
+        let data = await getBuffer(this);
+        _this.ctx.type = 'image/png';
+         _this.ctx.body = data;
+        // await res.body.pipe(resPath1).on('finish',async () =>{
+        //     const icoPath1 = fs.createWriteStream(icoPath);
+            // const ico = await _this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG');
+            // await ico.body.pipe(icoPath1).on('finish',async () =>{
+            //     let resdata = await fs.readFileSync(resPath)
+            //     let icodata = await fs.readFileSync(icoPath)
+            //     const data = await sharp(resdata).composite([{ input: icoPath,}]).toBuffer()
+            //     _this.ctx.type = 'image/png';
+            //     _this.ctx.body = res1.tail.data;
+            // })
+            // })
+
+
+    }
+
+}
+
+
+async function getBuffer($this: any) {
+
+    const { Writable } = require('stream');
+    // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
+    const res = await $this.fetch('https://tpc.googlesyndication.com/simgad/16824238831839262624?sqp=4sqPyQQrQikqJwhfEAEdAAC0QiABKAEwCTgDQPCTCUgAUAFYAWBfcAJ4AcUBLbKdPg&rs=AOga4qlGIdwTugHd_AnNxPzPeW2j-9ky0A');
+    // const res = await $this.fetch('http://img.wkdao.com/image/65/2020/01/07/9ed36e3bae2d24848c85ae8e79a58aa1.png@!200_200');
+    let chunks: any = [];
+    let size = 0;
+    return new Promise((resolve,reject) => {
+        /**
+         * 创建可写流
+         */
+        const outStream = new Writable({
+            write(chunk: Buffer, encoding: string, callback: any) {
+                chunks.push(chunk);
+                console.log(chunk);
+                size += chunk.length;
+                callback()
+            },
+            final(){
+                /**
+                 * 拼接Buffer
+                 */
+                let newBuffer = Buffer.concat(chunks,size);
+                resolve(newBuffer)
+            }
+        });
+        res.body.pipe(outStream);
+    })
 }

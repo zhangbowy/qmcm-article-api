@@ -1,7 +1,7 @@
 import { think } from 'thinkjs';
 export default class extends think.Controller {
   async __before() {
-    await think.timeout(500)
+    // await think.timeout(500)
     this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
     this.header('Access-Control-Allow-Headers', ["x-requested-with",'origin','content-type']);
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');

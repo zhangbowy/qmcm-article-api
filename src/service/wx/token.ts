@@ -2,9 +2,6 @@ const jwt = require('jsonwebtoken');
 const secret = 'SLDLKKDS323ssdd@#@@gf';
 import { think } from 'thinkjs';
 module.exports = class extends think.Service {
-    /**
-     * 根据header中的X-Nideshop-Token值获取用户id
-     */
     async getUserId(token: string) {
         if (!token) {
             return 0;
