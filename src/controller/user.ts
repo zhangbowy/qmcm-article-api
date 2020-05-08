@@ -61,7 +61,7 @@ export default class extends Base {
             // fontPath: './fonts/Comismsh.ttf', // your font path
             fontSize: 40, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
-        }
+        };
         let captcha = new ThinkSvgCaptcha(defaultOptions);
 
         let c= captcha.create();
@@ -70,5 +70,13 @@ export default class extends Base {
         return this.ctx.body = c.data
         // captcha.svgCaptcha(text);
     }
-
+    /**
+     * 用户列表
+     */
+    async userListAction(): Promise<void> {
+        // @ts-ignore
+        const shop_id: number = (await this.session('token')).shop_id;
+        const res = await this.model('user').where({shop_id}).countSelect();
+        this.success(res, '请求成功!');
+    }
 }

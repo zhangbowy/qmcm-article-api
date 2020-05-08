@@ -41,6 +41,10 @@ export default class extends Base {
      * @params { sku_show } sku规格列表
      * @params { sku_list } sku详细列表
      * @params { detail } 详情
+     * @params { is_custom } 是否开启定制
+     * @params { custom_category_id } 定制分类id
+     * @params { express_type } 物流类型 0 包邮 1 统一运费 2 运费模板
+     * @returns boolean
      */
     async addGoodsAction() {
         try {
@@ -59,14 +63,35 @@ export default class extends Base {
             const images = JSON.stringify(this.post('images'));
             const thumb_image_path = this.post('images')[0];
             const sku_show = JSON.stringify(this.post('sku_show'));
+            const is_custom = this.post('is_custom');
+            const custom_category_id = this.post('custom_category_id');
+            const express_type = this.post('express_type');
+            /**
+             * 查询商品分类是否存在
+             */
+            if(category_id) {
+                const category  =  await this.model('item_category').where({id: category_id}).find();
+                if (think.isEmpty(category)) {
+                    return this.fail(-1, '商品分类不存在!');
+                }
+            }
             /**
              * 快递费
              */
-            const express_fee = this.post('express_fee');
+            const express_fee = this.post('express_fee') || 0;
             /**
              * 快递模板
              */
             const express_template_id = this.post('express_template_id');
+            /**
+             * 验证运费模板  express_type 0 包邮 1 统一运费 2 运费模板
+             */
+            if (express_type == 2) {
+                const express_template =  await this.model('express_template').where({express_template_id}).find();
+                if (think.isEmpty(express_template)) {
+                    return this.fail(-1, '运费模板不存在!');
+                }
+            }
             const sku_list = JSON.stringify(this.post('sku_list'));
             const detail = this.post('detail');
             if(min_buy < 1) {
@@ -95,8 +120,17 @@ export default class extends Base {
                 detail,
                 thumb_image_path,
                 express_fee,
-                express_template_id
+                express_template_id,
+                is_custom,
+                express_type
             };
+            if (is_custom) {
+                const custom = await this.model('custom_category').where({custom_category_id}).find();
+                if (think.isEmpty(custom)) {
+                    return this.fail(-1, '定制分类不存在!');
+                }
+                params.custom_category_id = custom_category_id
+            }
             const model = this.model('item') as ItemModel;
             const res = await model.addGoods(params);
             if (res) {
@@ -144,6 +178,10 @@ export default class extends Base {
      * @params { sku_show } sku规格列表
      * @params { sku_list } sku详细列表
      * @params { detail } 详情
+     * @params { is_custom } 是否开启定制
+     * @params { custom_category_id } 定制分类id
+     * @params { express_type } 物流类型 0 包邮 1 统一运费 2 运费模板
+     * @returns boolean
      */
     async editGoodsAction() {
         try {
@@ -164,14 +202,35 @@ export default class extends Base {
             const sku_show = JSON.stringify(this.post('sku_show'));
             const sku_list = JSON.stringify(this.post('sku_list'));
             const detail = this.post('detail');
+            const is_custom = this.post('is_custom');
+            const custom_category_id = this.post('custom_category_id');
+            const express_type = this.post('express_type');
             /**
-             * 快递费
+             * 查询商品分类是否存在
              */
-            const express_fee = this.post('express_fee');
+            if(category_id) {
+                const category  =  await this.model('item_category').where({id: category_id}).find();
+                if (think.isEmpty(category)) {
+                    return this.fail(-1, '商品分类不存在!');
+                }
+            }
+            /**
+             * 统一快递费
+             */
+            const express_fee = this.post('express_fee') || 0;
             /**
              * 快递模板
              */
             const express_template_id = this.post('express_template_id');
+            /**
+             * 验证运费模板  express_type 0 包邮 1 统一运费 2 运费模板
+             */
+            if (express_type == 2) {
+                const express_template =  await this.model('express_template').where({express_template_id}).find();
+                if (think.isEmpty(express_template)) {
+                    return this.fail(-1, '运费模板不存在!');
+                }
+            }
             const params: any = {
                 name,
                 category_id,
@@ -189,8 +248,17 @@ export default class extends Base {
                 detail,
                 thumb_image_path,
                 express_fee,
-                express_template_id
+                express_template_id,
+                is_custom,
+                express_type
             };
+            if (is_custom) {
+                const custom = await this.model('custom_category').where({custom_category_id}).find();
+                if (think.isEmpty(custom)) {
+                    return this.fail(-1, '定制分类不存在!');
+                }
+                params.custom_category_id = custom_category_id
+            }
             const model = this.model('item') as ItemModel;
             let res: any = await model.editGoods(id, params);
             return this.success(res, '编辑成功!');
@@ -380,6 +448,7 @@ export default class extends Base {
             return this.fail(-1, e);
         }
     }
+
 }
 /**
  * 递归分类列表

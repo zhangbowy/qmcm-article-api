@@ -5,7 +5,59 @@ const Color = require('color');
 const path = require('path');
 const fs = require('fs');
 export default class extends Base {
-
+    /**
+     * 定制信息
+     * @param {id} 商品id
+     * @param {sku_id}
+     * @return {定制模板信息, 商品信息}
+     */
+    async customInfoAction() {
+        try {
+            const id = this.get('id');
+            const sku_id = this.get('sku_id') || 0;
+            let result: any = {};
+            let item = await this.model('item').where({id: id}).find();
+            let design_area_info = await this.model('custom_category').where({custom_category_id: item.custom_category_id}).find();
+            if (think.isEmpty(design_area_info)) {
+                return this.fail(-1, '定制模板不存在')
+            }
+            result.custom_info = {
+                design_width: design_area_info.design_width,
+                disign_height: design_area_info.disign_height,
+                design_top: design_area_info.design_top,
+                design_left: design_area_info.design_left,
+                design_bg: design_area_info.design_bg,
+                design_bg_width: design_area_info.design_bg_width,
+                design_bg_height: design_area_info.design_bg_height,
+            };
+            /**
+             * 没有sku的商品
+             */
+            if (sku_id == 0) {
+                result.item = {
+                    item_id:id,
+                    name:item.name,
+                    background:item.thumb_image_path,
+                    sku_id:0,
+                }
+            } else {
+                let sku_list  = JSON.parse(item.sku_list);
+                for (let sku_v of sku_list) {
+                    if (sku_v.sku_id == sku_id) {
+                        result.item = {
+                            item_id:id,
+                            name:item.name,
+                            background:sku_v.images,
+                            sku_id:sku_v.sku_id,
+                        }
+                    }
+                }
+            }
+            return this.success(result, '请求成功!');
+        }catch (e) {
+            return this.fail(-1, e);
+        }
+    }
     /**
      * 修改圖片顏色
      */

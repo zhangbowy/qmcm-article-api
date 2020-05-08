@@ -28,6 +28,8 @@
     "think-svg-captcha": "^1.0.3",
     "think-view": "^1.0.12",
     "think-view-nunjucks": "^1.0.10",
+    "think-websocket": "^1.0.7",
+    "think-websocket-socket.io": "^1.0.11",
     "thinkjs": "^3.2.11",
     "thinkjs3-ts": "^1.0.1"
   },

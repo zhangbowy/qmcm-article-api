@@ -46,7 +46,18 @@ module.exports = class extends base {
                 required: true,
                 method: 'post'
             },
-
+            express_fee:{
+                required: true,
+                method: 'post'
+            },
+            is_custom:{
+                required: true,
+                method: 'post'
+            },
+            express_type:{
+                required: true,
+                method: 'post'
+            }
         };
         const msgs: object = {
             required: '{name}不能为空'
@@ -88,12 +99,23 @@ module.exports = class extends base {
             //     required: true,
             //     method: 'post'
             // },
+            express_fee:{
+                required: true,
+                method: 'post'
+            },
             images: {
                 array: true,
                 required: true,
                 method: 'post'
             },
-
+            is_custom:{
+                required: true,
+                method: 'post'
+            },
+            express_type:{
+                required: true,
+                method: 'post'
+            }
         };
         const msgs: object = {
             required: '{name}不能为空'

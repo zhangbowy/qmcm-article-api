@@ -56,6 +56,10 @@ export default class extends Base {
             const shop_id = this.ctx.state.shop_id;
             const id: number = this.post('id');
             const model = this.model('item') as ItemModel;
+            /**
+             * 商品的浏览量增加1
+             */
+            await this.model('item').where({id: id}).increment('pv', 1);
             const res = await model.getGoodById(id, shop_id);
             return this.success(res, '请求成功!');
         }catch (e) {

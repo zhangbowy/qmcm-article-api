@@ -24,7 +24,8 @@ exports.model = {
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,
-        connectionLimit:10
+        connectionLimit:10,
+        charset: 'utf8mb4'
     }
 };
 

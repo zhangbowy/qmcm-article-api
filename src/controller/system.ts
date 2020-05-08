@@ -362,6 +362,10 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = (await this.session('token')).shop_id;
             const express_template_id: number = this.post('express_template_id');
+            const goods = await this.model('item').where({express_template_id}).select();
+            if (goods.length > 0) {
+                return this.fail(-1, `该运费模板已被【${goods[0].name}】等${goods.length}件商品使用!`);
+            }
             let res: any = await this.model('express_template').where({express_template_id,shop_id}).update({del:1});
             if (res) {
                 return this.success(res, '删除成功!');
@@ -395,7 +399,8 @@ export default class extends Base {
      * @param {design_top} 设计区域据图片顶部距离
      * @param {design_left} 设计区域据图片左边距离
      * @param {design_bg} 背景
-     * @param {scale} 比例
+     * @param {design_bg_width} 背景宽
+     * @param {design_bg_height} 背景高
      */
     async addCustomCateAction() {
         try {
