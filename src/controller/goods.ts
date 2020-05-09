@@ -18,7 +18,7 @@ export default class extends Base {
             const status: number = this.post('status') || -1;
             const name: string = this.post('name') || "";
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await model.goodsList({page, limit, shop_id,status,name});
             return this.success(data, '请求成功!');
         }catch (e) {
@@ -49,7 +49,7 @@ export default class extends Base {
     async addGoodsAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             console.log(shop_id, 'shop_id');
             const name = this.post('name');
             const category_id = this.post('category_id');
@@ -149,7 +149,7 @@ export default class extends Base {
     async goodsDetailAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = this.post('id');
             const model = this.model('item') as ItemModel;
             const res = await model.getGoodById(id,shop_id);
@@ -186,7 +186,7 @@ export default class extends Base {
     async editGoodsAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const id = this.post('id');
             const name = this.post('name');
             const category_id = this.post('category_id');
@@ -319,7 +319,7 @@ export default class extends Base {
             const limit: number = this.post('pageSize') || 10;
             const cateModel = this.model('item_category') as cateModel;
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await cateModel.categoryList({page, limit, shop_id});
             let res =  updateCategory(data,0);
             return this.success(res, '请求成功!');
@@ -339,7 +339,7 @@ export default class extends Base {
     async addCategoryAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const category_name: number = this.post('category_name');
             const parent_id: number = this.post('parent_id') || 0;
             const image_path: number = this.post('image_path') || "";
@@ -400,7 +400,7 @@ export default class extends Base {
     async editCategoryAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = this.post('id');
             const category_name: number = this.post('category_name');
             const image_path: number = this.post('image_path');
@@ -429,7 +429,7 @@ export default class extends Base {
     async delCategoryAction() {
         try {
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = Number(this.post('id'));
             let category = await this.model('item_category').where({id:id}).find();
             if (Object.keys(category).length == 0) {

@@ -344,7 +344,7 @@ export default class extends base {
         trim: true,
         method: 'post'
       },
-      disign_height: {
+      design_height: {
         required: true,
         trim: true,
         method: 'post'
@@ -403,7 +403,7 @@ export default class extends base {
         trim: true,
         method: 'post'
       },
-      disign_height: {
+      design_height: {
         required: true,
         trim: true,
         method: 'post'

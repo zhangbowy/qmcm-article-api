@@ -39,6 +39,17 @@ export default class extends Base {
                         admin_id:res.id,
                     };
                     let token = await tokenFuc.create1(info);
+
+                    // // @ts-ignore
+                    // const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${res.id}`, undefined, 'redis'));
+                    // // @ts-ignore
+                    // // this.ctx.state.adm_sign = await this.cache(`admin-sign-${res.id}`, undefined, 'redis');
+                    // this.ctx.state.adm_sign = admin_redis_sign.admin_id;
+                    // if (!think.isEmpty(admin_redis_sign)) {
+                    //     const orderController = this.controller('websocket');
+                    //     // @ts-ignore
+                    //     orderController.offlineAction();
+                    // }
                     await this.cache(`admin-${res.id}`, res, {
                         type: 'redis',
                         redis: {
@@ -53,17 +64,7 @@ export default class extends Base {
                             timeout:  60 * 60 * 1000
                         }
                     });
-                    // await this.session('captcha',null);
-                    // @ts-ignore
-                    // await this.session('admin_sign', info);
-                    // @ts-ignore
-                    const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${res.id}`, undefined, 'redis'));
-                    if (!think.isEmpty(admin_redis_sign)) {
-                        const orderController = this.controller('websocket');
-                        // @ts-ignore
-                        orderController.offlineAction();
-                    }
-                    return  this.success(token, "登录成功!");
+                    return  this.success({token,adminId:res.id}, "登录成功!");
                 }
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
@@ -82,10 +83,14 @@ export default class extends Base {
      * 登出
      */
     async logOutAction(): Promise<void> {
-        const admin_info = this.ctx.state.admin_info;
-        // @ts-ignore
-        await this.cache(`admin-${admin_info.id}`, null, 'redis');
-        return this.success([], "登出成功!");
+        try {
+            const admin_info = this.ctx.state.admin_info;
+            // @ts-ignore
+            // await this.cache(`admin-${admin_info.id}`, null, 'redis');
+            return this.success([], "登出成功!");
+        }catch (e) {
+            return this.fail(-1, e);
+        }
     }
 
     /**

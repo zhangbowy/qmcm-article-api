@@ -11,5 +11,8 @@ export default class extends think.Model {
         }
         return res;
     }
+    get pk() {
+        return 'express_template_id'
+    }
 }
 

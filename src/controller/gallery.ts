@@ -23,7 +23,7 @@ export default class extends Base {
         const groupModel = this.model('gallery_group') as GroupModel;
         const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         const data = await model.list({page, limit, shop_id,gallery_group_id:group_list,img_name});
         return this.success(data, '请求成功!');
     }
@@ -34,7 +34,7 @@ export default class extends Base {
     async getNeedsTreeAction()
     {
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         // const data = await model.list({page, limit, shop_id,gallery_group_id});
         // return this.success(data, '请求成功!');
     }
@@ -51,7 +51,7 @@ export default class extends Base {
             // await think.mkdir(path.dirname(filepath));
             const readStream = fs.createReadStream(file.path);
             // @ts-ignore
-            const shop_id = (await this.session('token')).shop_id;
+            const shop_id = this.ctx.state.admin_info.shop_id;
             let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
             let filePath = `/gallary/${shop_id}/${day}/${fileName}.${gs}`;
             const oss = await think.service('oss');
@@ -93,7 +93,7 @@ export default class extends Base {
         const id: any = JSON.parse(this.post('id'));
         const model = this.model('gallery') as GalleryModel;
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         let res =await model.findImageById(id);
         if (res.length == 0) {
            return   this.fail(-1, '图片不存在!',[]);
@@ -130,7 +130,7 @@ export default class extends Base {
         const img_name: string = this.post('img_name');
         const model = this.model('gallery') as GalleryModel;
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         let params: any = {
             gallery_group_id,
             img_name
@@ -153,7 +153,7 @@ export default class extends Base {
         const gallery_group_id: number = this.post('gallery_group_id');
         const model = this.model('gallery') as GalleryModel;
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         const data: any = await model.setGroup(id,gallery_group_id);
         return this.success([], '请求成功!');
     }
@@ -164,7 +164,7 @@ export default class extends Base {
     async groupListAction(): Promise<Object> {
         const model = this.model('gallery_group') as GroupModel;
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         const data = await model.list({shop_id});
         let res = updateGroup(data,0);
         return this.success(res, '请求成功!');
@@ -181,7 +181,7 @@ export default class extends Base {
         const parent_id: number = this.post('parent_id');
         const level: number = this.post('level');
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         let params: AddParams = {
             group_name,
             parent_id,
@@ -208,7 +208,7 @@ export default class extends Base {
         const parent_id: number = this.post('parent_id');
         const level: number = this.post('level');
         // @ts-ignore
-        const shop_id = (await this.session('token')).shop_id;
+        const shop_id = this.ctx.state.admin_info.shop_id;
         let params: AddParams = {
             group_name,
             parent_id,
@@ -229,7 +229,7 @@ export default class extends Base {
     async deleteGroupAction($id: number): Promise<Object> {
         const gallery_group_id: number = this.post('gallery_group_id');
         // @ts-ignore
-        const shop_id: number = (await this.session('token')).shop_id;
+        const shop_id: number = this.ctx.state.admin_info.shop_id;
         const model = this.model('gallery_group') as GroupModel;
         const galleryModel = this.model('gallery') as GalleryModel;
         const group_list: any  = await model.getNeedsTree(gallery_group_id);
@@ -272,5 +272,5 @@ function updateGroup(data:any, root:any) {
                 return node
             }
         }
-        return getNode(root)
+        return getNode(root);
 }

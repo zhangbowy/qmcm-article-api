@@ -64,7 +64,7 @@ export default class extends think.Model {
     //     };
     // }
     async getGoodById($id: number,shop_id: number) {
-        // const shop_id = (await this.session('token')).shop_id;
+        // const shop_id = this.ctx.state.admin_info.shop_id;
         // const id = this.post('id');
         // const name = this.post('name');
         // const category = this.post('category');

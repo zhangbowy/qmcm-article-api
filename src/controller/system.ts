@@ -111,7 +111,7 @@ export default class extends Base {
      */
     async getSliderAction(): Promise<void> {
         // @ts-ignore
-        const shop_id: number = (await this.session('token')).shop_id;
+        const shop_id: number = this.ctx.state.admin_info.shop_id;
         let res = await this.model('slider').order('sort DESC').where({shop_id: shop_id}).select();
         if (res) {
             return this.success(res, '请求成功!');
@@ -126,7 +126,7 @@ export default class extends Base {
      */
     async addSliderAction(): Promise<void>  {
         // @ts-ignore
-        const shop_id: number = (await this.session('token')).shop_id;
+        const shop_id: number = this.ctx.state.admin_info.shop_id;
         let image_path = this.post('image_path');
         let link = this.post('link');
         let slider_name = this.post('slider_name');
@@ -156,7 +156,7 @@ export default class extends Base {
      */
     async editSliderAction(): Promise<void> {
         // @ts-ignore
-        const shop_id: number = (await this.session('token')).shop_id;
+        const shop_id: number = this.ctx.state.admin_info.shop_id;
         let id = this.post('id');
         let image_path = this.post('image_path');
         let link = this.post('link');
@@ -210,7 +210,7 @@ export default class extends Base {
     async expTemplateAction(): Promise<void> {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             let page: number = this.get('currentPage');
             let limit: number = this.get('pageSize');
             let res = await (this.model('express_template') as ExpressTemp).getList({page, limit, shop_id});
@@ -227,7 +227,7 @@ export default class extends Base {
     async expTemplateDetailAction(): Promise<void> {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             let express_template_id: number = this.get('express_template_id');
             let res = await this.model('express_template').where({shop_id, express_template_id}).find();
             if (Object.keys(res).length > 0) {
@@ -256,7 +256,7 @@ export default class extends Base {
     async addExpTemplateAction(): Promise<void> {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const express_template_type: number = this.post('express_template_type');
             const express_template_name: number = this.post('express_template_name');
             let region_rules: any = this.post('region_rules') || [];
@@ -313,7 +313,7 @@ export default class extends Base {
     async editExpTemplateAction(): Promise<void> {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const express_template_id: number = this.post('express_template_id');
             const express_template_type: number = this.post('express_template_type');
             const express_template_name: number = this.post('express_template_name');
@@ -360,7 +360,7 @@ export default class extends Base {
     async delExpTemplateAction(): Promise<void> {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const express_template_id: number = this.post('express_template_id');
             const goods = await this.model('item').where({express_template_id}).select();
             if (goods.length > 0) {
@@ -382,7 +382,7 @@ export default class extends Base {
     async customCategoryAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('custom_category').order('created_at DESC').where({shop_id,del: 0}).select();
             return this.success(res, '请求成功!')
         }catch (e) {
@@ -405,10 +405,10 @@ export default class extends Base {
     async addCustomCateAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_name = this.post('custom_category_name');
             const design_width = this.post('design_width');
-            const disign_height = this.post('disign_height');
+            const design_height = this.post('design_height');
             const design_top = this.post('design_top');
             const design_left = this.post('design_left');
             const design_bg = this.post('design_bg');
@@ -419,7 +419,7 @@ export default class extends Base {
                 shop_id,
                 custom_category_name,
                 design_width,
-                disign_height,
+                design_height,
                 design_top,
                 design_left,
                 design_bg,
@@ -451,11 +451,11 @@ export default class extends Base {
     async editCustomCateAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id = this.post('custom_category_id');
             const custom_category_name = this.post('custom_category_name');
             const design_width = this.post('design_width');
-            const disign_height = this.post('disign_height');
+            const design_height = this.post('design_height');
             const design_top = this.post('design_top');
             const design_left = this.post('design_left');
             const design_bg = this.post('design_bg');
@@ -465,7 +465,7 @@ export default class extends Base {
             const params = {
                 custom_category_name,
                 design_width,
-                disign_height,
+                design_height,
                 design_top,
                 design_left,
                 design_bg,
@@ -489,7 +489,7 @@ export default class extends Base {
     async delCustomCateAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id: number = this.post('custom_category_id');
             const machineList: any = await this.model('machine').where({shop_id, custom_category_id, del: 0}).select();
             if(machineList.length > 0) {
@@ -517,7 +517,7 @@ export default class extends Base {
     async relationMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id: number = this.post('custom_category_id');
             const categoryRes: any = await this.model('custom_category').where({shop_id, custom_category_id}).find();
             if (think.isEmpty(categoryRes)) {
@@ -556,7 +556,7 @@ export default class extends Base {
     async unRelationMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id: number = this.post('custom_category_id');
             const categoryRes: any = await this.model('custom_category').where({shop_id, custom_category_id}).find();
             if (think.isEmpty(categoryRes)) {
@@ -592,7 +592,7 @@ export default class extends Base {
     async getMachineByIdAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id: number = this.get('custom_category_id');
             const res: any = await this.model('machine').where({shop_id,del: 0, custom_category_id}).select();
             return this.success(res, '请求成功!');
@@ -608,7 +608,7 @@ export default class extends Base {
     async getMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const page: number = this.get('currentPage') || 1;
             const limit: number = this.get('pageSize') || 10;
             const res: any = await this.model('machine').order('machine.created_at DESC').where({'machine.shop_id': shop_id, 'machine.del': 0}).page(page, limit).join({
@@ -633,7 +633,7 @@ export default class extends Base {
     async addMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const machine_code: string = this.post('machine_code');
             const machine_name: string = this.post('machine_name');
             const desc: string = this.post('desc');
@@ -664,7 +664,7 @@ export default class extends Base {
     async editMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const machine_id: string = this.post('machine_id');
             const machine_code: string = this.post('machine_code');
             const machine_name: string = this.post('machine_name');
@@ -692,7 +692,7 @@ export default class extends Base {
     async delMachineAction() {
         try {
             // @ts-ignore
-            const shop_id: number = (await this.session('token')).shop_id;
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const machine_id: number = this.post('machine_id');
             let res: any = await this.model('machine').where({machine_id,shop_id}).update({del:1});
             if (res) {

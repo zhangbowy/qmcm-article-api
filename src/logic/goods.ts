@@ -46,10 +46,6 @@ module.exports = class extends base {
                 required: true,
                 method: 'post'
             },
-            express_fee:{
-                required: true,
-                method: 'post'
-            },
             is_custom:{
                 required: true,
                 method: 'post'
@@ -99,10 +95,10 @@ module.exports = class extends base {
             //     required: true,
             //     method: 'post'
             // },
-            express_fee:{
-                required: true,
-                method: 'post'
-            },
+            // express_fee:{
+            //     required: true,
+            //     method: 'post'
+            // },
             images: {
                 array: true,
                 required: true,

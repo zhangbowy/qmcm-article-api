@@ -82,9 +82,9 @@ export default class extends Base {
             const receiver_name: string = address.name;
             const receiver_phone: string = address.phone;
             const receiver_address: string = `${address.province}${address.city}${address.area}${address.address}`;
-            const pay_amount: number = item_info.total_price;
-            const express_amount: number = item_info.express_amount;
-            const item_amount: number = item_info.item_price;
+            const pay_amount: number = Number(item_info.total_price);
+            const express_amount: number = Number(item_info.express_amount);
+            const item_amount: number = Number(item_info.item_price);
             // return this.success(item_info);
             /**
              * 创建订单存库
@@ -215,27 +215,7 @@ export default class extends Base {
                          * sku列表
                          */
                         let sku_list = JSON.parse(item.sku_list);
-                        /**
-                         * 物流类型 0 包邮
-                         */
-                        if(item.express_type == 0) {
-                            express_amount.push(0);
-                            pay_amount += item.current_price * cart_v.buy_num;
-                            let sku_name = item.name;
 
-                            let item_info = {
-                                item_id:item.id,
-                                name:item.name,
-                                weight:item.weight,
-                                image:item.thumb_image_path,
-                                sku_name,
-                                sku_id:cart_v.sku_id || 0,
-                                buy_num:cart_v.buy_num,
-                                current_price:item.current_price,
-                                category_id:item.category_id
-                            };
-                            item_list.push(item_info);
-                        } else {
                             if(sku_list.length == 0 ) {
 
                                 /**
@@ -249,6 +229,24 @@ export default class extends Base {
                                     return  item.name+'购买数量超出库存' + item.sum_stock;
                                     break;
                                 }
+                                if(item.express_type == 0) {
+                                    express_amount.push(0);
+                                }
+                                // pay_amount += item.current_price * cart_v.buy_num;
+                                // let sku_name = item.name;
+                                //
+                                // let item_info = {
+                                //     item_id:item.id,
+                                //     name:item.name,
+                                //     weight:item.weight,
+                                //     image:item.thumb_image_path,
+                                //     sku_name,
+                                //     sku_id:cart_v.sku_id || 0,
+                                //     buy_num:cart_v.buy_num,
+                                //     current_price:item.current_price,
+                                //     category_id:item.category_id
+                                // };
+                                // item_list.push(item_info);
                                 /**
                                  * 统一运费
                                  */
@@ -329,6 +327,9 @@ export default class extends Base {
                                             return  sku_v.sku_id+'购买数量超出库存' + sku_v.num;
                                             break;
                                         }
+                                        if(item.express_type == 0) {
+                                            express_amount.push(0);
+                                        }
                                         /**
                                          * 统一运费
                                          */
@@ -404,7 +405,6 @@ export default class extends Base {
                                     }
                                 }
                             }
-                        }
                     } else {
                         return  '商品不存在';
                     }
@@ -412,13 +412,14 @@ export default class extends Base {
                     return '商品信息不合法';
                 }
             }
-            express_amount = maxPrice(express_amount);
+            express_amount = (maxPrice(express_amount));
+            let total_price = express_amount + pay_amount;
             let result: object = {
                 item_list,
                 address:address,
-                item_price:pay_amount,
-                express_amount,
-                total_price:express_amount + pay_amount
+                item_price:pay_amount.toFixed(2),
+                express_amount:express_amount.toFixed(2),
+                total_price:total_price.toFixed(2)
             };
             return result;
         }catch (e) {

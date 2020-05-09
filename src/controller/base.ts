@@ -15,18 +15,18 @@ export default class extends think.Controller {
         }
         let tokenFuc =  think.service('token');
         let admin_data = await tokenFuc.parse1(adm_sign);
-        let admin_id = admin_data.admin_id;
-        if (think.isEmpty(admin_id)) {
+        if (admin_data == null) {
           return this.fail(402, '未登录!', []);
         }
+        let admin_id = admin_data.admin_id;
         // @ts-ignore
         const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${admin_id}`, undefined, 'redis'));
         if(think.isEmpty(admin_redis_sign)) {
           return this.fail(402, '未登录!', []);
         }
-        if(admin_data.iat < admin_redis_sign.iat) {
-          return this.fail(402, '当前账号已在其他浏览器登录!', []);
-        }
+        // if(admin_data.iat < admin_redis_sign.iat) {
+        //   return this.fail(402, '当前账号已在其他浏览器登录!', []);
+        // }
         // @ts-ignore
         const admin_info = await this.cache(`admin-${admin_id}`, undefined, 'redis');
         if(think.isEmpty(admin_info)) {

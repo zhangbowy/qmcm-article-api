@@ -16,7 +16,7 @@ export default class extends Base {
   async orderListAction() {
     try {
       // @ts-ignore
-      const shop_id = (await this.session('token')).shop_id;
+      const shop_id = this.ctx.state.admin_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       const status: number = Number(this.post('status') || 0);
@@ -49,7 +49,7 @@ export default class extends Base {
   async orderCountAction() {
     try {
       // @ts-ignore
-      const shop_id = (await this.session('token')).shop_id;
+      const shop_id = this.ctx.state.admin_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       // const status: number = this.post('status') || 0;
@@ -102,7 +102,7 @@ export default class extends Base {
     try {
       const order_no: any = this.post('order_no');
       // @ts-ignore
-      const shop_id = (await this.session('token')).shop_id;
+      const shop_id = this.ctx.state.admin_info.shop_id;
       let res = await this.model('order').where({shop_id, order_no}).find();
       if (Object.keys(res).length == 0) {
         return this.fail(-1, '该订单不存在!')
@@ -122,7 +122,7 @@ export default class extends Base {
     try {
       const order_id: any = this.post('order_id');
       // @ts-ignore
-      const shop_id = (await this.session('token')).shop_id;
+      const shop_id = this.ctx.state.admin_info.shop_id;
 
       let orderInfo: any = await this.model('order').where( {shop_id, id:order_id}).find();
       if (think.isEmpty(orderInfo)) {
@@ -166,7 +166,7 @@ export default class extends Base {
     try {
       const order_id: any = this.post('order_id');
       // @ts-ignore
-      const shop_id = (await this.session('token')).shop_id;
+      const shop_id = this.ctx.state.admin_info.shop_id;
 
       let orderInfo: any = await this.model('order').where({shop_id, id: order_id}).find();
       if (think.isEmpty(orderInfo)) {

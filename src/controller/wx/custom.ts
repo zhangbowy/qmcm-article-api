@@ -23,7 +23,7 @@ export default class extends Base {
             }
             result.custom_info = {
                 design_width: design_area_info.design_width,
-                disign_height: design_area_info.disign_height,
+                design_height: design_area_info.design_height,
                 design_top: design_area_info.design_top,
                 design_left: design_area_info.design_left,
                 design_bg: design_area_info.design_bg,
@@ -58,6 +58,32 @@ export default class extends Base {
             return this.fail(-1, e);
         }
     }
+    async getFontAction() {
+        try {
+            const font_id = this.get('font_id');
+            const font_list = JSON.parse(this.get('font_list') )|| ['a','b','c'];
+            let res = await this.model('fonts').where({font_id}).find();
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '字体不存在');
+            }
+            let result =  [];
+            let fontContent = JSON.parse(res.font_content);
+            for (let v of font_list) {
+                if(!fontContent[v]) {
+                    return this.fail(-1, v+'的字体不存在');
+                }
+                result.push(fontContent[v])
+            };
+            let fontContentList = Object.keys(JSON.parse(res.font_content));
+            fontContentList.filter(($data)=> {
+
+            });
+            return this.success(result, '请求成功!');
+        }catch (e) {
+            return this.fail(-1, JSON.stringify(e));
+        }
+    }
+
     /**
      * 修改圖片顏色
      */

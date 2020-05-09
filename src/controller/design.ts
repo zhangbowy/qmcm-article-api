@@ -10,7 +10,7 @@ export default class extends Base {
      */
     async designerListAction(): Promise<any> {
         // @ts-ignore
-        const shop_id: number = (await this.session('token')).shop_id;
+        const shop_id: number = this.ctx.state.admin_info.shop_id;
         const res = await this.model('designer').where({shop_id}).countSelect();
         this.success(res, '请求成功!');
     }
