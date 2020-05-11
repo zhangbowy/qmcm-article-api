@@ -58,6 +58,11 @@ export default class extends Base {
             return this.fail(-1, e);
         }
     }
+
+
+    /**
+     * 获取字体图片
+     */
     async getFontAction() {
         try {
             const font_id = this.get('font_id');
@@ -81,6 +86,18 @@ export default class extends Base {
             return this.success(result, '请求成功!');
         }catch (e) {
             return this.fail(-1, JSON.stringify(e));
+        }
+    }
+
+    async getDesignAction() {
+        try {
+            const page: number = this.post('currentPage') || 1;
+            const limit: number = this.post('pageSize') || 10;
+            const shop_id = this.ctx.state.shop_id;
+            const res = await this.model('design').field('design_id,designer_id,designer_team_id,prev_png_path,price,design_name').page(page,limit).where({shop_id}).countSelect();
+            return this.success(res, '请求成功!');
+        }catch (e) {
+            return this.fail(-1, e.stack || e);
         }
     }
 

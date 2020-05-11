@@ -47,6 +47,6 @@ export default class extends think.Controller {
 
   }
   __call() {
-    return this.fail(404,'404');
+    return this.fail(404,'adm_controller');
   }
 }

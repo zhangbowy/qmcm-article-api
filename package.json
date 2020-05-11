@@ -54,7 +54,7 @@
       "description": "云刺綉Api",
       "author": "zhangbo <xiaobo21@163.com>"
     },
-    "projectName": "demo1",
+    "projectName": "yuncixiu-api-v3",
     "template": "typescript",
     "clone": false,
     "isMultiModule": false

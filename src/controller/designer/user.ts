@@ -1,6 +1,6 @@
 import Base from './base.js';
 // tslint:disable-next-line:import-spacing
-import UserModel from  './../model/user';
+import UserModel from  './../../model/user';
 // @ts-ignore
 import ThinkSvgCaptcha from 'think-svg-captcha';
 import {think} from "thinkjs";
@@ -11,71 +11,62 @@ export default class extends Base {
      */
     async loginAction(): Promise<void> {
         try {
-            const Code = this.post('code');
-            if (think.isEmpty(Code)) {
-                return  this.fail(-1, "验证码不能为空!");
-            }
-            let code = Code.toLowerCase();
-            let code_cookie = (await this.session('captcha') || '').toLowerCase();
-            // let code_cookie = this.cookie('captcha').toLowerCase();
-            if(code != code_cookie) {
-                return  this.fail(-1, "验证码错误!");
-            }
-            const phone = this.post('phone');
-            const pwd = this.post('passWord');
-            if (!phone || !pwd) {
+            // const Code = this.post('code');
+            // if (think.isEmpty(Code)) {
+            //     return  this.fail(-1, "验证码不能为空!");
+            // }
+            // let code = Code.toLowerCase();
+            // let code_cookie = (await this.session('captcha') || '').toLowerCase();
+            // if(code != code_cookie) {
+            //     return  this.fail(-1, "验证码错误!");
+            // }
+            const designer_phone = this.post('phone');
+            let designer_password = this.post('password');
+            if (!designer_phone || !designer_phone) {
                 return  this.fail(-1, "用户名或密码不能为空!", []);
             }
-            const res = await this.model('admin').where({phone}).find();
+            designer_password = think.md5(designer_password);
+            const res = await this.model('designer').where({designer_phone,designer_password}).find();
             if (!think.isEmpty(res)) {
-                const bufferPwd = new Buffer(res.pwd, 'binary' ).toString('utf-8');
-                if (pwd === bufferPwd) {
+                    if(res.status == 0) {
+                        return  this.fail(-1, "该账号已禁用,请联系管理员!", []);
+                    }
                     let tokenFuc =  think.service('token');
                     /**
                      * 生成token
                      */
                     let info = {
                         // exp: Math.floor(Date.now() / 1000) + (60 * 60),
-                        admin_id:res.id,
+                        designer_id:res.designer_id,
                     };
                     let token = await tokenFuc.create1(info);
-
-                    // // @ts-ignore
-                    // const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${res.id}`, undefined, 'redis'));
-                    // // @ts-ignore
-                    // // this.ctx.state.adm_sign = await this.cache(`admin-sign-${res.id}`, undefined, 'redis');
-                    // this.ctx.state.adm_sign = admin_redis_sign.admin_id;
-                    // if (!think.isEmpty(admin_redis_sign)) {
-                    //     const orderController = this.controller('websocket');
-                    //     // @ts-ignore
-                    //     orderController.offlineAction();
-                    // }
-                    await this.cache(`admin-${res.id}`, res, {
+                    await this.cache(`design-${res.designer_id}`, res, {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
                             timeout:  60 * 60 * 1000
                         }
                     });
-                    await this.cache(`admin-sign-${res.id}`, token, {
-                        type: 'redis',
-                        redis: {
-                            // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000
-                        }
-                    });
-                    return  this.success({token,adminId:res.id}, "登录成功!");
-                }
+                    // await this.cache(`design-sign-${res.designer_id}`, token, {
+                    //     type: 'redis',
+                    //     redis: {
+                    //         // timeout: 24 * 60 * 60 * 1000
+                    //         timeout:  60 * 60 * 1000
+                    //     }
+                    // });
+                    return  this.success({design_sign: token,designer_id:res.designer_id}, "登录成功!");
+            } else {
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
-            return  this.fail(-1, "用户名或密码错误!", []);
         }catch (e) {
             return  this.fail(-1, e.stack || e);
         }
     }
     async infoAction(): Promise<void> {
-        const id: string = await  this.session('token');
-        const res = await (this.model('user') as UserModel).getUserById(id);
+        const designer_info = this.ctx.state.designer_info;
+        let shop_id = designer_info.shop_id;
+        let designer_id = designer_info.designer_id;
+        const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del:0}).find()
         return this.success(res, '请求成功!');
     }
 
@@ -84,7 +75,6 @@ export default class extends Base {
      */
     async logOutAction(): Promise<void> {
         try {
-            const admin_info = this.ctx.state.admin_info;
             // @ts-ignore
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");

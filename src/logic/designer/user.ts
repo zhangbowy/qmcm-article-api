@@ -1,14 +1,13 @@
 import { think } from 'thinkjs';
 import base from './base'
 export default class extends base {
-    customInfoAction() {
-
-
-    }
-    getFontAction() {
+    loginAction() {
 
     }
-    getDesignAction() {
+    logOutAction() {
+
+    }
+    infoAction() {
 
     }
 }

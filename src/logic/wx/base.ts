@@ -16,7 +16,7 @@ export default class extends think.Logic {
         // this.allowMethods = 'post';
     }
     __call() {
-        return this.fail(404,'404');
+        return this.fail(404,'wx_logic');
     }
 
 };
