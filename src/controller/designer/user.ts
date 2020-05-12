@@ -58,42 +58,46 @@ export default class extends Base {
             } else {
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
-        }catch (e) {
-            return  this.fail(-1, e.stack || e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
     async infoAction(): Promise<void> {
-        const designer_info = this.ctx.state.designer_info;
-        let shop_id = designer_info.shop_id;
-        let designer_id = designer_info.designer_id;
-        const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del:0}).find()
-        return this.success(res, '请求成功!');
+        try {
+            const designer_info = this.ctx.state.designer_info;
+            let shop_id = designer_info.shop_id;
+            let designer_id = designer_info.designer_id;
+            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del:0}).find()
+            return this.success(res, '请求成功!');
+        }catch ($err) {
+            this.dealErr($err);
+        }
     }
 
     /**
      * 登出
      */
-    async logOutAction(): Promise<void> {
+    async logOutAction(): Promise<any> {
         try {
             // @ts-ignore
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
     /**
      * checkLogin
      */
-    async checkLoginAction() {
+    async checkLoginAction(): Promise<any>  {
         return this.success([], "已登录!");
     }
 
     /**
      * 验证码
      */
-    async getCaptchaAction(): Promise<void> {
+    async getCaptchaAction(): Promise<any>  {
         const defaultOptions = {
             size: 4, // size of random string
             ignoreChars: '', // filter out some characters

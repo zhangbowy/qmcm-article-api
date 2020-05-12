@@ -26,7 +26,7 @@ export default class extends Base {
             let res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
             this.success(res, '请求成功!');
         }catch (e) {
-            this.fail(-1, e);
+
         }
     }
 
@@ -44,8 +44,8 @@ export default class extends Base {
                 return this.fail(-1, '该订单不存在!')
             }
             return this.success(res,'请求成功!');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -138,8 +138,8 @@ export default class extends Base {
             } else {
                 return this.fail(-1, "创建订单失败!");
             }
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -422,8 +422,8 @@ export default class extends Base {
                 total_price:total_price.toFixed(2)
             };
             return result;
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -439,8 +439,8 @@ export default class extends Base {
                 return this.fail(-1, res);
             }
             return this.success(res, '获取成功');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -473,8 +473,8 @@ export default class extends Base {
                 await this.model("item").where({id: item_v.item_id}).decrement('sale_num', item_v.buy_num);
             }
             return this.success(res, '取消订单成功');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -484,20 +484,24 @@ export default class extends Base {
      * @param {$add} true 增加  false 减少
      */
     async changeSumStock($item: any,$add: any) {
-        let res: any = await this.model('item').where({id: $item.item_id}).find();
-        let sku_list = JSON.parse(res.sku_list);
-        for (let sku_v of sku_list) {
-            if ($item.sku_id == sku_v.sku_id) {
-                if ($add) {
-                    sku_v.num = sku_v.num + $item.buy_num;
-                } else {
-                    sku_v.num = sku_v.num - $item.buy_num;
+        try {
+            let res: any = await this.model('item').where({id: $item.item_id}).find();
+            let sku_list = JSON.parse(res.sku_list);
+            for (let sku_v of sku_list) {
+                if ($item.sku_id == sku_v.sku_id) {
+                    if ($add) {
+                        sku_v.num = sku_v.num + $item.buy_num;
+                    } else {
+                        sku_v.num = sku_v.num - $item.buy_num;
+                    }
+                    break;
                 }
-                break;
             }
+            let new_sku_list: any = JSON.stringify(sku_list);
+            return await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list});
+        }catch ($err) {
+            this.dealErr($err);
         }
-        let new_sku_list: any = JSON.stringify(sku_list);
-        return await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list});
     }
 
 
@@ -541,8 +545,8 @@ export default class extends Base {
             if (res) {
                 return this.success(res, '请求成功!');
             }
-        } catch (e) {
-            return this.fail(-1, e);
+        } catch ($err) {
+            this.dealErr($err);
         }
     }
     /**

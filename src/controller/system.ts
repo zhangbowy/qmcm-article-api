@@ -8,9 +8,14 @@ export default class extends Base {
      * 刺绣模板列表
      */
     async embTemplateAction(): Promise<void> {
-        let template_type = this.post('template_type');
-        let res = await this.model('emb_template').where({template_type:template_type}).select();
-        return this.success(res, '请求成功!');
+        try {
+            let template_type = this.post('template_type');
+            let res = await this.model('emb_template').where({template_type:template_type}).select();
+            return this.success(res, '请求成功!');
+        }catch (e) {
+
+        }
+
     }
 
     /**

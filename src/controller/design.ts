@@ -88,7 +88,7 @@ export default class extends Base {
     }
 
     /**
-     * 删除设计师
+     * 删除设计师团队
      */
     async delDesignerAction(): Promise<any>  {
         const designer_team_id = this.post('designer_team_id');

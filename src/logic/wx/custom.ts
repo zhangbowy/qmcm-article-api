@@ -11,4 +11,13 @@ export default class extends base {
     getDesignAction() {
 
     }
+    getBufferAction() {
+
+    }
+    previewAction() {
+
+    }
+    reColorAction() {
+
+    }
 }

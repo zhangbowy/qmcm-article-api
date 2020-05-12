@@ -147,8 +147,8 @@ export default class extends Base {
             let id = this.ctx.state.userInfo.id;
             let res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id,shop_id,del:0}).select();
             this.success(res, '请求成功!');
-        }catch (e) {
-            this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -206,8 +206,8 @@ export default class extends Base {
                return this.success(res, '添加成功!');
             }
             return this.fail(-1, '添加失败!');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -266,8 +266,8 @@ export default class extends Base {
                return this.success(res, '编辑成功!');
             }
             return this.fail(-1, '编辑失败');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 
@@ -287,8 +287,8 @@ export default class extends Base {
                 return this.success(res, '删除成功!');
             }
             return this.fail(-1, '该地址不存在!');
-        }catch (e) {
-            return this.fail(-1, e);
+        }catch ($err) {
+            this.dealErr($err);
         }
     }
 }

@@ -1,5 +1,6 @@
 import { think } from 'thinkjs';
-export default class extends think.Controller {
+import restController from '../rest'
+export default class extends restController {
   async __before() {
     this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
     this.header('Access-Control-Allow-Headers', ["x-requested-with",'origin', 'token', 'content-type']);

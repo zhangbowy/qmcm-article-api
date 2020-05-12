@@ -5,7 +5,8 @@
   "author": "zhangbo <xiaobo21@163.com>",
   "scripts": {
     "start": "node development.js",
-    "compile": "npm run lint && tsc",
+    "prod": "node production.js",
+    "compile": "tsc",
     "lint": "tslint \"src/**/*.ts\""
   },
   "dependencies": {

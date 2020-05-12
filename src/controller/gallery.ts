@@ -107,11 +107,10 @@ export default class extends Base {
         }
         let data =  await model.deleteImg(id);
          // @ts-ignore
-        if(data) {
+        if (data) {
             const  oss  = think.service('oss');
             let del = await oss.deleteFile(arr);
-            if(del.statusCode && del.statusCode == 200)
-            {
+            if (del.statusCode && del.statusCode == 200) {
                 return this.success({del,data}, '删除成功!');
             }
             return this.fail(-1, '删除失败!',del);
@@ -140,7 +139,6 @@ export default class extends Base {
             return this.success(data, '修改成功!');
         }
         return this.fail(-1, '图片不存在!',data);
-
     }
 
     /**

@@ -1,5 +1,4 @@
 import Base from './base.js';
-// tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
 // @ts-ignore
 import ThinkSvgCaptcha from 'think-svg-captcha';
