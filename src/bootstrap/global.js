@@ -1,2 +1,0 @@
-global.$socketList = {};
-global.$socketId = {};

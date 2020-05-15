@@ -49,7 +49,7 @@ export default class extends base {
 
   addEmbPriceAction() {
     const rules = {
-      id: {
+      emb_template_id: {
         required: true,
         trim: true,
         method: 'post'

@@ -16,7 +16,9 @@ export default class extends Base {
   async orderListAction() {
     try {
       // @ts-ignore
-      const shop_id = this.ctx.state.admin_info.shop_id;
+      const shop_id: number = this.ctx.state.designer_info.shop_id;
+      const designer_id: number = this.ctx.state.designer_info.designer_id;
+      const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       const status: number = Number(this.post('status') || 0);
@@ -31,7 +33,9 @@ export default class extends Base {
       if (order_type) {
         where.order_type = order_type
       }
-      let res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
+      // let res await this.model('design').where({designer_id}).select();
+      let res = await this.model('order_item').page(page, limit).where({designer_id}).countSelect();
+      // let res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
       // let res = await this.model('order').group('status').where(where).countSelect();
       return this.success(res, '请求成功!');
     }catch (e) {
@@ -191,7 +195,7 @@ export default class extends Base {
             msg = '该订单询价中!';
             break;
         }
-        return this.fail(-1, msg)
+        return this.fail(-1, msg);
       }
       let _status = '已完成';
       let res: any = await this.model('order').where({shop_id, id: order_id}).update({_status, status: 4});

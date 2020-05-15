@@ -63,6 +63,13 @@ export default class extends Base {
                             timeout:  60 * 60 * 1000
                         }
                     });
+                    // const ownAuth = await this.model('auth_give').where({admin_role_id:res.role_id}).select()
+                    // const allAuth = await this.model('authority_category').select();
+                    // let arr = [];
+                    //
+                    // for (let all_v of allAuth) {
+                    //
+                    // }
                     return  this.success({token,adminId:res.id}, "登录成功!");
                 }
                 return  this.fail(-1, "用户名或密码错误!", []);

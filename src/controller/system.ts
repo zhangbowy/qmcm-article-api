@@ -22,10 +22,10 @@ export default class extends Base {
      * 編輯刺綉模板
      */
     async editEmbTemplateAction(): Promise<void> {
-        let id = this.post('id');
+        let emb_emplate_id = this.post('id');
         let template_type = this.post('template_type');
         let cover_image = this.post('cover_image');
-        let res = await this.model('emb_template').where({template_type,id}).update({cover_image});
+        let res = await this.model('emb_template').where({template_type,emb_emplate_id}).update({cover_image});
         if (res) {
             return this.success([], '修改成功!')
         }
@@ -41,7 +41,7 @@ export default class extends Base {
      * @params {height} 高度mm
      */
     async addEmbPriceAction(): Promise<void> {
-        let template_id = this.post('id');
+        let emb_template_id = this.post('emb_template_id');
         /**
          * type 1 有價格 2 沒有 只有基础价
          */
@@ -52,7 +52,7 @@ export default class extends Base {
         let width = this.post('width');
         let height = this.post('height');
         let params = {
-            template_id,
+            emb_template_id,
             template_type,
             name,
             price,
@@ -74,7 +74,7 @@ export default class extends Base {
      */
     async editEmbPriceAction(): Promise<void> {
         let id = this.post('id');
-        let template_id = this.post('template_id');
+        let emb_template_id = this.post('emb_template_id');
         // let template_type = this.post('template_type');
         let name = this.post('name');
         let price = this.post('price');
@@ -87,7 +87,7 @@ export default class extends Base {
             width,
             height
         };
-        let res: any = await this.model('emb_template_price').where({template_id,id}).update(params);
+        let res: any = await this.model('emb_template_price').where({emb_template_id,id}).update(params);
         if (res) {
             return this.success(res, '编辑成功!');
 
@@ -102,9 +102,9 @@ export default class extends Base {
      */
     async delEmbPriceAction(): Promise<void> {
         let id = this.post('id');
-        let template_id = this.post('template_id');
+        let emb_template_id = this.post('template_id');
         // @ts-ignore
-        let res:object = await this.model('emb_template_price').where({id,template_id}).delete();
+        let res:object = await this.model('emb_template_price').where({id,emb_template_id}).delete();
         if (res) {
             return this.success(res, '删除成功!');
         }
@@ -708,6 +708,20 @@ export default class extends Base {
             return this.fail(-1, e);
         }
     }
+
+
+    /**
+     * 权限列表
+     */
+    async authorityListAction(): Promise<void> {
+        try {
+           const res = await this.model('authority_category').select();
+            return this.success(res)
+        }catch (e) {
+
+        }
+    }
+
 
     /**
      * 角色列表

@@ -35,10 +35,18 @@ export default class extends think.Controller {
         // if (!await this.session('token')) {
         //   return this.fail(402, '未登录!', []);
         // }
-        /**
-         * 管理后台登录用户信息
-         */
-        this.ctx.state['admin_info'] = admin_info;
+
+        let isAuth = await this.checkAuth(admin_info);
+        if(isAuth){
+          /**
+           * 管理后台登录用户信息
+           */
+          this.ctx.state['admin_info'] = admin_info;
+        }else{
+          return this.fail(403,'您无权访问');
+        }
+
+
         console.log(this.session('token'));
       }
     }catch (e) {
@@ -46,6 +54,34 @@ export default class extends think.Controller {
     }
 
   }
+
+  /**
+   * 检查是否有权限
+   */
+  async checkAuth (aminInfo: any) {
+    if(aminInfo.id == 1){
+      return true
+    }
+    if (aminInfo.role_type == 1 || aminInfo.role_type ==2) {
+      return true
+
+    }
+
+    let role = await this.model('admin_role').where({admin_role_id: aminInfo.role_id}).find();
+    if(!role.admin_role_id){
+      return false
+    }
+    let auth_api = this.ctx.request.url;
+    // let auth_type =1;
+    // if(auth_api.indexOf('/config/') > -1){
+    //   auth_api = this.post('config_key');
+    //   auth_type = 2;
+    // }
+    const api = this.ctx.request.url.indexOf('?')> -1?this.ctx.request.url.split('?')[0]:this.ctx.request.url;
+    let res = await this.model('auth_give').checkAuth(role.admin_role_id,api);
+    return res
+  }
+
   __call() {
     return this.fail(404,'adm_controller');
   }

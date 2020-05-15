@@ -20,4 +20,15 @@ export default class extends base {
     reColorAction() {
 
     }
+    getPreviewAction() {
+
+    }
+    itemPreviewAction() {
+
+    }
+    getEmbPriceAction() {
+
+    }
+    getEmbTemplateAction() {}
+
 }

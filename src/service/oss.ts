@@ -11,7 +11,7 @@ module.exports = class extends think.Service {
         super();
 
     }
-     upload($file: string,$path: string) {
+     upload($file: string,$path: string, $buffer: boolean) {
         return new Promise((resolve,rejected) =>
         {
             cos.putObject({
@@ -19,7 +19,7 @@ module.exports = class extends think.Service {
                 Region: 'ap-guangzhou',    /* 地区 */
                 Key:  $path,
                 // StorageClass: 'STANDARD',
-                Body: fs.createReadStream($file),
+                Body: $buffer?$file:fs.createReadStream($file),
                 onProgress: function(progressData:any) {
                     console.log(JSON.stringify(progressData));
                 }

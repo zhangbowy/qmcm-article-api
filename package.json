@@ -5,7 +5,7 @@
   "author": "zhangbo <xiaobo21@163.com>",
   "scripts": {
     "start": "node development.js",
-    "prod": "node production.js",
+    "prod": "tsc && node production.js",
     "compile": "tsc",
     "lint": "tslint \"src/**/*.ts\""
   },

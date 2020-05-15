@@ -1,6 +1,9 @@
 import { think } from 'thinkjs';
 
 export default class extends think.Model {
+    get pk() {
+        return ''
+    }
     // get relation() {
     //     return {
     //         emb_template_price: {

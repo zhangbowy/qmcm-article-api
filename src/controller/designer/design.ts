@@ -175,13 +175,14 @@ export default class extends Base {
             const page: number = this.get('currentPage') || 1;
             const limit: number = this.get('pageSize') || 10;
             const design_name: string = this.get('design_name') || '';
-            const designer_id: string = this.get('designer_id') || false;
+            const designer_id: string = this.get('designer_id') || 0;
             const status: number = Number(this.get('status')) || 0;
             /**
              * 设计师信息
              */
             const designer_info = this.ctx.state.designer_info;
             const shop_id: number = designer_info.shop_id;
+            const designer_id_own: number = designer_info.designer_id;
             const designer_team_id: number = designer_info.designer_team_id;
             /**
              * 默认条件 查团队的花样
@@ -194,7 +195,7 @@ export default class extends Base {
                 /**
                  * 条件限制自己
                  */
-                where.designer_id = designer_id;
+                where.designer_id = designer_id_own;
             } else {
                 /**
                  * 设计师管理员 灵活查下级
@@ -203,6 +204,7 @@ export default class extends Base {
                     where.designer_id = designer_id
                 }
             }
+
             if (status) {
                 where.status = status
             }
@@ -228,6 +230,8 @@ export default class extends Base {
             const designer_info = this.ctx.state.designer_info;
             const shop_id: number = designer_info.shop_id;
             const designer_team_id: number = designer_info.designer_team_id;
+            const designer_id_own: number = designer_info.designer_id;
+
             /**
              * 默认条件 查团队的花样
              */
@@ -237,9 +241,9 @@ export default class extends Base {
              */
             if (!designer_info.is_leader) {
                 /**
-                 * 条件限制自己
+                 * 普通设计师 条件限制自己
                  */
-                where.designer_id = designer_id;
+                where.designer_id = designer_id_own;
             } else {
                 /**
                  * 设计师管理员 灵活查下级
@@ -284,6 +288,8 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+
+
     /**
      * 添加花样
      * @params {dst} dst文件路径
@@ -368,6 +374,10 @@ export default class extends Base {
      */
     async setPriceAction(): Promise<any>  {
         try {
+            const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
+            if(!is_leader_info) {
+                return  this.fail(-1, '权限不足!');
+            }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
             const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
