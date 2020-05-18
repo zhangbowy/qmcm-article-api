@@ -54,7 +54,7 @@ export default class extends Base {
                     //         timeout:  60 * 60 * 1000
                     //     }
                     // });
-                    return  this.success({design_sign: token,designer_id:res.designer_id}, "登录成功!");
+                    return this.success({design_sign: token,designer_id:res.designer_id}, "登录成功!");
             } else {
                 return  this.fail(-1, "用户名或密码错误!", []);
             }

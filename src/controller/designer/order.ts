@@ -315,7 +315,7 @@ export default class extends Base {
        */
       const express_info: any = await this.model('express_list').where({express_id}).find();
       if (think.isEmpty(express_info)) {
-        return this.fail(-1, '快递编号不正确');
+        return this.fail(-1, '快递编码不正确');
       }
       const express_code = express_info.express_code;
       const express = think.service('express');

@@ -219,7 +219,7 @@ export default class extends Base {
             let page: number = this.get('currentPage');
             let limit: number = this.get('pageSize');
             let res = await (this.model('express_template') as ExpressTemp).getList({page, limit, shop_id});
-            this.success(res,'请求成功!')
+            return this.success(res,'请求成功!')
         }catch (e) {
             return this.fail(-1, e)
         }
@@ -237,7 +237,7 @@ export default class extends Base {
             let res = await this.model('express_template').where({shop_id, express_template_id}).find();
             if (Object.keys(res).length > 0) {
                 res.region_rules = JSON.parse(res.region_rules);
-               return  this.success(res,'请求成功!')
+               return this.success(res,'请求成功!')
             }
             return  this.fail(-1,'该物流模板不存在!')
         }catch (e) {

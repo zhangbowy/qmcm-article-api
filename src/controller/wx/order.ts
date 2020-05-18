@@ -24,7 +24,7 @@ export default class extends Base {
                 where.status = status;
             }
             let res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
-            this.success(res, '请求成功!');
+            return this.success(res, '请求成功!');
         }catch (e) {
 
         }

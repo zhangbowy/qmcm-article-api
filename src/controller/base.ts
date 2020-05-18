@@ -1,4 +1,5 @@
 import { think } from 'thinkjs';
+import {ancestorWhere} from "tslint";
 export default class extends think.Controller {
   async __before() {
     try {
@@ -8,7 +9,7 @@ export default class extends think.Controller {
       this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
       this.header('Access-Control-Allow-Credentials', true);
 
-      if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1) {
+      if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
         const adm_sign = this.header("adm_sign");
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录!', []);
@@ -37,13 +38,14 @@ export default class extends think.Controller {
         // }
 
         let isAuth = await this.checkAuth(admin_info);
-        if(isAuth){
+        if (isAuth) {
           /**
            * 管理后台登录用户信息
            */
           this.ctx.state['admin_info'] = admin_info;
-        }else{
-          return this.fail(403,'您无权访问');
+        } else {
+          // return this.fail(401,'您无权访问');
+          return this.fail(401,'您没有此项权限!');
         }
 
 
@@ -53,6 +55,12 @@ export default class extends think.Controller {
       return this.fail(-1, e);
     }
 
+  }
+  /**
+   * 控制器后置方法
+   */
+   async __after(){
+    console.log('控制器后置方法')
   }
 
   /**
@@ -78,9 +86,22 @@ export default class extends think.Controller {
     //   auth_type = 2;
     // }
     const api = this.ctx.request.url.indexOf('?')> -1?this.ctx.request.url.split('?')[0]:this.ctx.request.url;
+    // @ts-ignore
     let res = await this.model('auth_give').checkAuth(role.admin_role_id,api);
     return res
   }
+
+  async saveSystemLog($log: any,$content: any) {
+    const admin_info = this.ctx.state.admin_info;
+    const admin_phone = this.ctx.state.admin_info.phone;
+
+     return  await this.model('system_log').add({
+      inter_face:$log,
+      content:JSON.stringify($content),
+      admin_phone:admin_phone
+    })
+  }
+
 
   __call() {
     return this.fail(404,'adm_controller');

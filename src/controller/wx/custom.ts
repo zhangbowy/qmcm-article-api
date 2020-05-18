@@ -422,7 +422,6 @@ export default class extends Base {
                 area:sqr,
                 'area=>price': priceObj,
                 // priceList,
-
             };
             return this.success(result, '请求成功!');
         }catch (e) {

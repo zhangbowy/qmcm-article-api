@@ -70,7 +70,7 @@ export default class extends Base {
                     // for (let all_v of allAuth) {
                     //
                     // }
-                    return  this.success({token,adminId:res.id}, "登录成功!");
+                    return this.success({token,adminId:res.id}, "登录成功!");
                 }
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
@@ -80,9 +80,32 @@ export default class extends Base {
         }
     }
     async infoAction(): Promise<void> {
-        const id: string = await  this.session('token');
-        const res = await (this.model('user') as UserModel).getUserById(id);
-        return this.success(res, '请求成功!');
+        const admin_info = this.ctx.state.admin_info;
+        const shop_id = admin_info.shop_id;
+        const admin_role_id = admin_info.role_id;
+        let where = {};
+        let res;
+        if (admin_info.role_type == 2) {
+           res = await this.model('authority').where({only_role_type:['in',[2,3]],is_show: 1,del: 0}).getField('id');
+        } else if (admin_info.role_type == 3) {
+             res = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
+            // res = await this.model('authority').where({ id:['in',auth_list]}).getField('id');
+        } else if (admin_info.role_type == 1) {
+            res = await this.model('authority').where({only_role_type:['in',[1]],is_show: 1,del: 0}).getField('id');
+        }
+        // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
+        // admin_role.authority_list = auth_list;
+        const result = {
+            admin_info:{
+                id:admin_info.id,
+                shop_id:admin_info.shop_id,
+                role_type:admin_info.role_type,
+                name:admin_info.name,
+                phone:admin_info.phone
+            },
+            authority_list:res
+        };
+        return this.success(result, '请求成功!')
     }
 
     /**

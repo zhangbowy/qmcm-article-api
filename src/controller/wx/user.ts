@@ -26,7 +26,7 @@ export default class extends Base {
 
         const res = await this.fetch(url).then(res => res.json());
         if (res && res.errcode) {
-           return  this.success(res)
+           return this.success(res)
         }
         let openId = res.openid;
         /**
@@ -91,14 +91,14 @@ export default class extends Base {
      * 获取用户信息
      */
     async infoAction() {
-        return  this.success(this.ctx.state.userInfo,'请求成功!')
+        return this.success(this.ctx.state.userInfo,'请求成功!')
     }
 
     /**
      * 判断是否登录
      */
     async checkLoginAction() {
-        return  this.success([],'已登录')
+        return this.success([],'已登录')
     }
 
     /**
@@ -129,7 +129,7 @@ export default class extends Base {
             // domain:'192.168.31.181'
         });
 
-        return  this.success('登录成功!')
+        return this.success('登录成功!')
     }
 
     /**
@@ -146,7 +146,7 @@ export default class extends Base {
              */
             let id = this.ctx.state.userInfo.id;
             let res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id,shop_id,del:0}).select();
-            this.success(res, '请求成功!');
+            return this.success(res, '请求成功!');
         }catch ($err) {
             this.dealErr($err);
         }
