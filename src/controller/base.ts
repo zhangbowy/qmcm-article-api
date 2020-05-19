@@ -13,6 +13,7 @@ export default class extends restController {
 
       if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
         const adm_sign = this.header("adm_sign");
+        console.log(adm_sign,'adm_sign1111111111111111111111111111111111111');
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录1!', []);
         }
