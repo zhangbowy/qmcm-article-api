@@ -12,7 +12,7 @@ export default class extends restController {
       this.header('Access-Control-Allow-Credentials', true);
 
       if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
-        const adm_sign = this.ctx.header("adm_sign");
+        const adm_sign = this.header("adm_sign");
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录1!', []);
         }
