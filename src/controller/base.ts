@@ -12,19 +12,19 @@ export default class extends think.Controller {
       if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
         const adm_sign = this.header("adm_sign");
         if (think.isEmpty(adm_sign)) {
-          return this.fail(402, '未登录!', []);
+          return this.fail(402, '未登录1!', []);
         }
         let tokenFuc =  think.service('token');
         let admin_data = await tokenFuc.parse1(adm_sign);
         if (admin_data == null) {
-          return this.fail(402, '未登录!', []);
+          return this.fail(402, '未登录2!', []);
         }
         let admin_id = admin_data.admin_id;
         // @ts-ignore
         const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${admin_id}`, undefined, 'redis'));
         console.log(admin_redis_sign,'admin_redis_sign');
         if(think.isEmpty(admin_redis_sign)) {
-          return this.fail(402, '未登录!', []);
+          return this.fail(402, '未登录3!', []);
         }
         // if(admin_data.iat < admin_redis_sign.iat) {
         //   return this.fail(402, '当前账号已在其他浏览器登录!', []);
