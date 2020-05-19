@@ -10,8 +10,8 @@ export default class extends think.Controller {
       this.header('Access-Control-Allow-Credentials', true);
 
       if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
-        const adm_sign = this.header("adm_sign");
-        console.log(this.header)
+        const adm_sign = this.ctx.header("adm_sign");
+        console.log(this.ctx.headers)
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录1!', []);
         }
