@@ -40,7 +40,8 @@ exports.cache = {
     },
     redis: {
         handle: redisCache,
-        host: '192.168.31.3',
+        host: '127.0.0.1',
+        // host: '192.168.31.3',
         port: '6379',
         password: '',
         log_connect: true
