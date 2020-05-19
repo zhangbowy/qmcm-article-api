@@ -1,6 +1,6 @@
 // default config
 export = {
-  workers:3,
+  workers:1,
   port: 8001,
   errnoField: 'code', // errno字段
   errmsgField: 'msg', // errmsg字段

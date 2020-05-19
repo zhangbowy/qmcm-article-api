@@ -17,7 +17,8 @@ exports.model = {
         database: 'yuncixiu_v3', //数据库名
         prefix: '',//表前缀
         encoding: 'utf8',
-        host: '129.211.65.201',//host
+        // host: '129.211.65.201',//host
+        host: '192.168.31.4',//host
         port: 3306,//端口
         // user: 'root',//用户名
         user: 'cx03',//用户名
