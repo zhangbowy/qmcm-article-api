@@ -53,14 +53,14 @@ export default class extends Base {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000
+                            timeout:  60 * 60 * 1000 * 2
                         }
                     });
                     await this.cache(`admin-sign-${res.id}`, token, {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000
+                            timeout:  60 * 60 * 1000 * 2
                         }
                     });
                     // const ownAuth = await this.model('auth_give').where({admin_role_id:res.role_id}).select()

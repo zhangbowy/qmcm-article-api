@@ -22,6 +22,7 @@ export default class extends think.Controller {
         let admin_id = admin_data.admin_id;
         // @ts-ignore
         const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${admin_id}`, undefined, 'redis'));
+        console.log(admin_redis_sign,'admin_redis_sign');
         if(think.isEmpty(admin_redis_sign)) {
           return this.fail(402, '未登录!', []);
         }
@@ -30,6 +31,7 @@ export default class extends think.Controller {
         // }
         // @ts-ignore
         const admin_info = await this.cache(`admin-${admin_id}`, undefined, 'redis');
+        console.log(admin_info,'admin_info');
         if(think.isEmpty(admin_info)) {
           return this.fail(402, '登录过期,请重新登录!', []);
         }
