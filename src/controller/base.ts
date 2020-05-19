@@ -1,6 +1,8 @@
 import { think } from 'thinkjs';
 import {ancestorWhere} from "tslint";
-export default class extends think.Controller {
+import restController from './rest'
+
+export default class extends restController {
   async __before() {
     try {
       // await think.timeout(500)
@@ -54,7 +56,7 @@ export default class extends think.Controller {
         console.log(this.session('token'));
       }
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
 
   }
