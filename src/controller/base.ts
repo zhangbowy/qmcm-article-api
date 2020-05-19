@@ -11,6 +11,7 @@ export default class extends think.Controller {
 
       if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
         const adm_sign = this.header("adm_sign");
+        console.log(this.header)
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录1!', []);
         }
