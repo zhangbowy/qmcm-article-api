@@ -13,6 +13,7 @@
     "adm-zip": "^0.4.14",
     "color": "^3.1.2",
     "cos-nodejs-sdk-v5": "^2.5.20",
+    "gm": "^1.23.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "request-promise": "^4.2.5",

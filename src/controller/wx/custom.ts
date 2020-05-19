@@ -1,9 +1,11 @@
 import Base from './base.js';
 import {think} from "thinkjs";
+import {resolveFilesAndProgram} from "tslint/lib/files/resolution";
 const sharp = require('sharp');
 const Color = require('color');
 const path = require('path');
 const fs = require('fs');
+const gm = require('gm')
 export default class extends Base {
     /**
      * 定制信息
@@ -250,7 +252,8 @@ export default class extends Base {
         try {
 
             const id = this.post('id') || 88;
-            const design_id = this.post('design_id') || 145  ;
+            const type = this.post('type') || 2;
+            const design_id = this.post('design_id') || 145;
             const top_scale = this.post('top_scale') || 0.21;
             const top_font_scale = this.post('top_font_scale') || 0.8;
             const top_font_content = this.post('top_font_content') || [1,2,3];
@@ -260,6 +263,10 @@ export default class extends Base {
             const bottom_font_scale = this.post('bottom_font_scale')|| 0.8;
             const bottom_font_content = this.post('bottom_font_content') || [1,2,3,4,5,6];
             const bottom_font_color = this.post('bottom_font_color') || '#06c7f1';
+
+            const draw_height_scale = this.post('draw_height_scale') || 1;
+            const draw_image = this.post('draw_image') || '';
+
             let result: any = {};
             let item = await this.model('item').where({id: id}).find();
             let design_area_info = await this.model('custom_category').where({custom_category_id: item.custom_category_id}).find();
@@ -277,10 +284,8 @@ export default class extends Base {
             const design_bg =  design_area_info.design_bg;
             const design_bg_width =  design_area_info.design_bg_width;
             const design_bg_height =  design_area_info.design_bg_height;
-
             const preview_bg_url = design_bg;
             const preview_bg_buffer = await getBuffer(this, preview_bg_url, true);
-
             /**
              * 背景图元信息
              */
@@ -295,27 +300,84 @@ export default class extends Base {
             let area_top = Math.floor(design_top * scale);
             let area_width = Math.floor(design_width * scale);
             let area_height = Math.floor(design_height * scale);
+            let area_width_mm = area_width/270*25.4;
+            let area_height_mm = area_height/270*25.4;
 
+            let composite: any = [];
+            /**
+             * type == 2 一般定制
+             */
+            if (type == 2) {
+                /**
+                 * 一般设计 花样 上传图片 区域大小
+                 */
+                const top_height = Math.floor(area_height * top_scale);
+                const top_font_height = Math.floor(top_height * top_font_scale);
+                const middle_height = Math.floor(area_height * middle_scale);
+                const bottom_height = Math.floor(area_height * bottom_scale);
+                const bottom_font_height = Math.floor(bottom_height * bottom_font_scale);
+                const design_data = await this.model('design').where({design_id}).find();
+                /**
+                 * 花样库花样buffer
+                 */
+                const design_preview = await getBuffer(this, design_data.prev_png_path, true);
+                /**
+                 * rezize 改变大小到标准尺寸下的大小
+                 */
+                const design_preview_buffer = await sharp(design_preview).resize({ height: middle_height}).toBuffer() ;
+                const design_preview_meta  = await sharp(design_preview_buffer).metadata();
+                const middle_design_width = design_preview_meta.width;
+                let topFontBuffer = await this.itemPreview(top_font_content, top_font_color, top_font_height, top_height, area_width);
+                let bottomBuffer = await this.itemPreview(bottom_font_content, bottom_font_color, bottom_font_height, bottom_height, area_width);
+                const font_top_left = Math.floor((area_width - topFontBuffer.font_area_width) / 2);
+                const font_bottom_left = Math.floor((area_width - bottomBuffer.font_area_width) / 2);
+                const middle_design_left = Math.floor((area_width - middle_design_width) / 2);
 
-            const top_height = Math.floor(area_height * top_scale);
-            const top_font_height = Math.floor(top_height * top_font_scale);
-            const middle_height = Math.floor(area_height * middle_scale);
-            const bottom_height = Math.floor(area_height * bottom_scale);
-            const bottom_font_height = Math.floor(bottom_height * bottom_font_scale);
-            const design_data = await this.model('design').where({design_id}).find();
-            const design_preview = await getBuffer(this, design_data.prev_png_path, true);
+                const bottom_position_top =  top_height + middle_height;
+                /**
+                 * 合成的图 三部分 top 文字  middle 花样 bottom 文字
+                 */
+                composite = [
+                    { input: topFontBuffer.areaBuffer,left: font_top_left, top: 0},
+                    { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},
+                    { input: design_preview_buffer,left: middle_design_left, top: top_height}
+                ];
+            }
+            if (type == 3) {
+                const drawArea_height = area_height * draw_height_scale;
+                const drawArea_width = area_width * draw_height_scale;
 
-            const design_preview_buffer = await sharp(design_preview).resize({ height: middle_height}).toBuffer() ;
-            const design_preview_meta  = await sharp(design_preview_buffer).metadata();
-            const middle_design_width = design_preview_meta.width;
-            let topFontBuffer = await this.itemPreview(top_font_content, top_font_color, top_font_height, top_height, area_width);
-            let bottomBuffer = await this.itemPreview(bottom_font_content, bottom_font_color, bottom_font_height, bottom_height, area_width);
-            const font_top_left = Math.floor((area_width - topFontBuffer.font_area_width) / 2);
-            const font_bottom_left = Math.floor((area_width - bottomBuffer.font_area_width) / 2);
-            const middle_design_left = Math.floor((area_width - middle_design_width) / 2);
+                let baseData = draw_image.replace(/data:image\/png;base64,/g,'');
+                let drawBuffer1 = Buffer.from(baseData, 'base64');
 
-            const bottom_position_top =  top_height + middle_height;
-            let areaBuffer = await sharp({
+                // const drawAreaBuffer1 = await sharp(drawBuffer1).rotate(1,{ background: { r: 255, g: 255, b: 255, alpha: 0}}).
+                //     toBuffer() ;
+                // // @ts-ignore
+                // let aa = await recolor(drawAreaBuffer1)
+                // this.ctx.type = 'image/png';
+                //    return  this.ctx.body = aa;
+                const wilcom = think.service('wilcom');
+                const embPng =  await wilcom.getEmbByImg(baseData,area_width_mm,area_height_mm);
+                let drawBuffer = Buffer.from(embPng, 'base64');
+                const drawAreaBuffer = await sharp(drawBuffer).resize({ width: drawArea_width, background: { r: 255, g: 255, b: 255, alpha: 0}}).webp().toBuffer() ;
+                const drawAreaBuffer_meta  = await sharp(drawAreaBuffer).metadata();
+                const drawAreaBuffer_width = drawAreaBuffer_meta.width;
+                const drawAreaBuffer_height = drawAreaBuffer_meta.height;
+                area_width =(drawAreaBuffer_width>area_width?drawAreaBuffer_width:area_width);
+                area_height =(drawAreaBuffer_height>area_height?drawAreaBuffer_height:area_height);
+                const drawAreaBuffer_top = Math.floor((area_height- drawAreaBuffer_height) / 2);
+                const drawAreaBuffer_left = Math.floor((area_width - drawAreaBuffer_width ) / 2);
+                /**
+                 * 合成的图 手绘图
+                 */
+                composite = [
+                    { input: drawAreaBuffer, left: drawAreaBuffer_left, top: drawAreaBuffer_top},
+                ]
+            }
+            /**
+             * 设计区的内容
+             */
+            let designAreaBuffer = await sharp({
                 create: {
                     width: area_width,
                     height: area_height,
@@ -323,25 +385,21 @@ export default class extends Base {
                     background: { r: 255, g: 255, b: 255, alpha: 0.1}
                 }
             })
-            .composite([
-                { input: topFontBuffer.areaBuffer,left: font_top_left, top: 0},
-                { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},
-                { input: design_preview_buffer,left: middle_design_left, top: top_height}
-            ])
+            .composite(composite)
             .png()
             .toBuffer();
-            const data = await sharp(preview_bg_buffer).composite([{ input: areaBuffer,left: area_left, top: area_top}]).toBuffer();
-            const data12 = Buffer.from(data, 'utf8');
-            let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
-            let fileName = think.uuid('v4');
+            const data = await sharp(preview_bg_buffer).composite([{ input: designAreaBuffer,left: area_left, top: area_top}]).toBuffer();
+            // const data12 = Buffer.from(data, 'utf8');
+            // let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
+            const fileName = think.uuid('v4');
             const oss = await think.service('oss');
-            let filePath = `/demo/${1}/${fileName}.png`;
+            const filePath = `/demo/${1}/${fileName}.png`;
             // const filepath = path.join(think.ROOT_PATH, `www/static/custom/preview/${fileName}.png`)
             // await think.mkdir(path.dirname(filepath));
             // fs.writeFileSync(filepath,)
             // this.ctx.type = 'image/png';
-                // this.ctx.body = data;
-            let res: any = await oss.upload(Buffer.from(data), filePath,true);
+            //     this.ctx.body = data;
+            const res: any = await oss.upload(Buffer.from(data), filePath,true);
             return this.success(`http://${res.Location}`);
         }catch (e) {
             this.dealErr(e)
@@ -430,6 +488,16 @@ export default class extends Base {
     }
 }
 
+async function recolor($buffer: any) {
+    return new Promise((resolve,reject) =>{
+        gm($buffer).resize(1000,1000).fill('white')
+            .opaque("black").toBuffer('PNG',function (err, buffer) {
+            resolve(buffer)
+        })
+    })
+
+
+}
 function getIndex (arr: any, num: number) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] > num) {

@@ -15,5 +15,9 @@ export = {
     appkey: 'f4292d9e-5328-42c5-8395-517a9f9f32e8', //AppKey
     request_url: 'http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx' //快递鸟实时物流接口
   },
+  wilcom:{
+     appId:'ba4d7ce4',
+     appKey: 'e9fbfcc2397822784eb02f18676585db'
+  },
   stickyCluster: true,
 };

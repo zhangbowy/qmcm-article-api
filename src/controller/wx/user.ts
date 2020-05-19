@@ -91,6 +91,13 @@ export default class extends Base {
      * 获取用户信息
      */
     async infoAction() {
+        const userInfo = this.ctx.state.userInfo;
+        const user_id = userInfo.id;
+        let info = await this.model('user').where({id: user_id}).find();
+        if(think.isEmpty(info)) {
+            await this.cookie('user_sign', '');
+            return this.fail(402,'未登录')
+        }
         return this.success(this.ctx.state.userInfo,'请求成功!')
     }
 
