@@ -1,5 +1,4 @@
 import Base from './base.js';
-import {ancestorWhere} from "tslint";
 import express_template from "../../model/express_template";
 import {think} from "thinkjs";
 const path = require('path');
@@ -26,7 +25,7 @@ export default class extends Base {
             let res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
             return this.success(res, '请求成功!');
         }catch (e) {
-
+            this.dealErr(e);
         }
     }
 
@@ -40,8 +39,8 @@ export default class extends Base {
             const order_no: any = this.get('order_no');
             const shop_id = this.ctx.state.shop_id;
             let res = await this.model('order').setRelation('order_item').order('order_no DESC').where({user_id, shop_id, order_no}).find();
-            if (Object.keys(res).length == 0) {
-                return this.fail(-1, '该订单不存在!')
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '该订单不存在!');
             }
             return this.success(res,'请求成功!');
         }catch ($err) {
@@ -50,10 +49,11 @@ export default class extends Base {
     }
 
     /**
-     * 支付
+     * 订单支付
      * @params {cart_list} 购物列表 {goods_id,buy_num,sku_id}
      * @params {shopping_type} 订单类型
      * @params {address_id} 收货地址id
+     * @return order_no
      */
     // async calculation() {
     async payAction() {
@@ -105,6 +105,7 @@ export default class extends Base {
                 buyer_message,
                 _status: '待付款',
                 _order_type: _order_type,
+                designer_id: item_info.item_list[0].designer_id
             });
             if (order_id) {
                 let item_list = item_info.item_list;
@@ -226,6 +227,9 @@ export default class extends Base {
                 address = await this.model('address').where({user_id, shop_id,is_default: 1}).find();
                 if(Object.keys(address).length == 0) {
                     address = await this.model('address').where({user_id, shop_id}).find();
+                    if (think.isEmpty(address)) {
+                        return this.fail(-1, '请先添加收货地址!')
+                    }
                 }
             } else {
                 address = await this.model('address').where({user_id, shop_id,address_id}).find();
@@ -374,6 +378,7 @@ export default class extends Base {
                                  * 单个商品总金额 商品价格 花样价格
                                  */
                                 item_info.item_total_price = 0;
+
                                 /**
                                  * order_type为 2 一般定制 在普通商品基础上增加的数据
                                  * @tip 一般定制字段注释
@@ -429,6 +434,22 @@ export default class extends Base {
                                     } else {
                                         return  'design_info of empty'
                                     }
+                                }
+                                /**
+                                 * 手绘订单
+                                 */
+                                if (cart_v.shopping_type == 4) {
+                                    item_info.order_type = 4;
+                                    item_info._order_type = getOrderType(item_info.order_type);
+                                    item_info.preview_image = cart_v.design_info.preview_image;
+                                    let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
+                                    let drawBuffer = Buffer.from(baseData, 'base64');
+                                    const fileName = think.uuid('v4');
+                                    const oss = await think.service('oss');
+                                    const filePath = `/demo/${1}/${fileName}.png`;
+                                    const res: any = await oss.upload(Buffer.from(drawBuffer), filePath,true);
+                                    item_info.draw_image = `http://${res.Location}`;
+                                    item_info.image = cart_v.design_info.preview_image;
                                 }
                                 item_info.item_total_price += item.current_price * cart_v.buy_num;
                                 pay_amount += item.current_price * cart_v.buy_num;
@@ -590,6 +611,28 @@ export default class extends Base {
                                                     return 'design_info of empty'
                                                 }
                                             }
+                                        /**
+                                         * 手绘订单
+                                         */
+                                        if (cart_v.shopping_type == 4) {
+                                            item_info.order_type = 4;
+                                            item_info._order_type = getOrderType(item_info.order_type);
+                                            /**
+                                             * 上传手绘的图
+                                             */
+                                            item_info.preview_image = cart_v.design_info.preview_image;
+                                            let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
+                                            let drawBuffer = Buffer.from(baseData, 'base64');
+                                            const fileName = think.uuid('v4');
+                                            const oss = await think.service('oss');
+                                            const filePath = `/demo/${1}/${fileName}.png`;
+                                            const res: any = await oss.upload(Buffer.from(drawBuffer), filePath,true);
+                                            item_info.draw_image = `http://${res.Location}`;
+                                            /**
+                                             * 订单预览图变成设计预览图
+                                             */
+                                            item_info.image = cart_v.design_info.preview_image;
+                                        }
                                         item_info.item_total_price += sku_v.current_price * cart_v.buy_num;
                                         pay_amount += sku_v.current_price * cart_v.buy_num;
                                         item_list.push(item_info);
@@ -647,10 +690,10 @@ export default class extends Base {
             const order_no = this.post('order_no');
             const res1: any = await this.model('order').where({order_no}).find();  //-2为已取消
             // @ts-ignore
-            if (Object.keys(res1) == 0) {
+            if (think.isEmpty(res1)) {
                 return this.fail(-1, '订单不存在');
             }
-            if (res1.status  == 2) {
+            if (res1.status == -2) {
                 return this.fail(-1, '该订单已取消, 请勿重复操作!');
             }
             const res: any = await this.model('order').where({order_no}).update({status:-2,_status:"已取消"});  //-2为已取消
@@ -674,7 +717,7 @@ export default class extends Base {
     /**
      * 改变库存
      * @param {$item} 商品
-     * @param {$add} true 增加  false 减少
+     * @param {$add} true 增加 , false 减少
      */
     async changeSumStock($item: any,$add: any) {
         try {

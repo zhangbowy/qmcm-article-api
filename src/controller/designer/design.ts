@@ -489,7 +489,12 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
-
+    async downLoadAction() {
+        const file = this.get('url');
+        const fileBuffer = await getBuffer(this, file,true);
+        await fs.writeFileSync('1.PNG',fileBuffer);
+        this.download('1.PNG')
+    }
 }
 function deleteFolder(path: any) {
     let files = [];
@@ -505,4 +510,45 @@ function deleteFolder(path: any) {
         });
         fs.rmdirSync(path);
     }
+}
+/**
+ * 獲取遠程圖片內容
+ * @param $this
+ * @param $filePath url
+ * @param $buffer  output tpye of 1 buffer 0 base64
+ */
+async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
+
+    const { Writable } = require('stream');
+    // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
+    const res = await $this.fetch($filePath);
+    let chunks: any = [];
+    let size = 0;
+    return new Promise((resolve,reject) => {
+        /**
+         * 创建可写流
+         */
+        const outStream = new Writable({
+            write(chunk: Buffer, encoding: string, callback: any) {
+                chunks.push(chunk);
+                console.log(chunk);
+                size += chunk.length;
+                callback()
+            },
+            final(){
+                /**
+                 * 拼接Buffer
+                 */
+                let newBuffer = Buffer.concat(chunks,size);
+                // @ts-ignore
+                let img = 'data:image/png;base64,' + Buffer.from(newBuffer, 'utf8').toString('base64');
+                if ($buffer) {
+                    resolve(newBuffer);
+                } else {
+                    resolve(img);
+                }
+            }
+        });
+        res.body.pipe(outStream);
+    })
 }

@@ -15,27 +15,25 @@ export default class extends Base {
    */
   async orderListAction() {
     try {
+      const designer_info = this.ctx.state.designer_info;
       // @ts-ignore
-      const shop_id: number = this.ctx.state.designer_info.shop_id;
-      const designer_id: number = this.ctx.state.designer_info.designer_id;
-      const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
+      const shop_id = designer_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
-      const status: number = Number(this.post('status') || 0);
+      const status: number = this.post('status') || '9,2,3,4';
       const order_no: string = this.post('order_no') || '';
       const order_type: number = Number(this.post('order_type') || 0);
       let where: any = {};
       where.order_no = ['like',`%${order_no}%`];
       where.shop_id = shop_id;
+      where.designer_id  =designer_info.designer_id;
       if (status) {
-        where.status = status
+        where.status = ['IN',status];
       }
       if (order_type) {
         where.order_type = order_type
       }
-      // let res await this.model('design').where({designer_id}).select();
-      let res = await this.model('order_item').page(page, limit).where({designer_id}).countSelect();
-      // let res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
+      let res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
       // let res = await this.model('order').group('status').where(where).countSelect();
       return this.success(res, '请求成功!');
     }catch (e) {
@@ -52,8 +50,10 @@ export default class extends Base {
    */
   async orderCountAction() {
     try {
+      const designer_info = this.ctx.state.designer_info;
+
       // @ts-ignore
-      const shop_id = this.ctx.state.admin_info.shop_id;
+      const shop_id = designer_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       // const status: number = this.post('status') || 0;
@@ -62,6 +62,7 @@ export default class extends Base {
       let where: any = {};
       where.order_no = ['like',`%${order_no}%`];
       where.shop_id = shop_id;
+      where.designer_id  =designer_info.designer_id;
       // if (status) {
       //   // where.status = status
       // }
@@ -70,28 +71,38 @@ export default class extends Base {
       }
 
       /**
-       * 订单状态列表 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复
+       * 订单状态列表 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9 设计师处理中
        */
-      let statusList = [1,2,3,4,5,6,-2];
-      let res:any = await this.model('order').order('order_no DESC').where(where).count('status');
-      // let res:any = await this.model('order').group('status').where(where).countSelect();
+      let statusList = [1,2,3,4,5,6,7,8,9,-2];
+      let statusListn = [
+        {
+          _status:"全部",
+          status:'9,2,3,4',
+          count:0
+        },
+        {
+          _status:"待处理",
+          status:'9',
+          count:0
+        },
+        {
+          _status:"已处理",
+          status:'2,3,4',
+          count:0
+        }
+      ];
+      // let res:any = await this.model('order').order('order_no DESC').where(where).count('status');
       let statusObj: any = {};
-      // let obj1 = {
-      //   status: 0,
-      //   count: res1
-      // }
-      // statusObj.push(obj1);
-      statusObj[0] = res;
-      for (let item of statusList) {
-        where.status = item;
-        let data: any = await this.model('order').where(where).count( 'status');
-        statusObj[item] = data
-        // let obj = {
-        //   status: item,
-        //   count: data
-        // };
-        // statusObj.push(obj)
+
+      for (let item of statusListn) {
+        where.status = ['IN',item.status];
+        const count =  await this.model('order').where(where).order('created_at DESC').count('status');
+        let index = statusListn.indexOf(item);
+        statusListn[index].count = count
       };
+      // statusListn[0].count = res;
+
+      return this.success(statusListn, '请求成功!');
       return this.success(statusObj, '请求成功!');
     }catch (e) {
       return this.fail(-1, e);

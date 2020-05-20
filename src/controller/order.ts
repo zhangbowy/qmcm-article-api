@@ -39,7 +39,6 @@ export default class extends Base {
     }
   }
 
-
   /**
    * 订单状态统计
    * @param {order_no} 订单编号
@@ -66,29 +65,77 @@ export default class extends Base {
       }
 
       /**
-       * 订单状态列表 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复
+       * 订单状态列表 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9 设计师处理中
        */
-      let statusList = [1,2,3,4,5,6,-2];
+      let statusList = [1,2,3,4,5,6,7,8,9,-2];
+      let statusListn = [
+        {
+          _status:"全部",
+          status:0,
+          count:0
+        },
+        {
+          _status:"待付款",
+          status:1,
+          count:0
+        },
+        {
+          _status:"询价中",
+          status:5,
+          count:0
+        },
+        {
+          _status:"已回复",
+          status:6,
+          count:0
+        },
+        {
+          _status:"待派单",
+          status:7,
+          count:0
+        },
+        {
+          _status:"派单中",
+          status:8,
+          count:0
+        },
+        {
+          _status:"设计师处理中",
+          status:9,
+          count:0
+        },
+        {
+          _status:"待发货",
+          status:2,
+          count:0
+
+        },
+        {
+          _status:"已发货",
+          status:3,
+          count:0
+        },
+        {
+          _status:"已完成",
+          status:4,
+          count:0
+        },
+        {
+          _status:"已取消",
+          status:-2,
+          count:0
+        }
+      ];
       let res:any = await this.model('order').order('order_no DESC').where(where).count('status');
-      // let res:any = await this.model('order').group('status').where(where).countSelect();
-      let statusObj: any = {};
-      // let obj1 = {
-      //   status: 0,
-      //   count: res1
-      // }
-      // statusObj.push(obj1);
-      statusObj[0] = res;
-      for (let item of statusList) {
-        where.status = item;
-        let data: any = await this.model('order').where(where).count( 'status');
-        statusObj[item] = data
-        // let obj = {
-        //   status: item,
-        //   count: data
-        // };
-        // statusObj.push(obj)
+
+      for (let item of statusListn) {
+        where.status = item.status;
+        const count =  await this.model('order').where(where).order('created_at DESC').count('status');
+        let index = statusListn.indexOf(item);
+        statusListn[index].count = count
       };
-      return this.success(statusObj, '请求成功!');
+      statusListn[0].count = res;
+      return this.success(statusListn, '请求成功!');
     }catch (e) {
       return this.fail(-1, e);
     }
@@ -148,7 +195,20 @@ export default class extends Base {
       }
       let _status = "待发货";
       let pay_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
-      let res: any = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:2});
+      let res: any;
+      if(orderInfo.order_type == 1) {
+        res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:2});
+      }
+      if (orderInfo.order_type == 2) {
+        /**
+         * 有花样的订单 直接推给设计师
+         */
+        if (orderInfo.designer_id) {
+          _status = "设计师处理中";
+          res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:9});
+        }
+        // res = await this.model('order_item').where({shop_id, order_id}).select();
+      }
 
       if ( res ) {
         return this.success(res, '请求成功!');

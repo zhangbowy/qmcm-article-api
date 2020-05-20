@@ -13,98 +13,115 @@ export default class extends Base {
         return this.success(url);
     }
     async authAction() {
-        let code:string = this.get('code');
-        if(!code) {
-            return this.fail(-1., 'code不能为空')
-        };
-        const appid = this.config('wx').appid;
-        const secret = this.config('wx').appSecret;
-        /**
-         * 通过code换取 access_token
-         */
-        let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
-
-        const res = await this.fetch(url).then(res => res.json());
-        if (res && res.errcode) {
-           return this.success(res)
-        }
-        let openId = res.openid;
-        /**
-         * 判断是否新用户
-         */
-         let info = await this.model('user').where({openid:openId}).find();
-         let userInfo;
-        /**
-         * 老用户
-         */
-        if (Object.keys(info).length > 0) {
-            let params: object = {
-                nickname:info.nickname,
-                sex:info.sex,
-                province:info.province,
-                city:info.city,
-                country:info.country,
-                headimgurl:info.headimgurl,
-                openid:info.openid,
-                id:info.id
-            }
-            userInfo = params
-        } else {
+        try {
+            let code:string = this.get('code');
+            if(!code) {
+                return this.fail(-1., 'code不能为空')
+            };
+            const appid = this.config('wx').appid;
+            const secret = this.config('wx').appSecret;
             /**
-             * 新用户 拉取用户信息
+             * 通过code换取 access_token
              */
-            let access_token = res.access_token;
-            let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
-             userInfo = await this.fetch(getInfoUrl).then(res => res.json());
-            let params: object = {
-                nickname:userInfo.nickname,
-                sex:userInfo.sex,
-                province:userInfo.province,
-                city:userInfo.city,
-                country:userInfo.country,
-                headimgurl:userInfo.headimgurl,
-                openid:userInfo.openid
+            let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
+
+            const res = await this.fetch(url).then(res => res.json());
+            if (res && res.errcode) {
+                return this.success(res)
             }
-            let id = await this.model('user').add(params);
-            userInfo.id = id;
-            console.log(userInfo);
+            let openId = res.openid;
+            /**
+             * 判断是否新用户
+             */
+            let info = await this.model('user').where({openid:openId}).find();
+            let userInfo;
+            /**
+             * 老用户
+             */
+            if (Object.keys(info).length > 0) {
+                let params: object = {
+                    nickname:info.nickname,
+                    sex:info.sex,
+                    province:info.province,
+                    city:info.city,
+                    country:info.country,
+                    headimgurl:info.headimgurl,
+                    openid:info.openid,
+                    id:info.id
+                };
+                userInfo = params
+            } else {
+                /**
+                 * 新用户 拉取用户信息
+                 */
+                let access_token = res.access_token;
+                let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
+                userInfo = await this.fetch(getInfoUrl).then(res => res.json());
+                let shop_id = this.ctx.state.shop_id;
+                let params: object = {
+                    nickname:userInfo.nickname,
+                    sex:userInfo.sex,
+                    province:userInfo.province,
+                    city:userInfo.city,
+                    country:userInfo.country,
+                    headimgurl:userInfo.headimgurl,
+                    openid:userInfo.openid,
+                    shop_id
+                }
+                let id = await this.model('user').add(params);
+                userInfo.id = id;
+                console.log(userInfo);
+            }
+            let tokenFuc =  think.service('wx/token');
+            /**
+             * 生成token
+             */
+            let token = await tokenFuc.create1(userInfo);
+            /**
+             * 下发到cookies
+             */
+            await this.cookie('user_sign', token,{
+                maxAge:1000*1000*1000*1000,
+                expires:new Date().getTime() + 1000*1000*1000*1000
+            });
+            /**
+             * 重定向到首页
+             */
+            this.redirect('http://cxgh.tecqm.club');
+        }catch (e) {
+            this.dealErr(e);
         }
-        let tokenFuc =  think.service('wx/token');
-        /**
-         * 生成token
-         */
-        let token = await tokenFuc.create1(userInfo);
-        /**
-         * 下发到cookies
-         */
-        await this.cookie('user_sign', token,{
-            maxAge:1000*1000*1000*1000,
-            expires:new Date().getTime() + 1000*1000*1000*1000
-        });
-        /**
-         * 重定向到首页
-         */
-        this.redirect('http://cxgh.tecqm.club')
     }
 
     /**
      * 获取用户信息
      */
     async infoAction() {
-        const userInfo = this.ctx.state.userInfo;
-        const user_id = userInfo.id;
-        let info = await this.model('user').where({id: user_id}).find();
-        if(think.isEmpty(info)) {
-            await this.cookie('user_sign', '');
-            return this.fail(402,'未登录')
+        try {
+            const userInfo = this.ctx.state.userInfo;
+            const user_id = userInfo.id;
+            let info = await this.model('user').where({id: user_id}).find();
+            if(think.isEmpty(info)) {
+                await this.cookie('user_sign', '');
+                return this.fail(402,'未登录');
+            }
+            return this.success(this.ctx.state.userInfo,'请求成功!')
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success(this.ctx.state.userInfo,'请求成功!')
     }
 
     /**
      * 判断是否登录
      */
     async checkLoginAction() {
+        const userInfo = this.ctx.state.userInfo;
+        const user_id = userInfo.id;
+        let info = await this.model('user').where({id: user_id}).find();
+        if(think.isEmpty(info)) {
+            await this.cookie('user_sign', '');
+            return this.fail(402,'未登录');
+        }
         return this.success([],'已登录')
     }
 
@@ -122,7 +139,7 @@ export default class extends Base {
             headimgurl:res.headimgurl,
             openid:res.openid,
             id:res.id
-        }
+        };
         let tokenFuc =  think.service('wx/token');
         /**
          * 生成token
@@ -135,7 +152,6 @@ export default class extends Base {
             // HttpOnly:false,
             // domain:'192.168.31.181'
         });
-
         return this.success('登录成功!')
     }
 

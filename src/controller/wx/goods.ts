@@ -56,11 +56,14 @@ export default class extends Base {
             const shop_id = this.ctx.state.shop_id;
             const id: number = this.post('id');
             const model = this.model('item') as ItemModel;
+            const res = await model.getGoodById(id, shop_id);
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '商品不存在!');
+            }
             /**
              * 商品的浏览量增加1
              */
             await this.model('item').where({id: id}).increment('pv', 1);
-            const res = await model.getGoodById(id, shop_id);
             return this.success(res, '请求成功!');
         }catch ($err) {
             this.dealErr($err);
@@ -78,7 +81,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.shop_id;
             const data = await cateModel.categoryList({page, limit, shop_id});
-            let res =  this.getTree(data,0, 'id', 'parent_id');
+            let res = this.getTree(data,0, 'id', 'parent_id');
             return this.success(res, '请求成功!');
         }catch ($err) {
             this.dealErr($err);

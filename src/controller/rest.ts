@@ -5,6 +5,10 @@ export default class extends think.Controller {
 
   }
 
+
+  test1Action() {
+    this.download('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/demo/1/1/1/1.png')
+  }
   /**
    * 抛出错误
    */

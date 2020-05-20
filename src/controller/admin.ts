@@ -114,6 +114,7 @@ export default class extends Base {
      * 验证码
      */
     async getCaptchaAction(): Promise<void> {
+
         const defaultOptions = {
             size: 4, // size of random string
             ignoreChars: '', // filter out some characters

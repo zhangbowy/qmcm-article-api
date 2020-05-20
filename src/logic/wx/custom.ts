@@ -30,5 +30,6 @@ export default class extends base {
 
     }
     getEmbTemplateAction() {}
+    downAction() {}
 
 }

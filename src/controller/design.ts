@@ -7,10 +7,14 @@ export default class extends Base {
      * 设计师列表
      */
     async designerListAction(): Promise<any> {
-        // @ts-ignore
-        const shop_id: number = this.ctx.state.admin_info.shop_id;
-        const res = await this.model('designer_team').fieldReverse('del').where({shop_id,del: 0}).countSelect();
-        return this.success(res, '请求成功!');
+        try {
+            // @ts-ignore
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const res = await this.model('designer_team').fieldReverse('del').where({shop_id,del: 0}).countSelect();
+            return this.success(res, '请求成功!');
+        }catch (e) {
+            this.dealErr(e)
+        }
     }
 
     /**
@@ -91,11 +95,15 @@ export default class extends Base {
      * 删除设计师团队
      */
     async delDesignerAction(): Promise<any>  {
-        const designer_team_id = this.post('designer_team_id');
-        const res = await this.model('designer_team').where({designer_team_id}).update({del:1});
-        if (!res) {
-            return  this.fail(-1, '设计师团队不存在!');
+        try {
+            const designer_team_id = this.post('designer_team_id');
+            const res = await this.model('designer_team').where({designer_team_id}).update({del:1});
+            if (!res) {
+                return  this.fail(-1, '设计师团队不存在!');
+            }
+            return this.success([], '删除成功!');
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success([], '删除成功!');
     }
 }

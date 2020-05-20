@@ -276,7 +276,11 @@ export default class extends Base {
                     { input: design_preview_buffer,left: middle_design_left, top: top_height}
                 ];
             }
-            if (type == 3) {
+
+            /**
+             * type == 4 手绘订单
+             */
+            if (type == 4) {
                 /**
                  * 绘制的高度
                  */
@@ -479,6 +483,11 @@ export default class extends Base {
         // })
         // })
     }
+    async downAction() {
+        const ico = await getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG',true);
+        await fs.writeFileSync('1.PNG',ico)
+        this.download('1.PNG')
+    }
 }
 
 
@@ -496,6 +505,7 @@ function getIndex (arr: any, num: number) {
     // } else {
         return arr.length-1
     // }
+
 }
 
 /**

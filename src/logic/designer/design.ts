@@ -150,4 +150,7 @@ export default class extends base {
     designCountAction() {
 
     }
+    downLoadAction() {
+
+    }
 }

@@ -7,7 +7,7 @@ export default class extends restController {
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
-      if(this.ctx.path.indexOf('designer/user/login') === -1) {
+      if(this.ctx.path.indexOf('designer/user/login') === -1 && this.ctx.path.indexOf('designer/design/downLoad') === -1) {
         const design_sign = this.header("design_sign");
         if (think.isEmpty(design_sign)) {
           return this.fail(402, '未登录!', []);

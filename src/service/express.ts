@@ -123,7 +123,7 @@ module.exports = class extends think.Service {
       DataSign: this.generateDataSign(requestData),
       DataType: '2'
     };
-    let str = ''
+    let str = '';
     for(let k in fromData) {
       if((Object.keys(fromData)).indexOf(k) == Object.keys(fromData).length - 1) {
         str += `${k}=${fromData[k]}`
