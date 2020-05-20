@@ -164,7 +164,7 @@ export default class extends Base {
         // @ts-ignore
         const shop_id = this.ctx.state.admin_info.shop_id;
         const data = await model.list({shop_id});
-        let res = updateGroup(data,0);
+        let res = this.getTree(data,0, 'group_id', 'parent_id');
         return this.success(res, '请求成功!');
     }
 
@@ -245,30 +245,4 @@ export default class extends Base {
         }
         return this.fail(-1, '分组不存在!', []);
     }
-}
-
-/**
- * 递归分类列表
- */
-function updateGroup(data:any, root:any) {
-        var idTxt:any = idTxt || 'group_id';
-        var pidTxt:any = pidTxt || 'parent_id';
-        var pushTxt:any = pushTxt || 'children';
-        // 递归方法
-        function getNode(id:any) {
-            var node = [];
-            var ids = [];
-            for (var i = 0; i < data.length; i++) {
-                if (data[i][pidTxt] == id) {
-                    data[i][pushTxt] = getNode(data[i][idTxt]);
-                    node.push(data[i])
-                }
-            }
-            if (node.length == 0) {
-                return
-            } else {
-                return node
-            }
-        }
-        return getNode(root);
 }

@@ -1,11 +1,9 @@
 import Base from './base.js';
 import {think} from "thinkjs";
-import {resolveFilesAndProgram} from "tslint/lib/files/resolution";
 const sharp = require('sharp');
 const Color = require('color');
 const path = require('path');
 const fs = require('fs');
-const gm = require('gm')
 export default class extends Base {
     /**
      * 定制信息
@@ -61,81 +59,11 @@ export default class extends Base {
         }
     }
 
-    async getBase64($id: any,$fonstObj: any) {
-        let obj = {};
-        for (let k of $fonstObj) {
-            let data = await getBuffer(this, $fonstObj[k]);
-            obj[k] = data
-        }
-        await this.cache(`fonts-${$id}`,obj)
-    }
-    async itemPreview($fontList: any, $color: any, $fontHeight: any, $fontAreaHeight: any, areaWidth?: any) {
-        try {
-            const font_id = this.get('font_id');
-            // const font_list =  ['a', 'a', 'a'];
-            // const font_list = JSON.parse(this.get('font_list')) || ['a', 'b', 'c'];
-            const font_list = $fontList;
-            // let res = await this.model('fonts').where({font_id}).find();
-            // if (think.isEmpty(res)) {
-            //     return this.fail(-1, '字体不存在');
-            // }
-            var color = Color($color);
-            let color1 = color.object();
-            let result: any = [];
-            let compositeList = [];
-            let font_area_width = 0;
-            let font_area_height = 0;
-            let position_width = 0;
-            // let fontContent = JSON.parse(res.font_content);
-            if (font_list.length == 0) {
-                font_area_width = areaWidth
-            } else {
-                for (let v of font_list) {
-                    // if (!fontContent[v]) {
-                    //     return this.fail(-1, `${v}的字体不存在`);
-                    // }
-                    // let data = await getBuffer(this, fontContent[v], true);
-                    let baseData = v.replace(/data:image\/png;base64,/g,'')
-                    let data = Buffer.from(baseData, 'base64');
-                    let initData =   await sharp(data).toBuffer();
-                    const bgMata  = await sharp(initData).metadata();
-                    // @ts-ignore
-                    font_area_height =  font_area_height == 0?Math.floor(bgMata.height):font_area_height;
-                    // let height = bgMata.height
-                    // font_area_height = Math.floor((bgMata.height > font_area_height?bgMata.height:font_area_height))
-                    const data2 = await sharp(initData).resize({ height: $fontHeight}).tint(color1).toBuffer() ;
-                    const bgMata2  = await sharp(data2).metadata();
-                    font_area_width = Math.floor(bgMata2.width)+font_area_width;
-                    const top = Math.ceil(($fontAreaHeight - $fontHeight)/2);
-                    let obj = { input: data2,left: position_width, top: top};
-                    compositeList.push(obj);
-                    result.push(data2);
-                    position_width += Math.floor(bgMata2.width)
-                }
-            }
-
-            let areaBuffer = await sharp({
-                create: {
-                    width: font_area_width,
-                    height: $fontAreaHeight,
-                    channels: 4,
-                    background: { r: 255, g: 255, b: 255, alpha: 0}
-                }
-            })
-            .composite(compositeList)
-            .png()
-            .toBuffer();
-            this.ctx.type = 'image/png';
-
-            return  {font_area_width,areaBuffer}
-        }catch (e) {
-            this.dealErr(e)
-        }
-    }
-
      /**
-     * 获取字体图片
-     */
+      * 获取字体图片
+      * @param {font_id} 字体id
+      * @param {font_list} 字体列表 后台有的字体
+      */
     async getFontAction() {
         try {
             const font_id = this.get('font_id');
@@ -163,12 +91,8 @@ export default class extends Base {
                 } else {
                     result.push(fonC)
                 }
-            }
-            ;
+            };
             let fontContentList = Object.keys(JSON.parse(res.font_content));
-            fontContentList.filter(($data) => {
-
-            });
             return this.success(result, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -177,6 +101,7 @@ export default class extends Base {
 
     /**
      * 获取花样
+     * @tip 當前店鋪type為 3的花樣
      */
     async getDesignAction() {
         try {
@@ -195,6 +120,8 @@ export default class extends Base {
 
     /**
      * 修改圖片顏色
+     * @param {color} 顏色
+     * @param {image} 圖片數組
      */
     async reColorAction() {
         try {
@@ -264,7 +191,13 @@ export default class extends Base {
             const bottom_font_content = this.post('bottom_font_content') || [1,2,3,4,5,6];
             const bottom_font_color = this.post('bottom_font_color') || '#06c7f1';
 
+
+            /**
+             * 手绘区域宽高比例
+             */
             const draw_height_scale = this.post('draw_height_scale') || 1;
+            const draw_left_scale = this.post('draw_left_scale') || 0;
+            const draw_top_scale = this.post('draw_top_scale') || 0;
             const draw_image = this.post('draw_image') || '';
 
             let result: any = {};
@@ -344,34 +277,31 @@ export default class extends Base {
                 ];
             }
             if (type == 3) {
-                const drawArea_height = area_height * draw_height_scale;
-                const drawArea_width = area_width * draw_height_scale;
-
+                /**
+                 * 绘制的高度
+                 */
+                const drawArea_height = Math.floor(area_height * draw_height_scale);
+                const drawArea_width = Math.floor(area_width * draw_height_scale);
+                const drawArea_left = Math.floor(area_width * draw_left_scale);
+                const drawArea_top = Math.floor(area_height * draw_top_scale);
                 let baseData = draw_image.replace(/data:image\/png;base64,/g,'');
-                let drawBuffer1 = Buffer.from(baseData, 'base64');
 
-                // const drawAreaBuffer1 = await sharp(drawBuffer1).rotate(1,{ background: { r: 255, g: 255, b: 255, alpha: 0}}).
-                //     toBuffer() ;
-                // // @ts-ignore
-                // let aa = await recolor(drawAreaBuffer1)
-                // this.ctx.type = 'image/png';
-                //    return  this.ctx.body = aa;
                 const wilcom = think.service('wilcom');
                 const embPng =  await wilcom.getEmbByImg(baseData,area_width_mm,area_height_mm);
                 let drawBuffer = Buffer.from(embPng, 'base64');
-                const drawAreaBuffer = await sharp(drawBuffer).resize({ width: drawArea_width, background: { r: 255, g: 255, b: 255, alpha: 0}}).webp().toBuffer() ;
+                const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).webp().toBuffer() ;
                 const drawAreaBuffer_meta  = await sharp(drawAreaBuffer).metadata();
                 const drawAreaBuffer_width = drawAreaBuffer_meta.width;
                 const drawAreaBuffer_height = drawAreaBuffer_meta.height;
-                area_width =(drawAreaBuffer_width>area_width?drawAreaBuffer_width:area_width);
-                area_height =(drawAreaBuffer_height>area_height?drawAreaBuffer_height:area_height);
-                const drawAreaBuffer_top = Math.floor((area_height- drawAreaBuffer_height) / 2);
-                const drawAreaBuffer_left = Math.floor((area_width - drawAreaBuffer_width ) / 2);
+                // area_width =(drawAreaBuffer_width>area_width?drawAreaBuffer_width:area_width);
+                // area_height =(drawAreaBuffer_height>area_height?drawAreaBuffer_height:area_height);
+                // const drawAreaBuffer_top = Math.floor((area_height- drawAreaBuffer_height) / 2);
+                // const drawAreaBuffer_left = Math.floor((area_width - drawAreaBuffer_width ) / 2);
                 /**
                  * 合成的图 手绘图
                  */
                 composite = [
-                    { input: drawAreaBuffer, left: drawAreaBuffer_left, top: drawAreaBuffer_top},
+                    { input: drawAreaBuffer, left: drawArea_left, top: drawArea_top},
                 ]
             }
             /**
@@ -382,7 +312,7 @@ export default class extends Base {
                     width: area_width,
                     height: area_height,
                     channels: 4,
-                    background: { r: 255, g: 255, b: 255, alpha: 0.1}
+                    background: { r: 255, g: 255, b: 255, alpha: 0}
                 }
             })
             .composite(composite)
@@ -406,39 +336,13 @@ export default class extends Base {
         }
     }
 
-
-    async previewAction()
-    {
-        let resPath = path.join(think.ROOT_PATH, 'www/1.png');
-        let icoPath = path.join(think.ROOT_PATH, 'www/2.png');
-        const res = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
-        const res1 = res.body.readableBuffer;
-        const res2 = res.body._writableState.getBuffer();
-        // const resPath1 = fs.createWriteStream(resPath);
-        let _this = this;
-        let data = await getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
-        _this.ctx.type = 'image/png';
-        _this.ctx.body = data;
-        // await res.body.pipe(resPath1).on('finish',async () =>{
-        //     const icoPath1 = fs.createWriteStream(icoPath);
-        // const ico = await _this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG');
-        // await ico.body.pipe(icoPath1).on('finish',async () =>{
-        //     let resdata = await fs.readFileSync(resPath)
-        //     let icodata = await fs.readFileSync(icoPath)
-        //     const data = await sharp(resdata).composite([{ input: icoPath,}]).toBuffer()
-        //     _this.ctx.type = 'image/png';
-        //     _this.ctx.body = res1.tail.data;
-        // })
-        // })
-    }
-
     /**
      *  获取EMB模板
+     *  @param {template_type} 模板類型
      */
     async getEmbTemplateAction() {
         try {
             const template_type = this.get('template_type') || 1;
-            const emb_template_id = this.get('emb_template_id') || 1;
             const res = await this.model('emb_template').setRelation(false).field('emb_template_id,template_name,template_type,cover_image,created_at,updated_at').where({template_type}).select();
             return this.success(res);
         }catch (e) {
@@ -448,6 +352,8 @@ export default class extends Base {
 
     /**
      * 获取刺绣模板的价格
+     * @parm {emb_template_id} 模板id
+     * @parm {template_type} 模板類型
      */
     async getEmbPriceAction() {
         try {
@@ -486,18 +392,96 @@ export default class extends Base {
             this.dealErr(e);
         }
     }
+    async itemPreview($fontList: any, $color: any, $fontHeight: any, $fontAreaHeight: any, areaWidth?: any) {
+        try {
+            const font_id = this.get('font_id');
+            // const font_list =  ['a', 'a', 'a'];
+            // const font_list = JSON.parse(this.get('font_list')) || ['a', 'b', 'c'];
+            const font_list = $fontList;
+            // let res = await this.model('fonts').where({font_id}).find();
+            // if (think.isEmpty(res)) {
+            //     return this.fail(-1, '字体不存在');
+            // }
+            var color = Color($color);
+            let color1 = color.object();
+            let result: any = [];
+            let compositeList = [];
+            let font_area_width = 0;
+            let font_area_height = 0;
+            let position_width = 0;
+            // let fontContent = JSON.parse(res.font_content);
+            if (font_list.length == 0) {
+                font_area_width = areaWidth
+            } else {
+                for (let v of font_list) {
+                    // if (!fontContent[v]) {
+                    //     return this.fail(-1, `${v}的字体不存在`);
+                    // }
+                    // let data = await getBuffer(this, fontContent[v], true);
+                    let baseData = v.replace(/data:image\/png;base64,/g,'')
+                    let data = Buffer.from(baseData, 'base64');
+                    let initData =   await sharp(data).toBuffer();
+                    const bgMata  = await sharp(initData).metadata();
+                    // @ts-ignore
+                    font_area_height =  font_area_height == 0?Math.floor(bgMata.height):font_area_height;
+                    // let height = bgMata.height
+                    // font_area_height = Math.floor((bgMata.height > font_area_height?bgMata.height:font_area_height))
+                    const data2 = await sharp(initData).resize({ height: $fontHeight}).tint(color1).toBuffer() ;
+                    const bgMata2  = await sharp(data2).metadata();
+                    font_area_width = Math.floor(bgMata2.width)+font_area_width;
+                    const top = Math.ceil(($fontAreaHeight - $fontHeight)/2);
+                    let obj = { input: data2,left: position_width, top: top};
+                    compositeList.push(obj);
+                    result.push(data2);
+                    position_width += Math.floor(bgMata2.width)
+                }
+            }
+
+            let areaBuffer = await sharp({
+                create: {
+                    width: font_area_width,
+                    height: $fontAreaHeight,
+                    channels: 4,
+                    background: { r: 255, g: 255, b: 255, alpha: 0}
+                }
+            })
+                .composite(compositeList)
+                .png()
+                .toBuffer();
+            this.ctx.type = 'image/png';
+
+            return  {font_area_width,areaBuffer}
+        }catch (e) {
+            this.dealErr(e)
+        }
+    }
+    async previewAction()
+    {
+        let resPath = path.join(think.ROOT_PATH, 'www/1.png');
+        let icoPath = path.join(think.ROOT_PATH, 'www/2.png');
+        const res = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
+        const res1 = res.body.readableBuffer;
+        const res2 = res.body._writableState.getBuffer();
+        // const resPath1 = fs.createWriteStream(resPath);
+        let _this = this;
+        let data = await getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
+        _this.ctx.type = 'image/png';
+        _this.ctx.body = data;
+        // await res.body.pipe(resPath1).on('finish',async () =>{
+        //     const icoPath1 = fs.createWriteStream(icoPath);
+        // const ico = await _this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG');
+        // await ico.body.pipe(icoPath1).on('finish',async () =>{
+        //     let resdata = await fs.readFileSync(resPath)
+        //     let icodata = await fs.readFileSync(icoPath)
+        //     const data = await sharp(resdata).composite([{ input: icoPath,}]).toBuffer()
+        //     _this.ctx.type = 'image/png';
+        //     _this.ctx.body = res1.tail.data;
+        // })
+        // })
+    }
 }
 
-async function recolor($buffer: any) {
-    return new Promise((resolve,reject) =>{
-        gm($buffer).resize(1000,1000).fill('white')
-            .opaque("black").toBuffer('PNG',function (err, buffer) {
-            resolve(buffer)
-        })
-    })
 
-
-}
 function getIndex (arr: any, num: number) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] > num) {
@@ -513,12 +497,18 @@ function getIndex (arr: any, num: number) {
         return arr.length-1
     // }
 }
+
+/**
+ * 獲取遠程圖片內容
+ * @param $this
+ * @param $filePath url
+ * @param $buffer  output tpye of 1 buffer 0 base64
+ */
 async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
 
     const { Writable } = require('stream');
     // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
     const res = await $this.fetch($filePath);
-    // const res = await $this.fetch('http://img.wkdao.com/image/65/2020/01/07/9ed36e3bae2d24848c85ae8e79a58aa1.png@!200_200');
     let chunks: any = [];
     let size = 0;
     return new Promise((resolve,reject) => {

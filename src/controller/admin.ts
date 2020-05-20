@@ -16,7 +16,6 @@ export default class extends Base {
             }
             let code = Code.toLowerCase();
             let code_cookie = (await this.session('captcha') || '').toLowerCase();
-            // let code_cookie = this.cookie('captcha').toLowerCase();
             if(code != code_cookie) {
                 return  this.fail(-1, "验证码错误!");
             }
@@ -38,17 +37,6 @@ export default class extends Base {
                         admin_id:res.id,
                     };
                     let token = await tokenFuc.create1(info);
-
-                    // // @ts-ignore
-                    // const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${res.id}`, undefined, 'redis'));
-                    // // @ts-ignore
-                    // // this.ctx.state.adm_sign = await this.cache(`admin-sign-${res.id}`, undefined, 'redis');
-                    // this.ctx.state.adm_sign = admin_redis_sign.admin_id;
-                    // if (!think.isEmpty(admin_redis_sign)) {
-                    //     const orderController = this.controller('websocket');
-                    //     // @ts-ignore
-                    //     orderController.offlineAction();
-                    // }
                     await this.cache(`admin-${res.id}`, res, {
                         type: 'redis',
                         redis: {
@@ -63,13 +51,6 @@ export default class extends Base {
                             timeout:  60 * 60 * 1000 * 2
                         }
                     });
-                    // const ownAuth = await this.model('auth_give').where({admin_role_id:res.role_id}).select()
-                    // const allAuth = await this.model('authority_category').select();
-                    // let arr = [];
-                    //
-                    // for (let all_v of allAuth) {
-                    //
-                    // }
                     return this.success({token,adminId:res.id}, "登录成功!");
                 }
                 return  this.fail(-1, "用户名或密码错误!", []);

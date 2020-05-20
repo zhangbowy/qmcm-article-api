@@ -22,16 +22,15 @@ export default class extends Base {
      * 編輯刺綉模板
      */
     async editEmbTemplateAction(): Promise<void> {
-        let emb_emplate_id = this.post('id');
+        let emb_template_id = this.post('id');
         let template_type = this.post('template_type');
         let cover_image = this.post('cover_image');
-        let res = await this.model('emb_template').where({template_type,emb_emplate_id}).update({cover_image});
+        let res = await this.model('emb_template').where({template_type,emb_template_id}).update({cover_image});
         if (res) {
             return this.success([], '修改成功!')
         }
         return this.fail(-1, '模板不存在')
     }
-
 
     /**
      * 添加刺绣模板价格
@@ -202,7 +201,7 @@ export default class extends Base {
     async getCityAction() {
         try {
             let region1: any[] = await this.model('region').field('id,pid,name,level,citycode as city_code,yzcode as yz_code').select();
-            let region = updateRegion(region1,100000);
+            let region = this.getTree(region1,100000);
             return this.success(region, '请求成功!');
         }catch (e) {
             return this.fail(-1, e)
@@ -772,31 +771,4 @@ export default class extends Base {
      */
     async delAdminAction(): Promise<void> {
     }
-}
-/**
- * 递归分类列表
- */
-function updateRegion(data:any, root:any) {
-    var idTxt:any = idTxt || 'id';
-    var pidTxt:any = pidTxt || 'pid';
-    var pushTxt:any = pushTxt || 'children';
-    // 递归方法
-    function getNode(id:any) {
-        var node = [];
-        var ids = [];
-        for (var i = 0; i < data.length; i++) {
-            if (data[i][pidTxt] == id) {
-                data[i][pushTxt] = getNode(data[i][idTxt]);
-                if (data[i].level != 3 ) {
-                    node.push(data[i])
-                }
-            }
-        }
-        if (node.length == 0) {
-            return
-        } else {
-            return node
-        }
-    }
-    return getNode(root)
 }

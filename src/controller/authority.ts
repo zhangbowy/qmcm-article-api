@@ -8,7 +8,7 @@ module.exports = class extends Base {
     async authorityListAction(): Promise<void> {
         try {
             const res = await this.model('authority').where({is_show: 1,only_role_type:3}).fieldReverse('del').select();
-            const data = updateCategory(res, 0);
+            const data = this.getTree(res,0);
             return this.success(data)
         }catch (e) {
 
@@ -218,29 +218,4 @@ module.exports = class extends Base {
         }
         return this.success([], '删除成功!')
     }
-}
-/**
- * 递归分类列表
- */
-function updateCategory(data:any, root:any) {
-    var idTxt:any = idTxt || 'id';
-    var pidTxt:any = pidTxt || 'pid';
-    var pushTxt:any = pushTxt || 'children';
-    // 递归方法
-    function getNode(id:any) {
-        var node = [];
-        var ids = [];
-        for (var i = 0; i < data.length; i++) {
-            if (data[i][pidTxt] == id) {
-                data[i][pushTxt] = getNode(data[i][idTxt]);
-                node.push(data[i])
-            }
-        }
-        if (node.length == 0) {
-            return
-        } else {
-            return node
-        }
-    }
-    return getNode(root)
 }

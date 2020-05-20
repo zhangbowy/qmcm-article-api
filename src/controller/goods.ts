@@ -321,7 +321,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await cateModel.categoryList({page, limit, shop_id});
-            let res =  updateCategory(data,0);
+            let res =  this.getTree(data,0, 'id','parent_id');
             return this.success(res, '请求成功!');
         }catch (e) {
             return this.fail(-1, e);
@@ -448,31 +448,4 @@ export default class extends Base {
             return this.fail(-1, e);
         }
     }
-
 }
-/**
- * 递归分类列表
- */
-function updateCategory(data:any, root:any) {
-    var idTxt:any = idTxt || 'id';
-    var pidTxt:any = pidTxt || 'parent_id';
-    var pushTxt:any = pushTxt || 'children';
-    // 递归方法
-    function getNode(id:any) {
-        var node = [];
-        var ids = [];
-        for (var i = 0; i < data.length; i++) {
-            if (data[i][pidTxt] == id) {
-                data[i][pushTxt] = getNode(data[i][idTxt]);
-                node.push(data[i])
-            }
-        }
-        if (node.length == 0) {
-            return
-        } else {
-            return node
-        }
-    }
-    return getNode(root)
-}
-

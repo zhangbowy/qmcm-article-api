@@ -2,7 +2,7 @@
   "name": "yuncixiu-api-v3",
   "description": "云刺綉Api",
   "version": "1.0.0",
-  "author": "zhangbo <xiaobo21@163.com>",
+  "author": "杭州千盟网络科技有限公司",
   "scripts": {
     "start": "node development.js",
     "prod": "tsc && node production.js",
@@ -54,7 +54,7 @@
     "metadata": {
       "name": "yuncixiu-api-v3",
       "description": "云刺綉Api",
-      "author": "zhangbo <xiaobo21@163.com>"
+      "author": "杭州千盟网络科技有限公司"
     },
     "projectName": "yuncixiu-api-v3",
     "template": "typescript",

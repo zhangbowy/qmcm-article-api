@@ -1,8 +1,10 @@
 import { think } from 'thinkjs';
 export default class extends think.Controller {
+
   async __before() {
 
   }
+
   /**
    * 抛出错误
    */
@@ -27,6 +29,32 @@ export default class extends think.Controller {
       }
     }
     return this.fail(-1,$errMsg,$data);
+  }
+
+  /**
+   * 递归分类列表
+   */
+   getTree(data:any, root:any, $id?: any,$pid?: any, pushTxt?: any) {
+    var idTxt:any = $id || 'id';
+    var pidTxt:any = $pid || 'pid';
+    var pushTxt:any = pushTxt || 'children';
+    // 递归方法
+    function getNode(id:any) {
+      var node = [];
+      var ids = [];
+      for (var i = 0; i < data.length; i++) {
+        if (data[i][pidTxt] == id) {
+          data[i][pushTxt] = getNode(data[i][idTxt]);
+          node.push(data[i])
+        }
+      }
+      if (node.length == 0) {
+        return
+      } else {
+        return node
+      }
+    }
+    return getNode(root)
   }
 
   __call() {
