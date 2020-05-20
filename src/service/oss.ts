@@ -1,10 +1,10 @@
 import { think } from 'thinkjs';
 const path = require('path');
-var COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
+var COS = require('cos-nodejs-sdk-v5');
 var cos = new COS({
-    SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
-    SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
+    SecretId: think.config('tencentCos').SecretId,
+    SecretKey: think.config('tencentCos').SecretKey
 });
 module.exports = class extends think.Service {
     constructor() {

@@ -84,9 +84,9 @@ export default class extends Base {
         if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
             let filepath;
             if( type == 1) {
-                filepath = path.join('/root/release/ghao/');
+                filepath = path.join('/root/release/ghao');
             } else  {
-                filepath = path.join('/root/release/admin/');
+                filepath = path.join('/root/release/admin');
             }
             deleteFolder(filepath);
             var zip = new AdmZip(file.path);
