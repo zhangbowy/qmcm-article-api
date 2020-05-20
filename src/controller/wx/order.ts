@@ -225,7 +225,7 @@ export default class extends Base {
                  */
                 address = await this.model('address').where({user_id, shop_id,is_default: 1}).find();
                 if(Object.keys(address).length == 0) {
-                    address = await this.model('addresss').where({user_id, shop_id}).find();
+                    address = await this.model('address').where({user_id, shop_id}).find();
                 }
             } else {
                 address = await this.model('address').where({user_id, shop_id,address_id}).find();
