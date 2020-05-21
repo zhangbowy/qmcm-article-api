@@ -44,6 +44,7 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_name = this.post('designer_name');
             const designer_phone = this.post('designer_phone');
+            const avatar_url = this.post('avatar_url');
             const user = await this.model('designer').where({designer_phone}).find();
             if (!think.isEmpty(user)) {
                 return  this.fail(-1, '手机号已被使用!');
@@ -58,6 +59,7 @@ export default class extends Base {
                 designer_team_id,
                 designer_name,
                 designer_phone,
+                avatar_url,
                 designer_password,
                 is_leader,
                 default_password,
@@ -489,11 +491,42 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+
+    /**
+     * 上传图片
+     * @params image file
+     * @params type 上传类型
+     * @return IMAGE PATH
+     */
+    async uploadImgAction() {
+        try {
+            const design_info = this.ctx.state.designer_info;
+            const shop_id: number = design_info.shop_id;
+            const designer_team_id: number = design_info.designer_team_id;
+            const file = this.file('image');
+            if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
+                const fileName = think.uuid('v4');
+                const gs = file.type.substring(6, file.type.length);
+                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                let filePath = `/design/avatar/${shop_id}/${designer_team_id}/${day}/${fileName}.${gs}`;
+                /**
+                 * 上传到腾讯OSS
+                 */
+                const oss = await think.service('oss');
+                let res: any = await oss.upload(file.path, filePath);
+                return this.success('http://' + res.Location);
+            } else {
+                this.fail(-1, '请上传png或jpg格式的图片', []);
+            }
+        }catch (e) {
+           this.dealErr(e);
+        }
+    }
     async downLoadAction() {
         const file = this.get('url');
         const fileBuffer = await getBuffer(this, file,true);
         await fs.writeFileSync('1.PNG',fileBuffer);
-        this.download('1.PNG')
+        this.download('1.PNG');
     }
 }
 function deleteFolder(path: any) {
@@ -551,4 +584,5 @@ async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
         });
         res.body.pipe(outStream);
     })
+
 }

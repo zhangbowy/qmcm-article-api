@@ -32,6 +32,7 @@ export default class extends restController {
         // if (Object.keys(res).length == 0)
         // {
         //   return this.fail(1001,'店铺不存在!')
+        console.log(designer_info);
         // }
       } else {
         console.log(this.ctx.state.userInfo);

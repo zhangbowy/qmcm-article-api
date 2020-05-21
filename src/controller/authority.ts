@@ -2,6 +2,7 @@ import {think} from "thinkjs";
 import Base from './base.js';
 import ItemModel from "../model/item";
 module.exports = class extends Base {
+
     /**
      * 权限列表
      */
@@ -11,7 +12,7 @@ module.exports = class extends Base {
             const data = this.getTree(res,0);
             return this.success(data)
         }catch (e) {
-
+            this.dealErr(e);
         }
     }
 
@@ -19,26 +20,34 @@ module.exports = class extends Base {
      * 角色列表
      */
     async roleListAction(): Promise<void> {
-        const shop_id = this.ctx.state.admin_info.shop_id;
-        const res = await this.model('admin_role').where({shop_id, del:0, role_type:['NOTIN', [1, 2]]}).countSelect();
-        return this.success(res)
+        try {
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const res = await this.model('admin_role').where({shop_id, del:0, role_type:['NOTIN', [1, 2]]}).countSelect();
+            return this.success(res)
+        }catch (e) {
+           this.dealErr(e);
+        }
     }
 
     /**
      * 角色详情
      */
     async roleDetailAction(): Promise<void> {
-        const admin_role_id = this.get('admin_role_id');
-        const shop_id = this.ctx.state.admin_info.shop_id;
-        const admin_role = await this.model('admin_role').where({shop_id,admin_role_id: admin_role_id,role_type:['NOTIN', [1, 2]]}).find();
-        if (think.isEmpty(admin_role)) {
-            return this.fail(-1, '该角色不存在!')
+        try {
+            const admin_role_id = this.get('admin_role_id');
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const admin_role = await this.model('admin_role').where({shop_id,admin_role_id: admin_role_id,role_type:['NOTIN', [1, 2]]}).find();
+            if (think.isEmpty(admin_role)) {
+                return this.fail(-1, '该角色不存在!')
+            }
+            const auth_list = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
+            // const res = await this.model('authority').where({is_page: 1, auth_id:['in',auth_list]}).getField('id');
+            // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
+            admin_role.authority_list = auth_list;
+            return this.success(admin_role);
+        }catch (e) {
+            this.dealErr(e);
         }
-        const auth_list = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
-        // const res = await this.model('authority').where({is_page: 1, auth_id:['in',auth_list]}).getField('id');
-        // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
-        admin_role.authority_list = auth_list;
-        return this.success(admin_role);
     }
 
     /**
@@ -63,33 +72,38 @@ module.exports = class extends Base {
             await this.saveSystemLog('添加权限角色',{'角色名称':admin_role_name,'赋予的权限':authority_list});
             return this.success([], '添加成功!');
         }catch (e) {
-
+            this.dealErr(e)
         }
     }
-    /*
+
+    /**
      * 编辑角色
      */
     async editRoleAction(): Promise<void> {
-        const admin_role_id = this.post('admin_role_id');
-        const admin_role_name = this.post('admin_role_name');
-        const shop_id = this.ctx.state.admin_info.shop_id;
-        await this.model('admin_role').where({admin_role_id,shop_id}).update({admin_role_name});
-        const authority_list  = typeof this.post('authority_list') == 'string'?this.post('authority_list').split(','):this.post('authority_list');
-        if (authority_list.length == 0) {
-            return this.fail(-1, '给予的权限列表不能为空!')
+        try {
+            const admin_role_id = this.post('admin_role_id');
+            const admin_role_name = this.post('admin_role_name');
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            await this.model('admin_role').where({admin_role_id,shop_id}).update({admin_role_name});
+            const authority_list  = typeof this.post('authority_list') == 'string'?this.post('authority_list').split(','):this.post('authority_list');
+            if (authority_list.length == 0) {
+                return this.fail(-1, '给予的权限列表不能为空!')
+            }
+            const get_auth_list = [];
+            for (let auth_v of authority_list) {
+                let obj = {
+                    admin_role_id:admin_role_id,
+                    auth_id:auth_v,
+                    shop_id
+                };
+                get_auth_list.push(obj)
+            }
+            await this.model('auth_give').where({admin_role_id,shop_id}).update({del:1});
+            await this.model('auth_give').addMany(get_auth_list);
+            this.success([], '编辑成功!');
+        }catch (e) {
+            this.dealErr(e);
         }
-        const get_auth_list = [];
-        for (let auth_v of authority_list) {
-            let obj = {
-                admin_role_id:admin_role_id,
-                auth_id:auth_v,
-                shop_id
-            };
-            get_auth_list.push(obj)
-        }
-        await this.model('auth_give').where({admin_role_id,shop_id}).update({del:1});
-        await this.model('auth_give').addMany(get_auth_list);
-        return this.success([], '编辑成功!');
     }
     /**
      * 删除角色
@@ -105,7 +119,7 @@ module.exports = class extends Base {
             const res = await this.model('admin').where({shop_id,role_id:admin_role_id}).update({del: 1});
             return this.success([], '删除成功!')
         }catch (e) {
-
+            this.dealErr(e);
         }
     }
     /**
@@ -127,7 +141,7 @@ module.exports = class extends Base {
                 .field('admin.id,admin.role_id,admin.name,admin.phone,admin.created_at,admin.updated_at,admin_role_name as role_name').page(page, limit).countSelect();
             return this.success(res, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+           this.dealErr(e);
         }
     }
     /**
@@ -161,7 +175,7 @@ module.exports = class extends Base {
             }
             return this.fail(-1, '创建失败!');
         }catch (e) {
-
+            this.dealErr(e);
         }
     }
     /**
@@ -191,7 +205,7 @@ module.exports = class extends Base {
                 name,
                 phone,
                 role_id
-            }
+            };
             if (password) {
                 const pwd = new Buffer(password, 'utf-8' );
                 udpOption.pwd = pwd
@@ -202,20 +216,23 @@ module.exports = class extends Base {
             }
             return this.fail(-1, '修改失败!');
         }catch (e) {
-
+            this.dealErr(e);
         }
-
     }
     /**
      * 删除管理员
      */
     async delAdminAction(): Promise<void> {
-        const id = this.post('id');
-        const shop_id = this.ctx.state.admin_info.shop_id;
-        const res = await this.model('admin').where({id,shop_id}).update({del: 1});
-        if (!res) {
-            return this.fail(-1, '管理员不存在!')
+        try {
+            const id = this.post('id');
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const res = await this.model('admin').where({id,shop_id}).update({del: 1});
+            if (!res) {
+                return this.fail(-1, '管理员不存在!')
+            }
+            return this.success([], '删除成功!')
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success([], '删除成功!')
     }
 }

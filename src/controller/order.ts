@@ -105,6 +105,11 @@ export default class extends Base {
           count:0
         },
         {
+          _status:"待打印",
+          status:10,
+          count:0
+        },
+        {
           _status:"待发货",
           status:2,
           count:0
@@ -196,7 +201,7 @@ export default class extends Base {
       let _status = "待发货";
       let pay_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
       let res: any;
-      if(orderInfo.order_type == 1) {
+      if (orderInfo.order_type == 1) {
         res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:2});
       }
       if (orderInfo.order_type == 2) {
@@ -205,22 +210,32 @@ export default class extends Base {
          */
         if (orderInfo.designer_id) {
           _status = "设计师处理中";
-          res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:9});
+          const _designer_status = '设计师处理中';
+          res = await this.model('order').where({shop_id, id: order_id}).update({ _designer_status, designer_status: 3, pay_time, _status, status:9 });
+        } else {
+          _status = "待派单";
+          res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:7});
         }
         // res = await this.model('order_item').where({shop_id, order_id}).select();
       }
 
+      if (orderInfo.order_type == 4) {
+        _status = "待派单";
+        res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status: 7});
+      }
+
       if ( res ) {
-        return this.success(res, '请求成功!');
+        return this.success(res, '操作成功!');
       }
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
   /**
    * 确认收货
    * @param {order_id} 订单id
+   * @return boolean
    */
   async confirmReceivedAction() {
     try {
@@ -261,7 +276,7 @@ export default class extends Base {
       }
       return this.fail(-1, '操作失败!');
     } catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
@@ -326,7 +341,7 @@ export default class extends Base {
       }
       return this.success([], '操作成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
@@ -339,7 +354,7 @@ export default class extends Base {
       const res = await this.model('express_list').fieldReverse('express_code').select();
       return this.success(res,'请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
@@ -366,6 +381,7 @@ export default class extends Base {
       if (think.isEmpty(express_number)) {
         return this.fail(-1, '快递单号未填写');
       }
+
       /**
        * 快递列表
        */
@@ -388,9 +404,74 @@ export default class extends Base {
         traces:res.traces
       };
       return this.success(result, '请求成功!');
-    } catch (e) {
-      return this.fail(-1, e);
+    } catch ($err) {
+      this.dealErr($err);
     }
   }
 
+  /**
+  /**
+   * 指派订单
+   * @param {order_id} 订单id
+   * @param {designer_team_id} 设计师团队id
+   * @return boolean
+   */
+  async dispatchOrderAction() {
+    try {
+      const shop_id = this.ctx.state.admin_info.shop_id;
+      const order_id = this.post('order_id');
+      const designer_price = this.post('designer_price');
+      const designer_team_id = this.post('designer_team_id');
+      let designer_team = await this.model('designer_team').where({designer_team_id}).find();
+      if (think.isEmpty(designer_team)) {
+        return this.fail(-1,'该设计师团队不存在!')
+      }
+      const order =  await this.model('order').where({shop_id, id: order_id}).find();
+      /**
+       * 状态不是 待发货 和 待收货 的时候
+       */
+      if (order.status != 7) {
+        let msg: string = '';
+        switch (order.status) {
+          case 1:
+            msg='该订单未支付!';
+            break;
+          case 4:
+            msg='该订单已完成!';
+            break;
+          case -2:
+            msg='该订单已关闭!';
+            break;
+          case 2:
+            msg='该订单等待发货!';
+            break;
+          case 3:
+            msg='该订单待收货!';
+            break;
+          case 4:
+            msg='该订单已完成!';
+            break;
+          case 5 || 6:
+            msg='该订单议价中!';
+            break;
+          case 8:
+            msg='该订单已在派单中,请勿重复操作!';
+            break;
+          case 9:
+            msg='该订单设计师处理中!';
+            break;
+          case 9:
+            msg='该订单待打印!';
+            break;
+        }
+        return this.fail(-1, msg);
+      }
+      const _status = '派单中';
+      const _designer_status = '待接单';
+      const res = await this.model('order').where({shop_id, id: order_id}).update({designer_price,_designer_status, designer_status:1,_status, status: 8, designer_team_id});
+      return this.success([], '操作成功!');
+    }catch (e) {
+      this.dealErr(e);
+    }
+  }
 }

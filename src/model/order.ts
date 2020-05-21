@@ -24,7 +24,14 @@ export default class extends think.Model {
                 Model: 'user',
                 fKey: 'id',
                 key: 'user_id',
-            }
+            },
+            designer: {
+                type: think.Model.HAS_ONE,
+                Model: 'designer',
+                fKey: 'designer_id',
+                key: 'designer_id',
+                field: 'designer_id,designer_team_id,designer_name,designer_phone,is_leader',
+            },
         };
     }
 

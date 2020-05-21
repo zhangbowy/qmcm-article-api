@@ -105,7 +105,8 @@ export default class extends Base {
                 buyer_message,
                 _status: '待付款',
                 _order_type: _order_type,
-                designer_id: item_info.item_list[0].designer_id
+                designer_id: item_info.item_list[0].designer_id,
+                designer_team_id: item_info.item_list[0].designer_team_id
             });
             if (order_id) {
                 let item_list = item_info.item_list;
@@ -403,6 +404,7 @@ export default class extends Base {
                                             let design_price = cart_v.buy_num * design.price;
 
                                             item_info.designer_id = design.designer_id;
+                                            item_info.designer_team_id = design.designer_team_id;
 
                                             item_info.design_price = design.price;
                                             item_info.design_png_path = design.prev_png_path;
@@ -580,6 +582,7 @@ export default class extends Base {
                                                         let design_price = cart_v.buy_num * design.price;
 
                                                         item_info.designer_id = design.designer_id;
+                                                        item_info.designer_team_id = design.designer_team_id;
 
                                                         item_info.design_price = design.price;
                                                         item_info.design_png_path = design.prev_png_path;

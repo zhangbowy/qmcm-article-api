@@ -117,5 +117,31 @@ export default class extends base {
     }
   }
 
-
+  dispatchOrderAction() {
+    const rules = {
+      order_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      designer_team_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      designer_price: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
 }

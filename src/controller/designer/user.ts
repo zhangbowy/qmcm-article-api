@@ -77,7 +77,7 @@ export default class extends Base {
     /**
      * 登出
      */
-    async logOutAction(): Promise<any> {
+    async logoutAction(): Promise<any> {
         try {
             // @ts-ignore
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');

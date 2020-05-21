@@ -4,7 +4,7 @@ export default class extends base {
     loginAction() {
 
     }
-    logOutAction() {
+    logoutAction() {
 
     }
     infoAction() {

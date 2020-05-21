@@ -153,4 +153,7 @@ export default class extends base {
     downLoadAction() {
 
     }
+    uploadImgAction() {
+
+    }
 }

@@ -105,8 +105,8 @@ export default class extends Base {
      */
     async getDesignAction() {
         try {
-            const page: number = this.post('currentPage') || 1;
-            const limit: number = this.post('pageSize') || 10;
+            const page: number = this.get('currentPage') || 1;
+            const limit: number = this.get('pageSize') || 10;
             const shop_id = this.ctx.state.shop_id;
             const res = await this.model('design').field('design_id,designer_id,designer_team_id,prev_png_path,price,design_name').page(page, limit).where({
                 status: 3,
