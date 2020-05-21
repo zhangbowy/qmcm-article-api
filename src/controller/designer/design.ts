@@ -524,9 +524,10 @@ export default class extends Base {
     }
     async downLoadAction() {
         const file = this.get('url');
+        const fileName = this.get('fileName');
         const fileBuffer = await getBuffer(this, file,true);
         await fs.writeFileSync('1.PNG',fileBuffer);
-        this.download('1.PNG');
+        this.download('1.PNG', fileName+'.png');
     }
 }
 function deleteFolder(path: any) {

@@ -117,4 +117,7 @@ export default class extends Base {
         return this.ctx.body = c.data
         // captcha.svgCaptcha(text);
     }
+    async editUserInfoAction() {
+
+    }
 }

@@ -105,7 +105,7 @@ export default class extends Base {
           count:0
         },
         {
-          _status:"待打印",
+          _status:"下发机器",
           status:10,
           count:0
         },
