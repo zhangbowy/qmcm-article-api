@@ -2,7 +2,7 @@
   "apps": [{
     "name": "yuncixiu-api",
     "script": "production.js",
-    "cwd": "/",
+    "cwd": "/root/workspace/yuncixiu-api-v3.0",
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
