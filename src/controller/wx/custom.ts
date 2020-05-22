@@ -67,6 +67,9 @@ export default class extends Base {
     async getFontAction() {
         try {
             const font_id = this.get('font_id');
+            let color = this.get('color') || '#4bff00';
+            var colors = Color(color);
+            let color1 = colors.object();
             const font_list = JSON.parse(this.get('font_list')) || ['a', 'b', 'c'];
             let res = await this.model('fonts').where({font_id}).find();
             if (think.isEmpty(res)) {
@@ -74,25 +77,24 @@ export default class extends Base {
             }
             let result = [];
             let fontContent = JSON.parse(res.font_content);
-            // if(think.isEmpty(fonC)) {
-            //     this.getBase64(font_id,fontContent);
-            // } else {
-            //     fontContent = fonC
-            // }
             for (let v of font_list) {
+                let data1;
                 if (!fontContent[v]) {
                     return this.fail(-1, `${v}的字体不存在`);
                 }
-                let fonC = await this.cache(`fonts1-${font_id}-${v}`);
+                let fonC = await this.cache(`fonts-${font_id}-${v}`);
                 if(think.isEmpty(fonC)) {
-                    let data = await getBuffer(this, fontContent[v]);
-                    await this.cache(`fonts1-${font_id}-${v}`,data);
-                    result.push(data)
+                    data1 = await getBuffer(this, fontContent[v],true);
+                    await this.cache(`fonts-${font_id}-${v}`,data1);
                 } else {
-                    result.push(fonC)
+                    data1 = Buffer.from(fonC)
                 }
+                // let baseData = data1.replace(/data:image\/png;base64,/g,'');
+                // let data = Buffer.from(baseData, 'base64');
+                let colorData = await sharp(data1).tint(color1).png().toBuffer();
+                let fonC1 = 'data:image/png;base64,' + Buffer.from(colorData, 'utf8').toString('base64');
+                result.push(fonC1)
             };
-            let fontContentList = Object.keys(JSON.parse(res.font_content));
             return this.success(result, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -149,8 +151,7 @@ export default class extends Base {
                     // const dest = fs.createWriteStream(filePath);
                     // await res.body.pipe(dest).on('finish',async () =>{
                     //     let data = res.body._readableState.buffer
-                    //
-                    let baseData = urlItem.replace(/data:image\/png;base64,/g,'')
+                    let baseData = urlItem.replace(/data:image\/png;base64,/g,'');
                     let data = Buffer.from(baseData, 'base64');
                     let color1 = color.object();
                     // let color1 = color.ansi256().object()
@@ -161,7 +162,6 @@ export default class extends Base {
                     imageObj.push(img);
                     ++i
                     // });
-
                 }
                 return this.success(imageObj);
 
@@ -325,18 +325,21 @@ export default class extends Base {
             const data = await sharp(preview_bg_buffer).composite([{ input: designAreaBuffer,left: area_left, top: area_top}]).toBuffer();
             // const data12 = Buffer.from(data, 'utf8');
             // let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
-            const fileName = think.uuid('v4');
             const oss = await think.service('oss');
-            const filePath = `/demo/${1}/${fileName}.png`;
+            const fileName = `${think.uuid('v4')}.png`;
             // const filepath = path.join(think.ROOT_PATH, `www/static/custom/preview/${fileName}.png`)
             // await think.mkdir(path.dirname(filepath));
             // fs.writeFileSync(filepath,)
             // this.ctx.type = 'image/png';
+            const filePath: any = path.join(think.ROOT_PATH, `/www/static/preview/${fileName}`);
+            const visitPath: any = `/static/preview/${fileName}`;
             //     this.ctx.body = data;
-            const res: any = await oss.upload(Buffer.from(data), filePath,true);
-            return this.success(`http://${res.Location}`);
+            await think.mkdir(path.dirname(filePath));
+            await fs.writeFileSync(filePath,data);
+            // const res: any = await oss.upload(Buffer.from(data), filePath,true);
+            return this.success(`${think.config('domain')}${visitPath}`);
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 

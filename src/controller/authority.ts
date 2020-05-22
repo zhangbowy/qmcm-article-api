@@ -57,8 +57,18 @@ module.exports = class extends Base {
         try {
             const admin_role_name = this.post('admin_role_name');
             const shop_id = this.ctx.state.admin_info.shop_id;
+            const authority_list  = this.post('authority_list');
+            if (authority_list.length == 0) {
+                return this.fail(-1, '赋予角色的权限不能为空!');
+            }
+            const authority_tree =  await this.model('authority').where({id:['IN',authority_list]}).select();
+            const pageList = authority_tree.filter(function(val:any,index:any){
+                return (val.is_page == 1 && val.pid!=0)
+            });
+            if (pageList.length == 0) {
+                return this.fail(-1, '请至少选择一个页面的权限!');
+            }
             const admin_role_id = await this.model('admin_role').add({admin_role_name, shop_id});
-            const authority_list  = this.post('authority_list') || [1,2];
             const get_auth_list = [];
             for (let auth_v of authority_list) {
                 let obj = {
@@ -72,7 +82,7 @@ module.exports = class extends Base {
             await this.saveSystemLog('添加权限角色',{'角色名称':admin_role_name,'赋予的权限':authority_list});
             return this.success([], '添加成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -84,11 +94,19 @@ module.exports = class extends Base {
             const admin_role_id = this.post('admin_role_id');
             const admin_role_name = this.post('admin_role_name');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            await this.model('admin_role').where({admin_role_id,shop_id}).update({admin_role_name});
             const authority_list  = typeof this.post('authority_list') == 'string'?this.post('authority_list').split(','):this.post('authority_list');
             if (authority_list.length == 0) {
-                return this.fail(-1, '给予的权限列表不能为空!')
+                return this.fail(-1, '赋予角色的权限不能为空!');
             }
+            const authority_tree =  await this.model('authority').where({id:['IN',authority_list]}).select();
+            const pageList = authority_tree.filter(function(val:any,index:any){
+                return (val.is_page == 1 && val.pid!=0)
+            });
+            if (pageList.length == 0) {
+                return this.fail(-1, '请至少选择一个页面的权限!');
+            }
+
+            await this.model('admin_role').where({admin_role_id,shop_id}).update({admin_role_name});
             const get_auth_list = [];
             for (let auth_v of authority_list) {
                 let obj = {
@@ -96,7 +114,7 @@ module.exports = class extends Base {
                     auth_id:auth_v,
                     shop_id
                 };
-                get_auth_list.push(obj)
+                get_auth_list.push(obj);
             }
             await this.model('auth_give').where({admin_role_id,shop_id}).update({del:1});
             await this.model('auth_give').addMany(get_auth_list);

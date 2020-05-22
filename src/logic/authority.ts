@@ -16,7 +16,6 @@ export default class extends base {
                 method: 'post'
             },
             authority_list: {
-                string: true,
                 required: true,
                 method: 'post'
             },

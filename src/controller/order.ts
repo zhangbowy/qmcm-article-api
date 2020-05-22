@@ -371,7 +371,7 @@ export default class extends Base {
       }
       let express_id = orderItem.express_id;
       let express_number = orderItem.express_number;
-      if (orderItem.item_status == 1) {
+      if (orderItem.item_status == 1 || !orderItem.item_status) {
         return this.fail(-1, '该商品未发货!');
       }
       if (!express_id) {

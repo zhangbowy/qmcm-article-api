@@ -94,14 +94,17 @@ export default class extends Base {
             }
             const sku_list = JSON.stringify(this.post('sku_list'));
             const detail = this.post('detail');
+            // if(old_price > current_price) {
+            //     return this.fail(-1, '商品现价不能大于划线价!', []);
+            // }
             if(min_buy < 1) {
-                return this.fail(-1, '最小购买数量为1', []);
+                return this.fail(-1, '最小购买数量为1!', []);
             }
             if(max_buy < min_buy) {
-                return this.fail(-1, '最大购买数量不能小于起购数量', []);
+                return this.fail(-1, '最大购买数量不能小于起购数量!', []);
             }
             if(max_buy > sum_stock) {
-                return this.fail(-1, '最大购买数量不能超过库存', []);
+                return this.fail(-1, '最大购买数量不能超过库存!', []);
             }
             const params: any = {
                 name,
@@ -138,7 +141,7 @@ export default class extends Base {
             }
             return this.fail(-1, '添加失敗', []);
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -158,7 +161,7 @@ export default class extends Base {
             res.sku_show = JSON.parse(res.sku_show);
             return this.success(res, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -231,6 +234,10 @@ export default class extends Base {
                     return this.fail(-1, '运费模板不存在!');
                 }
             }
+            // if(old_price > current_price) {
+            //     return this.fail(-1, '商品现价不能大于划线价!', []);
+            // }
+
             const params: any = {
                 name,
                 category_id,
@@ -282,7 +289,7 @@ export default class extends Base {
             }
             return this.success(res, '刪除成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -324,7 +331,7 @@ export default class extends Base {
             let res =  this.getTree(data,0, 'id','parent_id');
             return this.success(res, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -372,7 +379,7 @@ export default class extends Base {
             }
             return this.fail(-1, '添加失败!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
     async getLevel(parent_id: number,timer: number) {
@@ -418,7 +425,7 @@ export default class extends Base {
             }
             return this.fail(-1, '分类不存在!')
         }catch (e) {
-            return this.fail(-1, e)
+            this.dealErr(e);
         }
     }
 
@@ -433,7 +440,7 @@ export default class extends Base {
             const id: number = Number(this.post('id'));
             let category = await this.model('item_category').where({id:id}).find();
             if (Object.keys(category).length == 0) {
-                return this.fail(-1,'分类不存在')
+                return this.fail(-1,'分类不存在');
             }
             let model = this.model('item_category') as item_category;
             let ids = await model.getChild(id);
@@ -445,7 +452,7 @@ export default class extends Base {
                 return this.fail(-1, '分类不存在!');
             }
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 }
