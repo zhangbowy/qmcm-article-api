@@ -229,7 +229,7 @@ export default class extends Base {
                 if(Object.keys(address).length == 0) {
                     address = await this.model('address').where({user_id, shop_id}).find();
                     if (think.isEmpty(address)) {
-                        return this.fail(-1, '请先添加收货地址!')
+                        // return  '请先添加收货地址!'
                     }
                 }
             } else {
@@ -314,7 +314,7 @@ export default class extends Base {
                                 /**
                                  * 物流模板计费
                                  */
-                                if (item.express_type == 2 && item.express_template_id) {
+                                if (item.express_type == 2 && item.express_template_id && address.user_id) {
                                     /**
                                      * 有区域规则
                                      */
@@ -482,7 +482,7 @@ export default class extends Base {
                                         /**
                                          * 物流模板计费
                                          */
-                                        if (item.express_type == 2 && item.express_template_id) {
+                                        if (item.express_type == 2 && item.express_template_id && address.user_id) {
                                             /**
                                              * 有区域规则
                                              */

@@ -67,7 +67,7 @@ export default class extends Base {
     async uploadCodeAction() {
 
         const file = this.file('file');
-        let typeArr = [1,2];
+        let typeArr = [1,2,3];
         const type = Number(this.post('type'));
         if (!typeArr.includes(type)) {
             return  this.fail(-1, 'type不正确', []);
@@ -85,8 +85,10 @@ export default class extends Base {
             let filepath;
             if( type == 1) {
                 filepath = path.join('/root/release/ghao');
-            } else  {
+            } else if(type == 2)  {
                 filepath = path.join('/root/release/admin');
+            } else {
+                filepath = path.join('/root/release/design');
             }
             deleteFolder(filepath);
             var zip = new AdmZip(file.path);

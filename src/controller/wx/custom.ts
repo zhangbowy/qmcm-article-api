@@ -336,8 +336,11 @@ export default class extends Base {
             //     this.ctx.body = data;
             await think.mkdir(path.dirname(filePath));
             await fs.writeFileSync(filePath,data);
+            let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
+
             // const res: any = await oss.upload(Buffer.from(data), filePath,true);
             return this.success(`${think.config('domain')}${visitPath}`);
+            // return this.success(img);
         }catch (e) {
             this.dealErr(e);
         }

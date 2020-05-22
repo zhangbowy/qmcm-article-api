@@ -7,7 +7,7 @@ export = {
   errmsgField: 'msg',
   defaultErrno: 0,
   validateDefaultErrno: -1,
-  domain:think.env=='devlopment'?'http://192.168.31.180:8001':'http://cxapi.tecqm.club',
+  domain:think.env=='development'?'http://192.168.31.180:8001':'http://cxapi.tecqm.club',
   tencentCos:{ //腾讯cos对象储存账号
     SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
     SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
