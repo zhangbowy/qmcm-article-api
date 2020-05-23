@@ -44,7 +44,7 @@ export default class extends Base {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000
+                            timeout:  60 * 60 * 1000 * 6
                         }
                     });
                     // await this.cache(`design-sign-${res.designer_id}`, token, {

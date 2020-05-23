@@ -41,14 +41,14 @@ export default class extends Base {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000 * 2
+                            timeout:  60 * 60 * 1000 * 6
                         }
                     });
                     await this.cache(`admin-sign-${res.id}`, token, {
                         type: 'redis',
                         redis: {
                             // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000 * 2
+                            timeout:  60 * 60 * 1000 * 6
                         }
                     });
                     return this.success({token,adminId:res.id}, "登录成功!");

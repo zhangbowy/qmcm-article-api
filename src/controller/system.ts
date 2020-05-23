@@ -220,7 +220,7 @@ export default class extends Base {
             let res = await (this.model('express_template') as ExpressTemp).getList({page, limit, shop_id});
             return this.success(res,'请求成功!')
         }catch (e) {
-            return this.fail(-1, e)
+            return this.dealErr(e)
         }
     }
 
