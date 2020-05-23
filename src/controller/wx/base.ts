@@ -32,6 +32,7 @@ export default class extends restController {
         //   return this.success('','已登录')
         // }
       }
+      this.ctx.state.shop_id = 15
     }catch (e) {
      return  this.fail(1001, e)
     }
