@@ -3,6 +3,7 @@ const path = require('path');
 export default class extends Base {
     /**
      * 首页接口
+     * @return {slider,category}
      */
     async indexAction(): Promise<void> {
         try {

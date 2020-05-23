@@ -13,7 +13,7 @@ export default class extends Base {
             const res = await this.model('designer_team').fieldReverse('del').where({shop_id,del: 0}).countSelect();
             return this.success(res, '请求成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -58,7 +58,7 @@ export default class extends Base {
             }
             return this.success([], '添加成功!');
         }catch (e) {
-            return this.fail(-1, e.stack || e);
+            this.dealErr(e);
         }
     }
 
@@ -87,12 +87,13 @@ export default class extends Base {
             }
             return this.success([], '修改成功!');
         }catch (e) {
-            return this.fail(-1, e.stack || e);
+            this.dealErr(e);
         }
     }
 
     /**
      * 删除设计师团队
+     * @param {designer_team_id} 设计师团队id
      */
     async delDesignerAction(): Promise<any>  {
         try {

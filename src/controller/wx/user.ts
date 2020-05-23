@@ -5,6 +5,7 @@ const path = require('path');
 export default class extends Base {
     /**
      * 微信登录
+     * @return {authUrl}
      */
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
@@ -12,6 +13,12 @@ export default class extends Base {
         let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
         return this.success(url);
     }
+
+    /**
+     * 登录授权回调接口
+     * @tip 当用户确认授权后 微信带着code回调的接口
+     * @return 302 重定向
+     */
     async authAction() {
         try {
             let code:string = this.get('code');
@@ -95,12 +102,13 @@ export default class extends Base {
 
     /**
      * 获取用户信息
+     * @return userInfo
      */
     async infoAction() {
         try {
             const userInfo = this.ctx.state.userInfo;
-            const user_id = userInfo.id;
-            let info = await this.model('user').where({id: user_id}).find();
+            const openid = userInfo.openid;
+            let info = await this.model('user').where({openid: openid}).find();
             if(think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402,'未登录');
@@ -115,14 +123,18 @@ export default class extends Base {
      * 判断是否登录
      */
     async checkLoginAction() {
-        const userInfo = this.ctx.state.userInfo;
-        const user_id = userInfo.id;
-        let info = await this.model('user').where({id: user_id}).find();
-        if(think.isEmpty(info)) {
-            await this.cookie('user_sign', '');
-            return this.fail(402,'未登录');
+        try {
+            const userInfo = this.ctx.state.userInfo;
+            const openid = userInfo.openid;
+            let info = await this.model('user').where({openid: openid}).find();
+            if(think.isEmpty(info)) {
+                await this.cookie('user_sign', '');
+                return this.fail(402,'未登录');
+            }
+            return this.success([],'已登录')
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success([],'已登录')
     }
 
     /**
@@ -157,6 +169,7 @@ export default class extends Base {
 
     /**
      * 收货地址
+     * @return ARRAY<object> of addressList
      */
     async addressAction() {
         try {
@@ -299,6 +312,7 @@ export default class extends Base {
      * @params {shop_id} 店铺Id
      * @params {user_id} 用户id
      * @params {address_id} 地址id
+     * @return boolean
      */
     async delAddressAction() {
         try {

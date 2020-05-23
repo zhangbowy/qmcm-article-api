@@ -522,6 +522,12 @@ export default class extends Base {
            this.dealErr(e);
         }
     }
+
+    /**
+     *  下载资源接口
+     *  @param {url} 资源链接
+     *  @param {fileName} 文件名
+     */
     async downLoadAction() {
         const file = this.get('url');
         const fileName = this.get('fileName');
@@ -530,6 +536,8 @@ export default class extends Base {
         this.download('1.PNG', fileName+'.png');
     }
 }
+
+
 function deleteFolder(path: any) {
     let files = [];
     if (fs.existsSync(path)) {
@@ -545,6 +553,7 @@ function deleteFolder(path: any) {
         fs.rmdirSync(path);
     }
 }
+
 /**
  * 獲取遠程圖片內容
  * @param $this

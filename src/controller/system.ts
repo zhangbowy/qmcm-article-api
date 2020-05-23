@@ -2,6 +2,7 @@ import Base from './base.js';
 // tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
 import ExpressTemp from './../model/express_template'
+const sharp = require('sharp');
 export default class extends Base {
 
     /**
@@ -510,6 +511,22 @@ export default class extends Base {
             return this.success(res, '删除成功!')
         }catch (e) {
             return this.fail(-1, e);
+        }
+    }
+
+    async getImgMetaAction() {
+        try {
+            const imageUrl = await this.get('image_url');
+            const bufferData = await this.getBuffer(this, imageUrl,true);
+            const buffer_meta  = await sharp(bufferData).metadata();
+            const width: any  = (buffer_meta.density / ((160/(buffer_meta.width / buffer_meta.density)))).toFixed(2);
+            const height: any  = (buffer_meta.height / buffer_meta.density * 25.4).toFixed(2);
+            let result = {
+                width, height, format:buffer_meta.format, size: buffer_meta.size,width_px:buffer_meta.width,height_px:buffer_meta.height,buffer_meta
+            };
+            return this.success(result);
+        }catch (e) {
+            this.dealErr(e)
         }
     }
 

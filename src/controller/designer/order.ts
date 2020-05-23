@@ -45,7 +45,6 @@ export default class extends Base {
     }
   }
 
-
   /**
    * 订单状态统计
    * @param {order_no} 订单编号
@@ -136,6 +135,7 @@ export default class extends Base {
   /**
    * 接单
    * @param {order_id} 订单id
+   * @return boolean
    */
   async receiveOrderAction() {
     try {
@@ -184,6 +184,7 @@ export default class extends Base {
   /**
    * 拒绝订单
    * @param {order_id} 订单id
+   * @return boolean
    */
   async refuseOrderAction() {
     try {
@@ -231,6 +232,7 @@ export default class extends Base {
    * 指派订单
    * @param {order_id} 订单id
    * @param {designer_id} 设计师id
+   * @return boolean
    */
   async dispatchOrderAction() {
     try {
@@ -281,6 +283,7 @@ export default class extends Base {
    * @param {dst} dst
    * @param {prev_png} 花样预览图
    * @param {txt_png} 工艺单图片
+   * @return boolean
    */
   async  uploadDesignAction() {
     try {
@@ -343,6 +346,7 @@ export default class extends Base {
   /**
    * 订单详情
    * @param {order_no} 订单编号
+   * @return boolean
    */
   async orderDetailAction() {
     try {
@@ -376,6 +380,7 @@ export default class extends Base {
   /**
    * 查询快递
    * @param order_item_id 订单商品id
+   * @return 物流信息
    */
   async orderTraceAction() {
     try {
@@ -422,5 +427,4 @@ export default class extends Base {
       return this.fail(-1, e);
     }
   }
-
 }

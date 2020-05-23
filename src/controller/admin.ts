@@ -1,5 +1,4 @@
 import Base from './base.js';
-import UserModel from  './../model/user';
 // @ts-ignore
 import ThinkSvgCaptcha from 'think-svg-captcha';
 import {think} from "thinkjs";
@@ -57,36 +56,41 @@ export default class extends Base {
             }
             return  this.fail(-1, "用户名或密码错误!", []);
         }catch (e) {
-            return  this.fail(-1, e.stack || e);
+            this.dealErr(e);
         }
     }
+
+    /**
+     * 用户信息
+     */
     async infoAction(): Promise<void> {
-        const admin_info = this.ctx.state.admin_info;
-        const shop_id = admin_info.shop_id;
-        const admin_role_id = admin_info.role_id;
-        let where = {};
-        let res;
-        if (admin_info.role_type == 2) {
-           res = await this.model('authority').where({only_role_type:['in',[2,3]],is_show: 1,del: 0}).getField('id');
-        } else if (admin_info.role_type == 3) {
-             res = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
-            // res = await this.model('authority').where({ id:['in',auth_list]}).getField('id');
-        } else if (admin_info.role_type == 1) {
-            res = await this.model('authority').where({only_role_type:['in',[1]],is_show: 1,del: 0}).getField('id');
+        try {
+            const admin_info = this.ctx.state.admin_info;
+            const shop_id = admin_info.shop_id;
+            const admin_role_id = admin_info.role_id;
+            let where = {};
+            let authority_list;
+            if (admin_info.role_type == 2) {
+                authority_list = await this.model('authority').where({only_role_type:['in',[2,3]],is_show: 1,del: 0}).getField('id');
+            } else if (admin_info.role_type == 3) {
+                authority_list = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
+            } else if (admin_info.role_type == 1) {
+                authority_list = await this.model('authority').where({only_role_type:['in',[1]],is_show: 1,del: 0}).getField('id');
+            }
+            const result = {
+                admin_info:{
+                    id:admin_info.id,
+                    shop_id:admin_info.shop_id,
+                    role_type:admin_info.role_type,
+                    name:admin_info.name,
+                    phone:admin_info.phone
+                },
+                authority_list
+            };
+            return this.success(result, '请求成功!')
+        }catch (e) {
+            this.dealErr(e);
         }
-        // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
-        // admin_role.authority_list = auth_list;
-        const result = {
-            admin_info:{
-                id:admin_info.id,
-                shop_id:admin_info.shop_id,
-                role_type:admin_info.role_type,
-                name:admin_info.name,
-                phone:admin_info.phone
-            },
-            authority_list:res
-        };
-        return this.success(result, '请求成功!')
     }
 
     /**
@@ -99,7 +103,7 @@ export default class extends Base {
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -112,6 +116,7 @@ export default class extends Base {
 
     /**
      * 验证码
+     * @return {验证码图片}
      */
     async getCaptchaAction(): Promise<void> {
 
@@ -124,7 +129,7 @@ export default class extends Base {
             width: 150, // width of captcha
             height: 50, // height of captcha
             // fontPath: './fonts/Comismsh.ttf', // your font path
-            fontSize: 60, // captcha text size
+            fontSize: 65, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
         };
         let captcha = new ThinkSvgCaptcha(defaultOptions);
@@ -132,6 +137,5 @@ export default class extends Base {
         await this.session('captcha',c.text);
         this.ctx.type = 'image/svg+xml';
         return this.ctx.body = c.data
-        // captcha.svgCaptcha(text);
     }
 }

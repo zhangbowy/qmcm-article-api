@@ -84,7 +84,7 @@ export default class extends Base {
                 }
                 let fonC = await this.cache(`fonts-${font_id}-${v}`);
                 if(think.isEmpty(fonC)) {
-                    data1 = await getBuffer(this, fontContent[v],true);
+                    data1 = await this.getBuffer(this, fontContent[v],true);
                     await this.cache(`fonts-${font_id}-${v}`,data1);
                 } else {
                     data1 = Buffer.from(fonC)
@@ -218,7 +218,7 @@ export default class extends Base {
             const design_bg_width =  design_area_info.design_bg_width;
             const design_bg_height =  design_area_info.design_bg_height;
             const preview_bg_url = design_bg;
-            const preview_bg_buffer = await getBuffer(this, preview_bg_url, true);
+            const preview_bg_buffer = await this.getBuffer(this, preview_bg_url, true);
             /**
              * 背景图元信息
              */
@@ -253,7 +253,7 @@ export default class extends Base {
                 /**
                  * 花样库花样buffer
                  */
-                const design_preview = await getBuffer(this, design_data.prev_png_path, true);
+                const design_preview = await this.getBuffer(this, design_data.prev_png_path, true);
                 /**
                  * rezize 改变大小到标准尺寸下的大小
                  */
@@ -474,7 +474,7 @@ export default class extends Base {
         const res2 = res.body._writableState.getBuffer();
         // const resPath1 = fs.createWriteStream(resPath);
         let _this = this;
-        let data = await getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
+        let data = await this.getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-10:55:55/1.PNG');
         _this.ctx.type = 'image/png';
         _this.ctx.body = data;
         // await res.body.pipe(resPath1).on('finish',async () =>{
@@ -490,10 +490,11 @@ export default class extends Base {
         // })
     }
     async downAction() {
-        const ico = await getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG',true);
-        await fs.writeFileSync('1.PNG',ico)
+        const ico = await this.getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG',true);
+        await fs.writeFileSync('1.PNG',ico);
         this.download('1.PNG')
     }
+
 }
 
 
@@ -514,44 +515,4 @@ function getIndex (arr: any, num: number) {
 
 }
 
-/**
- * 獲取遠程圖片內容
- * @param $this
- * @param $filePath url
- * @param $buffer  output tpye of 1 buffer 0 base64
- */
-async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
 
-    const { Writable } = require('stream');
-    // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
-    const res = await $this.fetch($filePath);
-    let chunks: any = [];
-    let size = 0;
-    return new Promise((resolve,reject) => {
-        /**
-         * 创建可写流
-         */
-        const outStream = new Writable({
-            write(chunk: Buffer, encoding: string, callback: any) {
-                chunks.push(chunk);
-                console.log(chunk);
-                size += chunk.length;
-                callback()
-            },
-            final(){
-                /**
-                 * 拼接Buffer
-                 */
-                let newBuffer = Buffer.concat(chunks,size);
-                // @ts-ignore
-                let img = 'data:image/png;base64,' + Buffer.from(newBuffer, 'utf8').toString('base64');
-                if ($buffer) {
-                    resolve(newBuffer);
-                } else {
-                    resolve(img);
-                }
-            }
-        });
-        res.body.pipe(outStream);
-    })
-}

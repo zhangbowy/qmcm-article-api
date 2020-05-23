@@ -12,7 +12,7 @@ export = {
     SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
     SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
   },
-  wx:{ //腾讯cos对象储存账号
+  wx:{ //微信公众号的appid和密钥
     appid:'wx8d8e2dd3ce250894',
     appSecret:'767be27192a424108a8c6907bdaf1549',
   },
