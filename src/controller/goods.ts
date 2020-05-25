@@ -22,7 +22,7 @@ export default class extends Base {
             const data = await model.goodsList({page, limit, shop_id,status,name});
             return this.success(data, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -270,7 +270,7 @@ export default class extends Base {
             let res: any = await model.editGoods(id, params);
             return this.success(res, '编辑成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 

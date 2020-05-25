@@ -41,7 +41,7 @@ export default class extends Base {
       // let res = await this.model('order').group('status').where(where).countSelect();
       return this.success(res, '请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e)
     }
   }
 
@@ -128,7 +128,7 @@ export default class extends Base {
       };
       return this.success(result, '请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e)
     }
   }
 
@@ -373,7 +373,7 @@ export default class extends Base {
       const res = await this.model('express_list').fieldReverse('express_code').select();
       return this.success(res,'请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e)
     }
   }
 
@@ -424,7 +424,7 @@ export default class extends Base {
       };
       return this.success(result, '请求成功!');
     } catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e)
     }
   }
 }

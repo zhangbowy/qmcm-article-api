@@ -106,7 +106,9 @@ export default class extends Base {
                 _status: '待付款',
                 _order_type: _order_type,
                 designer_id: item_info.item_list[0].designer_id,
-                designer_team_id: item_info.item_list[0].designer_team_id
+                designer_team_id: item_info.item_list[0].designer_team_id,
+                custom_template_id:item_info.item_list[0].custom_template_id
+
             });
             if (order_id) {
                 let item_list = item_info.item_list;
@@ -405,6 +407,7 @@ export default class extends Base {
 
                                             item_info.designer_id = design.designer_id;
                                             item_info.designer_team_id = design.designer_team_id;
+                                            item_info.designer_team_id = design.designer_team_id;
 
                                             item_info.design_price = design.price;
                                             item_info.design_png_path = design.prev_png_path;
@@ -415,6 +418,8 @@ export default class extends Base {
                                             pay_amount += design_price;
                                             item_info.item_total_price += design_price;
                                         }
+
+                                        item_info.custom_template_id = cart_v.design_info.custom_template_id;
 
                                         item_info.top_font_size = cart_v.design_info.top_font_size;
                                         item_info.top_font_content = cart_v.design_info.top_font_content;
@@ -427,7 +432,24 @@ export default class extends Base {
                                         item_info.design_width = cart_v.design_info.design_width;
                                         item_info.design_height = cart_v.design_info.design_height;
                                         item_info.is_choose_design = cart_v.design_info.is_choose_design;
-                                        item_info.custom_image = cart_v.design_info.custom_image;
+
+                                        if (item_info.is_choose_design != 1) {
+                                            const custom_image_base64 = cart_v.design_info.custom_image.split(',')[1];
+                                            const oss = await think.service('oss');
+                                            const fileName = think.uuid('v4');
+                                            let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                            let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                            /**
+                                             * 上传到腾讯OSS
+                                             */
+                                            let res: any = await oss.upload(Buffer.from(custom_image_base64,'base64'), filePath, true);
+                                            item_info.custom_image = 'http://' + res.Location;
+                                            // item_info.custom_image = cart_v.design_info.custom_image;
+                                        } else {
+                                            item_info.custom_image = cart_v.design_info.custom_image;
+                                        }
+
+                                        item_info.design_area_image = cart_v.design_info.design_area_image;
                                         item_info.preview_image = cart_v.design_info.preview_image;
                                         item_info.order_type == 2;
                                         item_info.image = cart_v.design_info.preview_image;
@@ -441,9 +463,16 @@ export default class extends Base {
                                  * 手绘订单
                                  */
                                 if (cart_v.shopping_type == 4) {
+                                    item_info.custom_template_id = 2;
                                     item_info.order_type = 4;
                                     item_info._order_type = getOrderType(item_info.order_type);
+
+                                    item_info.draw_height = cart_v.design_info.draw_height;
+                                    item_info.draw_width = cart_v.design_info.draw_width;
+
+                                    item_info.design_area_image = cart_v.design_info.design_area_image;
                                     item_info.preview_image = cart_v.design_info.preview_image;
+
                                     let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
                                     let drawBuffer = Buffer.from(baseData, 'base64');
                                     const fileName = think.uuid('v4');
@@ -594,6 +623,8 @@ export default class extends Base {
                                                         item_info.item_total_price += design_price;
                                                     }
 
+                                                    item_info.custom_template_id = cart_v.design_info.custom_template_id;
+
                                                     item_info.top_font_size = cart_v.design_info.top_font_size;
                                                     item_info.top_font_content = cart_v.design_info.top_font_content;
                                                     item_info.top_font_color = cart_v.design_info.top_font_color;
@@ -605,8 +636,27 @@ export default class extends Base {
                                                     item_info.design_width = cart_v.design_info.design_width;
                                                     item_info.design_height = cart_v.design_info.design_height;
                                                     item_info.is_choose_design = cart_v.design_info.is_choose_design;
-                                                    item_info.custom_image = cart_v.design_info.custom_image;
+                                                    // item_info.custom_image = cart_v.design_info.custom_image;
+
+                                                    if (item_info.is_choose_design != 1 ) {
+                                                        const custom_image_base64 = cart_v.design_info.custom_image.split(',')[1];
+                                                        const oss = await think.service('oss');
+                                                        const fileName = think.uuid('v4');
+                                                        let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                        let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                                        /**
+                                                         * 上传到腾讯OSS
+                                                         */
+                                                        let res: any = await oss.upload(Buffer.from(custom_image_base64,'base64'), filePath, true);
+                                                        item_info.custom_image = 'http://' + res.Location;
+                                                        // item_info.custom_image = cart_v.design_info.custom_image;
+                                                    } else {
+                                                        item_info.custom_image = cart_v.design_info.custom_image;
+                                                    }
+
+
                                                     item_info.preview_image = cart_v.design_info.preview_image;
+                                                    item_info.design_area_image = cart_v.design_info.design_area_image;
                                                     item_info.order_type = 2;
                                                     item_info.image = cart_v.design_info.preview_image;
                                                     item_info._order_type = getOrderType(Number(item_info.order_type));
@@ -618,11 +668,17 @@ export default class extends Base {
                                          * 手绘订单
                                          */
                                         if (cart_v.shopping_type == 4) {
+                                            item_info.custom_template_id = 2;
                                             item_info.order_type = 4;
                                             item_info._order_type = getOrderType(item_info.order_type);
+
+                                            item_info.draw_height = cart_v.design_info.draw_height;
+                                            item_info.draw_width = cart_v.design_info.draw_width;
+
                                             /**
                                              * 上传手绘的图
                                              */
+                                            item_info.design_area_image = cart_v.design_info.design_area_image;
                                             item_info.preview_image = cart_v.design_info.preview_image;
                                             let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
                                             let drawBuffer = Buffer.from(baseData, 'base64');

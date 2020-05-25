@@ -180,7 +180,14 @@ export default class extends Base {
 
             const id = this.post('id') || 88;
             const type = this.post('type') || 2;
-            const design_id = this.post('design_id') || 145;
+
+            const design_id = this.post('design_id');
+            const custom_image = this.post('custom_image');
+            if (type == 2) {
+                if(think.isEmpty(design_id) &&  think.isEmpty(custom_image)) {
+                    // return this.fail(-1, '花样或图片不能为空!')
+                }
+            }
             const top_scale = this.post('top_scale') || 0.21;
             const top_font_scale = this.post('top_font_scale') || 0.8;
             const top_font_content = this.post('top_font_content') || [1,2,3];
@@ -249,11 +256,24 @@ export default class extends Base {
                 const middle_height = Math.floor(area_height * middle_scale);
                 const bottom_height = Math.floor(area_height * bottom_scale);
                 const bottom_font_height = Math.floor(bottom_height * bottom_font_scale);
-                const design_data = await this.model('design').where({design_id}).find();
+
+                let design_data = await this.model('design').where({design_id}).find();
+
+                let design_preview: any;
                 /**
-                 * 花样库花样buffer
+                 *  没有花样id 是自己上传的图片
                  */
-                const design_preview = await this.getBuffer(this, design_data.prev_png_path, true);
+                if (think.isEmpty(design_data)) {
+                    let baseData = custom_image.split(',')[1];
+                    design_preview = Buffer.from(baseData, 'base64');
+                } else {
+                    let design_data = await this.model('design').where({design_id}).find();
+                    /**
+                     * 花样库花样buffer
+                     */
+                    design_preview = await this.getBuffer(this, design_data.prev_png_path, true);
+                }
+
                 /**
                  * rezize 改变大小到标准尺寸下的大小
                  */
@@ -289,10 +309,15 @@ export default class extends Base {
                 const drawArea_left = Math.floor(area_width * draw_left_scale);
                 const drawArea_top = Math.floor(area_height * draw_top_scale);
                 let baseData = draw_image.replace(/data:image\/png;base64,/g,'');
-
-                const wilcom = think.service('wilcom');
-                const embPng =  await wilcom.getEmbByImg(baseData,area_width_mm,area_height_mm);
-                let drawBuffer = Buffer.from(embPng, 'base64');
+                let drawBuffer;
+                const setting = await this.model('setting').where({key: 'is_request_wilcom',value: 1}).find();
+                if (!think.isEmpty(setting)) {
+                    const wilcom = think.service('wilcom');
+                    const embPng =  await wilcom.getEmbByImg(baseData,area_width_mm,area_height_mm);
+                    drawBuffer = Buffer.from(embPng, 'base64');
+                } else {
+                    drawBuffer = Buffer.from(baseData, 'base64');
+                }
                 const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).webp().toBuffer() ;
                 const drawAreaBuffer_meta  = await sharp(drawAreaBuffer).metadata();
                 const drawAreaBuffer_width = drawAreaBuffer_meta.width;
@@ -327,19 +352,27 @@ export default class extends Base {
             // let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
             const oss = await think.service('oss');
             const fileName = `${think.uuid('v4')}.png`;
+            const fileName2 = `${think.uuid('v4')}.png`;
             // const filepath = path.join(think.ROOT_PATH, `www/static/custom/preview/${fileName}.png`)
             // await think.mkdir(path.dirname(filepath));
             // fs.writeFileSync(filepath,)
             // this.ctx.type = 'image/png';
             const filePath: any = path.join(think.ROOT_PATH, `/www/static/preview/${fileName}`);
+            const filePath2: any = path.join(think.ROOT_PATH, `/www/static/preview/${fileName2}`);
             const visitPath: any = `/static/preview/${fileName}`;
+            const visitPath2: any = `/static/preview/${fileName2}`;
             //     this.ctx.body = data;
             await think.mkdir(path.dirname(filePath));
             await fs.writeFileSync(filePath,data);
+            await fs.writeFileSync(filePath2,designAreaBuffer);
             let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
 
             // const res: any = await oss.upload(Buffer.from(data), filePath,true);
-            return this.success(`${think.config('domain')}${visitPath}`);
+            const result1: any = {
+                preview_image:`${think.config('domain')}${visitPath}`,
+                design_area_image:`${think.config('domain')}${visitPath2}`
+            };
+            return this.success(result1);
             // return this.success(img);
         }catch (e) {
             this.dealErr(e);
@@ -493,6 +526,34 @@ export default class extends Base {
         const ico = await this.getBuffer(this, 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/font/2020-04-21-11:36:20/0.PNG',true);
         await fs.writeFileSync('1.PNG',ico);
         this.download('1.PNG')
+    }
+
+    async uploadImgAction() {
+        const file = this.file('image');
+        let currentPath;
+        let resultPath;
+        // tslint:disable-next-line:no-console
+        console.log(file, 'file');
+        if (!file || !file.type) {
+            return  this.fail(-1, '图片不能为空', []);
+        }
+        currentPath = 'www/static/custom/prev/';
+        resultPath = 'static/custom/prev/';
+        if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
+            const fileName = think.uuid('v4');
+            const gs = file.type.substring(6, file.type.length);
+            const filepath = path.join(think.ROOT_PATH, currentPath + fileName + '.' + gs);
+            await think.mkdir(path.dirname(filepath));
+            const readStream = fs.createReadStream(file.path);
+            const writeStream = fs.createWriteStream(filepath);
+            readStream.pipe(writeStream);
+            await readStream.on('end', function() {
+                fs.unlinkSync((this.files as any).upload.path);
+            });
+            return this.success({url: resultPath + fileName + '.' + gs}, "上传成功!");
+        } else {
+            this.fail(-1, '请上传png或jpg格式的图片', []);
+        }
     }
 
 }

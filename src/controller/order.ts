@@ -35,7 +35,7 @@ export default class extends Base {
       // let res = await this.model('order').group('status').where(where).countSelect();
       return this.success(res, '请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e)
     }
   }
 
@@ -142,7 +142,7 @@ export default class extends Base {
       statusListn[0].count = res;
       return this.success(statusListn, '请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
@@ -161,7 +161,7 @@ export default class extends Base {
       }
       return this.success(res, '请求成功!');
     }catch (e) {
-      return this.fail(-1, e);
+      this.dealErr(e);
     }
   }
 
@@ -200,30 +200,41 @@ export default class extends Base {
       }
       let _status = "待发货";
       let pay_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
-      let res: any;
+
+      let udpOption: any;
       if (orderInfo.order_type == 1) {
-        res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:2});
+        udpOption = {pay_time, _status, status:2}
       }
       if (orderInfo.order_type == 2) {
-        /**
-         * 有花样的订单 直接推给设计师
-         */
-        if (orderInfo.designer_id) {
+
+        if (orderInfo.designer_id && orderInfo.custom_template_id != 2) {
+          /**
+           * 有花样的订单 并且有文字 直接推给设计师
+           */
           _status = "设计师处理中";
           const _designer_status = '设计师处理中';
-          res = await this.model('order').where({shop_id, id: order_id}).update({ _designer_status, designer_status: 3, pay_time, _status, status:9 });
+          udpOption = { _designer_status, designer_status: 3, pay_time, _status, status:9 }
+        } else if(orderInfo.designer_id && orderInfo.custom_template_id == 2) {
+          /**
+           * 有花样的订单 并且无文字只有一个花样 直接送去打印
+           */
+          _status = "待打印";
+          udpOption = {pay_time, _status, status:10};
         } else {
+          /**
+           * 其余自己上传的图各种组合 去到待派单
+           */
           _status = "待派单";
-          res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status:7});
+          udpOption = {pay_time, _status, status:7};
         }
-        // res = await this.model('order_item').where({shop_id, order_id}).select();
       }
-
       if (orderInfo.order_type == 4) {
         _status = "待派单";
-        res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status: 7});
+        // res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status: 7});
+        udpOption = {pay_time, _status, status: 7}
       }
 
+      const res: any = await this.model('order').where({shop_id, id: order_id}).update(udpOption);
       if ( res ) {
         return this.success(res, '操作成功!');
       }
@@ -460,7 +471,7 @@ export default class extends Base {
           case 9:
             msg='该订单设计师处理中!';
             break;
-          case 9:
+          case 10:
             msg='该订单待打印!';
             break;
         }

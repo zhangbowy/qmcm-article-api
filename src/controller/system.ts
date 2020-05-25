@@ -2,6 +2,8 @@ import Base from './base.js';
 // tslint:disable-next-line:import-spacing
 import UserModel from  './../model/user';
 import ExpressTemp from './../model/express_template'
+import {forEachComment} from "tslint";
+const fs = require('fs')
 const sharp = require('sharp');
 export default class extends Base {
 
@@ -391,7 +393,7 @@ export default class extends Base {
             const res = await this.model('custom_category').order('created_at DESC').where({shop_id,del: 0}).select();
             return this.success(res, '请求成功!')
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -437,7 +439,7 @@ export default class extends Base {
             }
             return this.success(res, '添加成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -483,7 +485,7 @@ export default class extends Base {
             }
             return this.success(res, '编辑成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
@@ -502,31 +504,33 @@ export default class extends Base {
                 for(let v of machineList) {
                     machine += v.name + ','
                 }
-                return this.fail(-1, `该定制分类已关联${machine}机器`)
+                return this.fail(-1, `该定制分类已关联${machine}机器`);
             }
             const res: any = await this.model('custom_category').where({shop_id, custom_category_id}).update({del:1});
             if (!res) {
-                return this.fail(-1, '该定制分类不存在!')
+                return this.fail(-1, '该定制分类不存在!');
             }
-            return this.success(res, '删除成功!')
+            return this.success(res, '删除成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e);
         }
     }
 
     async getImgMetaAction() {
         try {
+            // const data = await fs.readFileSync('2.PNG');
             const imageUrl = await this.get('image_url');
             const bufferData = await this.getBuffer(this, imageUrl,true);
             const buffer_meta  = await sharp(bufferData).metadata();
-            const width: any  = (buffer_meta.density / ((160/(buffer_meta.width / buffer_meta.density)))).toFixed(2);
+            // const width: any  = (buffer_meta.density / ((160/(buffer_meta.width / buffer_meta.density)))).toFixed(2);
+            const width: any  = (buffer_meta.width / buffer_meta.density * 25.4).toFixed(2);
             const height: any  = (buffer_meta.height / buffer_meta.density * 25.4).toFixed(2);
             let result = {
                 width, height, format:buffer_meta.format, size: buffer_meta.size,width_px:buffer_meta.width,height_px:buffer_meta.height,buffer_meta
             };
             return this.success(result);
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -565,7 +569,7 @@ export default class extends Base {
                 return this.success(res, '关联成功!')
             }
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -602,7 +606,7 @@ export default class extends Base {
                 return this.fail(-1, '该机器未关联可定制分类!');
             }
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -618,7 +622,7 @@ export default class extends Base {
             const res: any = await this.model('machine').where({shop_id,del: 0, custom_category_id}).select();
             return this.success(res, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -640,7 +644,7 @@ export default class extends Base {
             }).countSelect();
             return this.success(res, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -670,7 +674,7 @@ export default class extends Base {
             }
             return this.success(res, '添加成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -701,7 +705,7 @@ export default class extends Base {
             }
             return this.success(res, '修改成功!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
 
@@ -721,9 +725,35 @@ export default class extends Base {
             }
             return this.fail(-1, '机器不存在!');
         }catch (e) {
-            return this.fail(-1, e);
+            this.dealErr(e)
         }
     }
+
+    /**
+     * 获取系统设置
+     */
+    async getSettingAction() {
+        const res = await this.model('setting').select();
+        let result_obj: any = {};
+        for ( let v of res) {
+            result_obj[v.key] = JSON.parse(v.value)
+        }
+        return this.success(result_obj, '平台设置');
+    }
+
+    /**
+     * 修改设置
+     */
+    async editSettingAction() {
+        const key = this.post('key');
+        const value = this.post('value')?1:0;
+        const res = await this.model('setting').where({key}).update({value});
+        if (!res) {
+            return this.fail([], `${key} 不存在!`);
+        }
+        return this.success([], '设置成功!')
+    }
+
 
 
     /**
@@ -737,6 +767,7 @@ export default class extends Base {
 
         }
     }
+
 
 
     /**
