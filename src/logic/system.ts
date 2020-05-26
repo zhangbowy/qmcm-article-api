@@ -168,11 +168,11 @@ export default class extends base {
         trim: true,
         method: 'post'
       },
-      link: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
+      // link: {
+      //   required: true,
+      //   trim: true,
+      //   method: 'post'
+      // },
     };
     const msgs: object = {
       required: '{name}不能为空'
@@ -633,5 +633,26 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-
+  sortSliderAction() {
+    const rules = {
+      id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      sort: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    }
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
 }

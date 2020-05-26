@@ -421,7 +421,6 @@ export default class extends Base {
   }
 
   /**
-  /**
    * 指派订单
    * @param {order_id} 订单id
    * @param {designer_team_id} 设计师团队id
@@ -484,5 +483,69 @@ export default class extends Base {
     }catch (e) {
       this.dealErr(e);
     }
+  }
+
+  /**
+   * 回复订单
+   * @param {order_id} 订单id
+   * @return boolean
+   */
+  async replyOrderAction() {
+      const order_id = this.post('order_id');
+      const shop_id = this.ctx.state.admin_info.shop_id;
+      const order =  await this.model('order').where({shop_id, id: order_id}).find();
+      /**
+       * 状态不是 待发货 和 待收货 的时候
+       */
+      if (order.status != 5) {
+        let msg: string = '';
+        switch (order.status) {
+          case 1:
+            msg='该订单未支付!';
+            break;
+          case 4:
+            msg='该订单已完成!';
+            break;
+          case -2:
+            msg='该订单已关闭!';
+            break;
+          case 2:
+            msg='该订单等待发货!';
+            break;
+          case 3:
+            msg='该订单待收货!';
+            break;
+          case 4:
+            msg='该订单已完成!';
+            break;
+          case 6:
+            msg='该订单已回复,待客户应答!';
+            break;
+          case 7:
+            msg='该订单待派单!';
+            break;
+          case 8:
+            msg='该订单已在派单中,请勿重复操作!';
+            break;
+          case 9:
+            msg='该订单设计师处理中!';
+            break;
+          case 10:
+            msg='该订单待打印!';
+            break;
+        }
+        return this.fail(-1, msg);
+      }
+      const _status = '已回复, 待客户确认';
+      const _item_status = '已回复, 待客户确认';
+      const price = this.post('price');
+      await this.model('order').where({id: order_id}).update({
+        _status,
+        status:6,
+        pay_amount: price
+      })
+      await this.model('order_item').where({order_id}).update({
+        item_status:6
+      })
   }
 }

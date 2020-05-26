@@ -9,15 +9,14 @@ var cos = new COS({
 module.exports = class extends think.Service {
     constructor() {
         super();
-
     }
      upload($file: string,$path: string, $buffer: boolean) {
         return new Promise((resolve,rejected) =>
         {
             cos.putObject({
-                Bucket: 'cos-cx-n1-1257124629', /* 桶 */
-                Region: 'ap-guangzhou',    /* 地区 */
-                Key:  $path,
+                Bucket: think.config('tencentCos').bucket, /* 桶 */
+                Region:  think.config('tencentCos').region,    /* 地区 */
+                Key:  $path, /* 路径 */
                 // StorageClass: 'STANDARD',
                 Body: $buffer?$file:fs.createReadStream($file),
                 onProgress: function(progressData:any) {
@@ -34,8 +33,8 @@ module.exports = class extends think.Service {
         return new Promise((resolve,rejected) =>
         {
             cos.deleteMultipleObject({
-                Bucket: 'cos-cx-n1-1257124629', /* 桶 */
-                Region: 'ap-guangzhou',    /* 地区 */
+                Bucket: think.config('tencentCos').bucket, /* 桶 */
+                Region:  think.config('tencentCos').region,    /* 地区 */
                 Objects: $fileList
             }, function(err: object, data: object) {
                 console.log(err || data);

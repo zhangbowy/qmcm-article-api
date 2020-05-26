@@ -139,7 +139,7 @@ export default class extends Base {
             }
             return this.success([], '操作成功!');
         }catch ($err) {
-            this.dealErr($err)
+            this.dealErr($err);
         }
     }
 

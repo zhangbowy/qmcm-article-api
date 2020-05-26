@@ -10,7 +10,9 @@ export = {
   domain:think.env=='development'?'http://192.168.31.180:8001':'http://cxapi.tecqm.club',
   tencentCos:{ //腾讯cos对象储存账号
     SecretId: 'AKIDoOilY6VL2g4wYxI3kCahxJSM0NinJAJB',
-    SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz'
+    SecretKey: 'wgAcpmSEkzyh5C2fEXZKo9D1b9VaPyTz',
+    bucket:'cos-cx-n1-1257124629',
+    region: 'ap-guangzhou'
   },
   wx:{ //微信公众号的appid和密钥
     appid:'wx8d8e2dd3ce250894',

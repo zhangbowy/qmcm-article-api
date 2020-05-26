@@ -9,12 +9,15 @@ export default class extends Base {
      * 字体列表
      */
     async fontListAction() {
-        let res = await this.model('fonts').select();
-        for (let item of res) {
-            item.font_content = JSON.parse(item.font_content)
+        try {
+            let res = await this.model('fonts').select();
+            for (let item of res) {
+                item.font_content = JSON.parse(item.font_content)
+            }
+            return this.success(res, "请求成功!");
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success(res, "请求成功!");
-
     }
 
     /**
@@ -26,6 +29,9 @@ export default class extends Base {
         try {
             const file = this.file('font');
             const font_name = this.post('font_name');
+            const min_height = this.post('min_height');
+            const max_height = this.post('max_height');
+
             if (!file || !file.type) {
                 return this.fail(-1, '导入文件不能为空', []);
             }
@@ -43,6 +49,8 @@ export default class extends Base {
                 let res: any = await oss.uploadFiles(res1.fileList);
                 let params = {
                     font_name,
+                    max_height,
+                    min_height,
                     font_content:JSON.stringify(res1.fileObj)
                 };
                 let data = await this.model('fonts').add(params);
@@ -50,10 +58,24 @@ export default class extends Base {
                 return this.success([], "导入成功!");
             } else {
                 return this.fail(-1, '导入文件格式必须为zip');
-
             }
-        } catch (err) {
-            // handle any errors
+        } catch ($err) {
+            this.dealErr($err);
+        }
+    }
+
+    /**
+     * 编辑字体
+     * @params { font_id }
+     * @params { max_height } 最大高
+     * @params { min_height } 最小高
+     * @params { font_name } 最小高
+     */
+    async editFontAction() {
+        try {
+
+        }catch (e) {
+
         }
     }
 
@@ -87,10 +109,10 @@ export default class extends Base {
                 {
                     return this.success({del,data}, '删除成功!');
                 }
-                return   this.fail(-1, '删除失败!',del);
+                return this.fail(-1, '删除失败!',del);
             }
         }catch (e) {
-            return   this.fail(-1, e);
+           this.dealErr(e);
         }
     }
 }

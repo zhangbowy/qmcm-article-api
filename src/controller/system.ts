@@ -16,7 +16,7 @@ export default class extends Base {
             let res = await this.model('emb_template').where({template_type:template_type}).select();
             return this.success(res, '请求成功!');
         }catch (e) {
-
+            this.dealErr(e);
         }
 
     }
@@ -25,14 +25,18 @@ export default class extends Base {
      * 編輯刺綉模板
      */
     async editEmbTemplateAction(): Promise<void> {
-        let emb_template_id = this.post('id');
-        let template_type = this.post('template_type');
-        let cover_image = this.post('cover_image');
-        let res = await this.model('emb_template').where({template_type,emb_template_id}).update({cover_image});
-        if (res) {
-            return this.success([], '修改成功!')
+        try {
+            let emb_template_id = this.post('id');
+            let template_type = this.post('template_type');
+            let cover_image = this.post('cover_image');
+            let res = await this.model('emb_template').where({template_type,emb_template_id}).update({cover_image});
+            if (res) {
+                return this.success([], '修改成功!')
+            }
+            return this.fail(-1, '模板不存在')
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.fail(-1, '模板不存在')
     }
 
     /**
@@ -43,26 +47,30 @@ export default class extends Base {
      * @params {height} 高度mm
      */
     async addEmbPriceAction(): Promise<void> {
-        let emb_template_id = this.post('emb_template_id');
-        /**
-         * type 1 有價格 2 沒有 只有基础价
-         */
-        let template_type = 1;
-        // let template_type = this.post('template_type');
-        let name = this.post('name');
-        let price = this.post('price');
-        let width = this.post('width');
-        let height = this.post('height');
-        let params = {
-            emb_template_id,
-            template_type,
-            name,
-            price,
-            width,
-            height
-        };
-        let res = await this.model('emb_template_price').add(params);
-        return this.success(res,'请求成功!');
+        try {
+            let emb_template_id = this.post('emb_template_id');
+            /**
+             * type 1 有價格 2 沒有 只有基础价
+             */
+            let template_type = 1;
+            // let template_type = this.post('template_type');
+            let name = this.post('name');
+            let price = this.post('price');
+            let width = this.post('width');
+            let height = this.post('height');
+            let params = {
+                emb_template_id,
+                template_type,
+                name,
+                price,
+                width,
+                height
+            };
+            let res = await this.model('emb_template_price').add(params);
+            return this.success(res,'请求成功!');
+        }catch (e) {
+            this.dealErr(e);
+        }
     }
 
     /**
@@ -75,26 +83,29 @@ export default class extends Base {
      * @params {height} 高度mm
      */
     async editEmbPriceAction(): Promise<void> {
-        let id = this.post('id');
-        let emb_template_id = this.post('emb_template_id');
-        // let template_type = this.post('template_type');
-        let name = this.post('name');
-        let price = this.post('price');
-        let width = this.post('width');
-        let height = this.post('height');
-        let params = {
-            id,
-            name,
-            price,
-            width,
-            height
-        };
-        let res: any = await this.model('emb_template_price').where({emb_template_id,id}).update(params);
-        if (res) {
-            return this.success(res, '编辑成功!');
-
+        try {
+            let id = this.post('id');
+            let emb_template_id = this.post('emb_template_id');
+            // let template_type = this.post('template_type');
+            let name = this.post('name');
+            let price = this.post('price');
+            let width = this.post('width');
+            let height = this.post('height');
+            let params = {
+                id,
+                name,
+                price,
+                width,
+                height
+            };
+            let res: any = await this.model('emb_template_price').where({emb_template_id,id}).update(params);
+            if (res) {
+                return this.success(res, '编辑成功!');
+            }
+            return this.fail(-1, '该模板价格不存在!');
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.fail(-1, '该模板价格不存在!');
     }
 
     /**
@@ -103,25 +114,83 @@ export default class extends Base {
      * @params {template_id} 模板id
      */
     async delEmbPriceAction(): Promise<void> {
-        let id = this.post('id');
-        let emb_template_id = this.post('template_id');
-        // @ts-ignore
-        let res:object = await this.model('emb_template_price').where({id,emb_template_id}).delete();
-        if (res) {
-            return this.success(res, '删除成功!');
+        try {
+            let id = this.post('id');
+            let emb_template_id = this.post('template_id');
+            // @ts-ignore
+            let res:object = await this.model('emb_template_price').where({id,emb_template_id}).delete();
+            if (res) {
+                return this.success(res, '删除成功!');
+            }
+            return this.fail(-1, '删除失败!');
+        }catch (e) {
+            this.dealErr(e)
         }
-        return this.fail(-1, '删除失败!');
     }
 
     /**
      * 首页轮播图
      */
     async getSliderAction(): Promise<void> {
-        // @ts-ignore
-        const shop_id: number = this.ctx.state.admin_info.shop_id;
-        let res = await this.model('slider').order('sort DESC').where({shop_id: shop_id}).select();
-        if (res) {
-            return this.success(res, '请求成功!');
+        try {
+            // @ts-ignore
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            let res = await this.model('slider').order('sort ASC').where({shop_id: shop_id}).select();
+            if (res) {
+                return this.success(res, '请求成功!');
+            }
+        }catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 首页轮播图
+     */
+    async sortSliderAction(): Promise<void> {
+        try {
+            // @ts-ignore
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const id: number = this.post('id');
+            const sort: string = this.post('sort');
+            let allowSort = ["down","up"];
+            if (!allowSort.includes(sort)) {
+                return this.fail(-1, '不被允许的sort');
+            }
+            let res = await this.model('slider').order('sort ASC').where({shop_id: shop_id}).select();
+            let current;
+            let last;
+            let next;
+            for (let [k, v] of res.entries()) {
+                if (v.id == id) {
+                    current = v;
+                    last = res[k-1];
+                    next = res[k+1];
+                }
+            }
+            let updateArr = [];
+            if (sort == 'up') {
+                if( think.isEmpty(last)) {
+                    return this.fail(-2,'到顶了')
+                }
+                // last.sort = id;
+                // current.sort = last.id;
+                updateArr.push({id:last.id,sort:current.sort}, {id:current.id,sort:last.sort})
+            } else {
+                if( think.isEmpty(next)) {
+                    return this.fail(-2,'到底了')
+                }
+                // next.sort = id;
+                // current.sort = next.id;
+                updateArr.push({id:next.id,sort:current.sort}, {id:current.id,sort:next.sort})
+            }
+            const updateNum: any = await this.model('slider').updateMany(updateArr);
+            if (updateNum.length == 2) {
+                return this.success([], '操作成功!');
+            }
+            return this.success([], '操作失败!');
+        }catch (e) {
+            this.dealErr(e);
         }
     }
 
@@ -132,26 +201,31 @@ export default class extends Base {
      * @params {sort}
      */
     async addSliderAction(): Promise<void>  {
-        // @ts-ignore
-        const shop_id: number = this.ctx.state.admin_info.shop_id;
-        let image_path = this.post('image_path');
-        let link = this.post('link');
-        let slider_name = this.post('slider_name');
-        let sort = this.post('sort') || 0;
-        // @ts-ignore
-        let params = {
-            link,
-            image_path,
-            sort,
-            slider_name,
-            shop_id
-        };
-        // @ts-ignore
-        let res:object = await this.model('slider').add(params);
-        if (res) {
-            return this.success(res, '添加成功!');
+        try {
+            // @ts-ignore
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            let image_path = this.post('image_path');
+            let link = this.post('link');
+            let slider_name = this.post('slider_name');
+            // let sort = this.post('sort') || 0;
+            // @ts-ignore
+            let params = {
+                link,
+                image_path,
+                // sort,
+                slider_name,
+                shop_id
+            };
+            // @ts-ignore
+            let id:object = await this.model('slider').add(params);
+            if (id) {
+                let res: any = await this.model('slider').where({id}).update({sort:id});
+                return this.success(res, '添加成功!');
+            }
+            return this.fail(-1, '添加失败!');
+        }catch (e) {
+           this.dealErr(e);
         }
-        return this.fail(-1, '添加失败!');
     }
 
     /**
@@ -162,26 +236,30 @@ export default class extends Base {
      * @params {sort}
      */
     async editSliderAction(): Promise<void> {
-        // @ts-ignore
-        const shop_id: number = this.ctx.state.admin_info.shop_id;
-        let id = this.post('id');
-        let image_path = this.post('image_path');
-        let link = this.post('link');
-        let sort = this.post('sort') || 0;
-        let slider_name = this.post('slider_name');
-        // @ts-ignore
-        let params = {
-            link,
-            image_path,
-            sort,
-            slider_name
-        };
-        // @ts-ignore
-        let res:object = await this.model('slider').where({id:id,shop_id}).update(params);
-        if (res) {
-            return this.success(res, '编辑成功!');
+        try {
+            // @ts-ignore
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            let id = this.post('id');
+            let image_path = this.post('image_path');
+            let link = this.post('link');
+            // let sort = this.post('sort') || 0;
+            let slider_name = this.post('slider_name');
+            // @ts-ignore
+            let params = {
+                link,
+                image_path,
+                // sort,
+                slider_name
+            };
+            // @ts-ignore
+            let res:object = await this.model('slider').where({id:id,shop_id}).update(params);
+            if (res) {
+                return this.success(res, '编辑成功!');
+            }
+            return this.fail(-1, '编辑失败!');
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.fail(-1, '编辑失败!');
     }
 
     /**
@@ -189,13 +267,17 @@ export default class extends Base {
      * @params {id} 轮播图id
      */
     async delSliderAction(): Promise<void> {
-        let id = this.post('id');
-        // @ts-ignore
-        let res:object = await this.model('slider').where({id}).delete();
-        if (res) {
-            return this.success(res, '删除成功!');
+        try {
+            let id = this.post('id');
+            // @ts-ignore
+            let res:object = await this.model('slider').where({id}).delete();
+            if (res) {
+                return this.success(res, '删除成功!');
+            }
+            return this.fail(-1, '删除失败!');
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.fail(-1, '删除失败!');
     }
 
     /**
@@ -207,7 +289,7 @@ export default class extends Base {
             let region = this.getTree(region1,100000);
             return this.success(region, '请求成功!');
         }catch (e) {
-            return this.fail(-1, e)
+            this.dealErr(e);
         }
     }
 
@@ -243,7 +325,7 @@ export default class extends Base {
             }
             return  this.fail(-1,'该物流模板不存在!')
         }catch (e) {
-            return this.fail(-1, e)
+            this.dealErr(e);
         }
     }
 
@@ -299,7 +381,7 @@ export default class extends Base {
             }
             return this.fail(-1, '添加失败!')
         }catch (e) {
-            return this.fail(-1, e)
+            this.dealErr(e);
         }
     }
 
@@ -356,7 +438,7 @@ export default class extends Base {
             }
             return this.fail(-1, '编辑失败!')
         }catch (e) {
-            return this.fail(-1, e)
+            this.dealErr(e);
         }
     }
 
@@ -379,7 +461,7 @@ export default class extends Base {
             }
             return this.fail(-1, '模板不存在!');
         }catch (e) {
-            return this.fail(-1, e)
+           this.dealErr(e);
         }
     }
 
@@ -393,7 +475,7 @@ export default class extends Base {
             const res = await this.model('custom_category').order('created_at DESC').where({shop_id,del: 0}).select();
             return this.success(res, '请求成功!')
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -674,7 +756,7 @@ export default class extends Base {
             }
             return this.success(res, '添加成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -705,7 +787,7 @@ export default class extends Base {
             }
             return this.success(res, '修改成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -733,28 +815,34 @@ export default class extends Base {
      * 获取系统设置
      */
     async getSettingAction() {
-        const res = await this.model('setting').select();
-        let result_obj: any = {};
-        for ( let v of res) {
-            result_obj[v.key] = JSON.parse(v.value)
+        try {
+            const res = await this.model('setting').select();
+            let result_obj: any = {};
+            for ( let v of res) {
+                result_obj[v.key] = JSON.parse(v.value)
+            }
+            return this.success(result_obj, '平台设置');
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success(result_obj, '平台设置');
     }
 
     /**
      * 修改设置
      */
     async editSettingAction() {
-        const key = this.post('key');
-        const value = this.post('value')?1:0;
-        const res = await this.model('setting').where({key}).update({value});
-        if (!res) {
-            return this.fail([], `${key} 不存在!`);
+        try {
+            const key = this.post('key');
+            const value = this.post('value');
+            const res = await this.model('setting').where({key}).update({value});
+            if (!res) {
+                return this.fail([], `${key} 不存在!`);
+            }
+            return this.success([], '设置成功!')
+        }catch (e) {
+            this.dealErr(e);
         }
-        return this.success([], '设置成功!')
     }
-
-
 
     /**
      * 权限列表
@@ -764,11 +852,9 @@ export default class extends Base {
            const res = await this.model('authority_category').select();
             return this.success(res)
         }catch (e) {
-
+            this.dealErr(e);
         }
     }
-
-
 
     /**
      * 角色列表

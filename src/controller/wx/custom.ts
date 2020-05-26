@@ -183,6 +183,7 @@ export default class extends Base {
 
             const design_id = this.post('design_id');
             const custom_image = this.post('custom_image');
+            const custom_template_id = this.post('custom_template_id');
             if (type == 2) {
                 if(think.isEmpty(design_id) &&  think.isEmpty(custom_image)) {
                     // return this.fail(-1, '花样或图片不能为空!')
@@ -260,26 +261,32 @@ export default class extends Base {
                 let design_data = await this.model('design').where({design_id}).find();
 
                 let design_preview: any;
-                /**
-                 *  没有花样id 是自己上传的图片
-                 */
-                if (think.isEmpty(design_data)) {
-                    let baseData = custom_image.split(',')[1];
-                    design_preview = Buffer.from(baseData, 'base64');
-                } else {
-                    let design_data = await this.model('design').where({design_id}).find();
+                let middle_design_width;
+                let design_preview_buffer
+                if (custom_template_id !=1) {
                     /**
-                     * 花样库花样buffer
+                     *  没有花样id 是自己上传的图片
                      */
-                    design_preview = await this.getBuffer(this, design_data.prev_png_path, true);
+                    if (think.isEmpty(design_data)) {
+                        let baseData = custom_image.split(',')[1];
+                        design_preview = Buffer.from(baseData, 'base64');
+                    } else {
+                        let design_data = await this.model('design').where({design_id}).find();
+                        /**
+                         * 花样库花样buffer
+                         */
+                        design_preview = await this.getBuffer(this, design_data.prev_png_path, true);
+                    }
+
+                    /**
+                     * rezize 改变大小到标准尺寸下的大小
+                     */
+                    design_preview_buffer = await sharp(design_preview).resize({ height: middle_height}).toBuffer() ;
+                    const design_preview_meta  = await sharp(design_preview_buffer).metadata();
+                    middle_design_width = design_preview_meta.width;
                 }
 
-                /**
-                 * rezize 改变大小到标准尺寸下的大小
-                 */
-                const design_preview_buffer = await sharp(design_preview).resize({ height: middle_height}).toBuffer() ;
-                const design_preview_meta  = await sharp(design_preview_buffer).metadata();
-                const middle_design_width = design_preview_meta.width;
+
                 let topFontBuffer = await this.itemPreview(top_font_content, top_font_color, top_font_height, top_height, area_width);
                 let bottomBuffer = await this.itemPreview(bottom_font_content, bottom_font_color, bottom_font_height, bottom_height, area_width);
                 const font_top_left = Math.floor((area_width - topFontBuffer.font_area_width) / 2);
@@ -287,14 +294,25 @@ export default class extends Base {
                 const middle_design_left = Math.floor((area_width - middle_design_width) / 2);
 
                 const bottom_position_top =  top_height + middle_height;
-                /**
-                 * 合成的图 三部分 top 文字  middle 花样 bottom 文字
-                 */
-                composite = [
-                    { input: topFontBuffer.areaBuffer,left: font_top_left, top: 0},
-                    { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},
-                    { input: design_preview_buffer,left: middle_design_left, top: top_height}
-                ];
+
+                if (custom_template_id !=1) {
+                    /**
+                     * 合成的图 三部分 top 文字  middle 花样 bottom 文字
+                     */
+                    composite = [
+                        { input: topFontBuffer.areaBuffer,left: font_top_left, top: 0},
+                        { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},
+                        { input: design_preview_buffer,left: middle_design_left, top: top_height}
+                    ];
+                } else {
+                    let top = (area_height-top_height)/2;
+                    composite = [
+                        { input: topFontBuffer.areaBuffer,left: font_top_left, top: top},
+                        // { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},
+                        // { input: design_preview_buffer,left: middle_design_left, top: top_height}
+                    ];
+                }
+
             }
 
             /**

@@ -1,5 +1,6 @@
-import Base from './base.js';
+import Base from './rest';
 const path = require('path');
+const fs = require('fs');
 export default class extends Base {
   indexAction() {
     // return this.display();
@@ -7,5 +8,17 @@ export default class extends Base {
     const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
     return this.success([], "请求成功!");
     return  this.download(filepath);
+  }
+  /**
+   *  下载资源接口
+   *  @param {url} 资源链接
+   *  @param {fileName} 文件名
+   */
+  async downLoadAction() {
+    const file = this.get('url');
+    const fileName = this.get('fileName');
+    const fileBuffer = await this.getBuffer(this, file,true);
+    await fs.writeFileSync('1.PNG',fileBuffer);
+    this.download('1.PNG', fileName+'.png');
   }
 }

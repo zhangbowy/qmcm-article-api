@@ -9,7 +9,6 @@ module.exports = class extends think.Service {
         super();
 
     }
-
     /**
      * 根据图片获取刺绣预览图
      * @$image 图片base64字符串
