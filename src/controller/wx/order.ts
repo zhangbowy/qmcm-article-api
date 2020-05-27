@@ -21,7 +21,7 @@ export default class extends Base {
             where.shop_id = shop_id;
             where.user_id = user_id;
             if (status) {
-                where.status = status;
+                where.status =['in',status];
             }
             let res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
             return this.success(res, '请求成功!');
