@@ -18,7 +18,7 @@ module.exports = [{
                 list.push(order);
                 console.log(created_time);
                 await think.model('order').where({id: order.id}).update({
-                    _status:"超时,已取消",
+                    _status:"超时未支付,已取消",
                     status:-2
                 });
                 await think.model('order_item').where({order_id: order.id}).update({
