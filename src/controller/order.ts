@@ -434,9 +434,10 @@ export default class extends Base {
       const designer_team_id = this.post('designer_team_id');
       let designer_team = await this.model('designer_team').where({designer_team_id}).find();
       if (think.isEmpty(designer_team)) {
-        return this.fail(-1,'该设计师团队不存在!')
+          return this.fail(-1,'该设计师团队不存在!')
       }
       const order =  await this.model('order').where({shop_id, id: order_id}).find();
+
       /**
        * 状态不是 待发货 和 待收货 的时候
        */
@@ -494,58 +495,82 @@ export default class extends Base {
       const order_id = this.post('order_id');
       const shop_id = this.ctx.state.admin_info.shop_id;
       const order =  await this.model('order').where({shop_id, id: order_id}).find();
-      /**
-       * 状态不是 待发货 和 待收货 的时候
-       */
-      if (order.status != 5) {
-        let msg: string = '';
-        switch (order.status) {
-          case 1:
-            msg='该订单未支付!';
-            break;
-          case 4:
-            msg='该订单已完成!';
-            break;
-          case -2:
-            msg='该订单已关闭!';
-            break;
-          case 2:
-            msg='该订单等待发货!';
-            break;
-          case 3:
-            msg='该订单待收货!';
-            break;
-          case 4:
-            msg='该订单已完成!';
-            break;
-          case 6:
-            msg='该订单已回复,待客户应答!';
-            break;
-          case 7:
-            msg='该订单待派单!';
-            break;
-          case 8:
-            msg='该订单已在派单中,请勿重复操作!';
-            break;
-          case 9:
-            msg='该订单设计师处理中!';
-            break;
-          case 10:
-            msg='该订单待打印!';
-            break;
+      if (think.isEmpty(order)) {
+          return this.fail(-1, '该订单不存在');
+      }
+
+      if (order.order_type != 3) {
+        return this.fail(-1, '此订单不是特殊定制订单, 无法询价');
+      } else {
+        /**
+         * 状态不是 待发货 和 待收货 的时候
+         */
+        if (order.status != 5) {
+          let msg: string = '';
+          switch (order.status) {
+            case 1:
+              msg='该订单未支付!';
+              break;
+            case 4:
+              msg='该订单已完成!';
+              break;
+            case -2:
+              msg='该订单已关闭!';
+              break;
+            case 2:
+              msg='该订单等待发货!';
+              break;
+            case 3:
+              msg='该订单待收货!';
+              break;
+            case 4:
+              msg='该订单已完成!';
+              break;
+            case 6:
+              msg='该订单已回复,待客户应答!';
+              break;
+            case 7:
+              msg='该订单待派单!';
+              break;
+            case 8:
+              msg='该订单已在派单中';
+              break;
+            case 9:
+              msg='该订单设计师处理中!';
+              break;
+            case 10:
+              msg='该订单待打印!';
+              break;
+          }
+          return this.fail(-1, msg);
         }
-        return this.fail(-1, msg);
       }
       const _status = '已回复, 待客户确认';
       const _item_status = '已回复, 待客户确认';
-      const price = this.post('price');
+      const price = Number(this.post('price'));
+      let order_item = await this.model('order_item').where({order_id}).find();
+      if (think.isEmpty(order_item)) {
+          return this.fail(-1, '该子订单不存在')
+      }
+      if ( price < order_item.special_base_price) {
+          return this.fail(-1, `价格不能小于基础价【${order_item.special_base_price}】`);
+      }
+      const item_amount = price;
+      const pay_amount = order.express_amount + item_amount;
+      const item_total_price = item_amount;
       await this.model('order').where({id: order_id}).update({
         _status,
         status:6,
-        pay_amount: price
-      })
-      await this.model('order_item').where({order_id}).update({
-        item_status:6
-      })
+        item_amount,
+        pay_amount,
+      });
+      const res = await this.model('order_item').where({order_id}).update({
+        item_status:6,
+        item_total_price,
+      });
+      if (!res) {
+          return this.fail(-1, '操作失败!');
+      }
+      this.success([], '操作成功!');
   }
 }

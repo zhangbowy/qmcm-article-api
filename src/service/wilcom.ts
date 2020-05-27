@@ -4,6 +4,8 @@ var COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
 var rp = require('request-promise');
 import func from './../utils/func';
+const appId = think.config('wilcom').appId;
+const appKey =  think.config('wilcom').appKey;
 module.exports = class extends think.Service {
     constructor() {
         super();
@@ -14,8 +16,7 @@ module.exports = class extends think.Service {
      * @$image 图片base64字符串
      */
      async getEmbByImg($image: string,$width: any, $height: any) {
-        const appId = think.config('wilcom').appId;
-        const appKey =  think.config('wilcom').appKey;
+
 
         const width = $width|| 100;
         const height = $height || 100;
@@ -64,12 +65,32 @@ module.exports = class extends think.Service {
         if (!embData) {
             throw '获取design错误'
         }
-        return pngData
+        return embData
         // req.embDataBuffer = embData;//存储生成的 emb data
         // req.pngData = pngData; //存储生成的 png data
         //console.log('图片--》design api返回成功')
         //console.log('embData==>',embData);
 
+    }
+
+    async getDesignInfo($embData: string) {
+        const options3 = {
+            method: 'POST',
+            uri: 'http://ewa.wilcom.com/2.0/api/designInfo',
+            body: {
+                appId: appId,
+                appKey: appKey,
+                requestXml: `<xml>
+                    <files>
+                    <file filename="design.EMB" filecontents="${$embData}" />
+                    </files>
+                    </xml>`
+            },
+            json: true
+        };
+        //emb info
+        const resForInfo = await rp(options3);
+         return  resForInfo
     }
 
 }

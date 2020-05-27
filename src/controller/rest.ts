@@ -101,6 +101,6 @@ export default class extends think.Controller {
     })
   }
   __call() {
-    return this.fail(404,'res_controller');
+    return this.fail(404,'init_controller');
   }
 }

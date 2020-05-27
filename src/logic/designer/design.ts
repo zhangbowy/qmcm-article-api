@@ -156,4 +156,7 @@ export default class extends base {
     uploadImgAction() {
 
     }
+    getDesignInfoAction() {
+
+    }
 }

@@ -284,6 +284,8 @@ export default class extends Base {
                     design_preview_buffer = await sharp(design_preview).resize({ height: middle_height}).toBuffer() ;
                     const design_preview_meta  = await sharp(design_preview_buffer).metadata();
                     middle_design_width = design_preview_meta.width;
+                } else {
+
                 }
 
 
@@ -305,7 +307,7 @@ export default class extends Base {
                         { input: design_preview_buffer,left: middle_design_left, top: top_height}
                     ];
                 } else {
-                    let top = (area_height-top_height)/2;
+                    let top = Math.floor((area_height-top_height)/2);
                     composite = [
                         { input: topFontBuffer.areaBuffer,left: font_top_left, top: top},
                         // { input: bottomBuffer.areaBuffer,left: font_bottom_left, top: bottom_position_top},

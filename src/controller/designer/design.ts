@@ -2,7 +2,7 @@ import Base from './base.js';
 import {think} from "thinkjs";
 const path = require('path');
 const fs = require('fs');
-
+const AdmZip = require('adm-zip');
 const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
 
@@ -292,6 +292,58 @@ export default class extends Base {
     }
 
 
+    async addDesignAction(): Promise<any> {
+        try {
+
+            /**
+             * 设计师信息
+             */
+            const designer_info = this.ctx.state.designer_info;
+            const shop_id: number = designer_info.shop_id;
+            const designer_id: number = designer_info.designer_id;
+            const designer_team_id: number = designer_info.designer_team_id;
+            /**
+             * 请求参数
+             */
+            const design_name: string = this.post('design_name');
+
+            const file = this.file('design');
+
+            if (!file || !file.type) {
+                return this.fail(-1, '导入文件不能为空', []);
+            }
+            const filepath = path.join(think.ROOT_PATH,'www/static/updesign/');
+            if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
+                let res: any = await this.exportFile(file.path);
+                if (typeof res == 'string') {
+                    deleteFolder(filepath);
+                    return this.fail(-1, res);
+                }
+                let param: any = res.fileObj;
+                param.design_name = design_name;
+                param.designer_id = designer_id;
+                param.shop_id = shop_id;
+                param.designer_team_id = designer_team_id;
+                const oss = await think.service('oss');
+                /**
+                 * 上传到腾讯OSS
+                 */
+                let ossRes: any = await oss.uploadFiles(res.fileList);
+
+                const design_id = await this.model('design').add(param);
+                if (!design_id) {
+                    return this.fail(-1, "添加失败!");
+                }
+                deleteFolder(filepath);
+                return this.success([], "添加成功!");
+            } else {
+                return this.fail(-1, '上传文件格式必须为zip');
+            }
+        } catch ($err) {
+            this.dealErr($err);
+        }
+    }
+
     /**
      * 添加花样
      * @params {dst} dst文件路径
@@ -302,8 +354,9 @@ export default class extends Base {
      * @params {designer_id}
      * @params {designer_team_id}
      * @params {shop_id}
+     * status 废弃 改为上传压缩包
      */
-    async addDesignAction(): Promise<any>  {
+    async addDesignAction1(): Promise<any>  {
         try {
             /**
              * 设计师信息
@@ -523,6 +576,127 @@ export default class extends Base {
         }
     }
 
+
+    async getDesignInfoAction() {
+        try {
+            let url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/b4f05d1d-1b2e-4ad1-90f6-ec3623e5f4a5.ation/octet-stream';
+            let img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
+            const data = fs.readFileSync('1.EMB');
+            let imgBuffer: any  = await this.getBuffer(this, img, true);
+            const imgBase64 = imgBuffer.toString('base64');
+
+            let embBuffer: any  = await this.getBuffer(this, url, true);
+            const wilcom = think.service('wilcom');
+
+            // const embData = await wilcom.getEmbByImg(imgBase64);
+            const embBase64 = embBuffer.toString('base64');
+            const design_info = await wilcom.getDesignInfo(embBase64);
+            return this.success(design_info)
+        }catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+
+    async exportFile($file: any,$filePath?: any) {
+
+        let obj = [
+            '.DST',
+            '.EMB',
+            '.PNG',
+            '-1.PNG',
+        ];
+        let objName = {
+            '.DST':"dst_path",
+            '.EMB':"emb_path",
+            '.PNG': "prev_png_path",
+            '-1.PNG':"txt_png_path",
+        };
+        const design_info = this.ctx.state.designer_info;
+        const shop_id: number = design_info.shop_id;
+        const designer_id: number = design_info.designer_id;
+        return new Promise((resolve,reject) => {
+            var zip = new AdmZip($file);
+            let aaa = zip.getEntries();
+            const filepath = path.join(think.ROOT_PATH,'www/static/updesign/');
+            let path1 = path.dirname(filepath);
+            think.mkdir(path1);
+            zip.extractAllTo(filepath, true);
+            if(fs.existsSync(filepath)) {
+                const files = fs.readdirSync(filepath);
+                if (files.length > 4) {
+                    return resolve('请检查压缩包内是否包含多余文件!');
+                }
+                let fileList = [];
+                let fileObj = {};
+                let str = '';
+                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+                let ossPath = `/design/${shop_id}/${designer_id}/${day}/`;
+                let fileLastList: any = [];
+                for (let  v of obj) {
+                    for (let item of files) {
+                        if (item.indexOf(v) >-1) {
+                            let obj = {
+                                Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+                                Region: 'ap-guangzhou',
+                                Key: ossPath + item,
+                                FilePath: filepath+item,
+                            };
+                            if (v == '.PNG' ) {
+                                if (item.indexOf('-1.PNG') == -1) {
+                                    fileList.push(obj);
+
+                                    fileLastList.push(v);
+                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                                }
+                            } else {
+                                fileList.push(obj);
+
+                                fileLastList.push(v);
+                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                            }
+                        }
+                    }
+                    // if (fileLastList.includes(v)) {
+                    //     return resolve(`后缀为${v}的文件重复`)
+                    // }
+                    if(fileLastList.indexOf(v) == -1) {
+                        resolve(`后缀${v}的文件不存在`)
+                    }
+                    // if (!files.indexOf(item)) {
+                    //     // str+=item+','
+                    //     resolve(`文件${item}不存在!`);
+                    // } else {
+                    //     let k;
+                    //     if (item.indexOf('-')> -1) {
+                    //         k = item.split('-')[0];
+                    //     } else {
+                    //         k = item.split('.')[0];
+                    //     }
+                    //     let obj = {
+                    //         Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+                    //         Region: 'ap-guangzhou',
+                    //         Key: ossPath + item,
+                    //         FilePath: filepath+item,
+                    //     };
+                    //     fileList.push(obj);
+                    //     fileObj[k] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                    // }
+                }
+                // const list = new Set(fileList);
+                // resolve( Array.from(list))
+                resolve({fileObj,fileList});
+            }else
+            {
+                console.log('无文件')
+            }
+        })
+    }
+
+
+
+
+
     /**
      *  下载资源接口
      *  @param {url} 资源链接
@@ -535,7 +709,11 @@ export default class extends Base {
         await fs.writeFileSync('1.PNG',fileBuffer);
         this.download('1.PNG', fileName+'.png');
     }
+
+
 }
+
+
 
 
 function deleteFolder(path: any) {

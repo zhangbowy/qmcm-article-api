@@ -1,4 +1,5 @@
 import Base from './rest';
+import {ancestorWhere} from "tslint";
 const path = require('path');
 const fs = require('fs');
 export default class extends Base {
@@ -20,5 +21,10 @@ export default class extends Base {
     const fileBuffer = await this.getBuffer(this, file,true);
     await fs.writeFileSync('1.PNG',fileBuffer);
     this.download('1.PNG', fileName+'.png');
+  }
+  async getDataAction() {
+    const res: any = await this.model('order').where({status:['NOTIN',[1,-2,5,6]]}).sum('pay_amount');
+    // SELECT SUM(score) AS think_sum FROM `test_d` LIMIT 1
+    return this.success(res)
   }
 }
