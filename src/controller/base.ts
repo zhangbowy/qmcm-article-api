@@ -1,20 +1,17 @@
 import { think } from 'thinkjs';
 import {ancestorWhere} from "tslint";
 import restController from './rest'
-
 export default class extends restController {
   async __before() {
     try {
-      // await think.timeout(500)
+      await think.timeout(500);
       this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
       this.header('Access-Control-Allow-Headers', ["x-requested-with",'origin','content-type','adm_sign']);
       this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
       this.header('Access-Control-Allow-Credentials', true);
-
-      if (this.ctx.path.indexOf('/admin/login') === -1 && this.ctx.path.indexOf('/admin/getCaptcha') === -1 && this.ctx.path.indexOf('/admin/logOut') === -1 ) {
+      let whiteList = [ '/admin/login','/admin/getCaptcha','/admin/logOut', '/index/downLoad'];
+      if (whiteList.indexOf(this.ctx.path) === -1) {
         const adm_sign = this.header("adm_sign");
-        console.log(adm_sign,'adm_sign1111111111111111111111111111111111111');
-        console.log(this.ctx.headers,'adm_sign1111111111111111111111111111111111111');
         if (think.isEmpty(adm_sign)) {
           return this.fail(402, '未登录1!', []);
         }
@@ -26,7 +23,6 @@ export default class extends restController {
         let admin_id = admin_data.admin_id;
         // @ts-ignore
         const admin_redis_sign = await tokenFuc.parse1(await this.cache(`admin-sign-${admin_id}`, undefined, 'redis'));
-        console.log(admin_redis_sign,'admin_redis_sign');
         if(think.isEmpty(admin_redis_sign)) {
           return this.fail(402, '未登录3!', []);
         }
@@ -35,7 +31,6 @@ export default class extends restController {
         // }
         // @ts-ignore
         const admin_info = await this.cache(`admin-${admin_id}`, undefined, 'redis');
-        console.log(admin_info,'admin_info');
         if(think.isEmpty(admin_info)) {
           return this.fail(402, '登录过期,请重新登录!', []);
         }
@@ -53,8 +48,6 @@ export default class extends restController {
           // return this.fail(401,'您无权访问');
           return this.fail(401,'您没有此项权限!');
         }
-
-
         console.log(this.session('token'));
       }
     }catch (e) {
@@ -73,15 +66,22 @@ export default class extends restController {
    * 检查是否有权限
    */
   async checkAuth (aminInfo: any) {
+    /**
+     * id == 1 是平台
+     */
     if(aminInfo.id == 1){
       return true
     }
-    if (aminInfo.role_type == 1 || aminInfo.role_type ==2) {
-      return true
 
+    /**
+     * role_type == 2 or 1 是店铺 和 平台
+     */
+    if (aminInfo.role_type == 1 || aminInfo.role_type == 2) {
+      return true
     }
 
     let role = await this.model('admin_role').where({admin_role_id: aminInfo.role_id}).find();
+
     if(!role.admin_role_id){
       return false
     }
@@ -91,7 +91,13 @@ export default class extends restController {
     //   auth_api = this.post('config_key');
     //   auth_type = 2;
     // }
+    /**
+     *  访问中台的路由
+     */
     const api = this.ctx.request.url.indexOf('?')> -1?this.ctx.request.url.split('?')[0]:this.ctx.request.url;
+    /**
+     * 检查权限
+     */
     // @ts-ignore
     let res = await this.model('auth_give').checkAuth(role.admin_role_id,api);
     return res
@@ -100,14 +106,12 @@ export default class extends restController {
   async saveSystemLog($log: any,$content: any) {
     const admin_info = this.ctx.state.admin_info;
     const admin_phone = this.ctx.state.admin_info.phone;
-
      return  await this.model('system_log').add({
       inter_face:$log,
       content:JSON.stringify($content),
       admin_phone:admin_phone
     })
   }
-
 
   __call() {
     return this.fail(404,'adm_controller');

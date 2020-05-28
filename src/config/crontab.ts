@@ -1,6 +1,6 @@
 import {think} from "thinkjs";
 module.exports = [{
-    interval: '10s',
+    interval: '30s',
     immediate: true,
     enable:true,
     handle: async () => {
@@ -10,11 +10,11 @@ module.exports = [{
         let now = today;
         // let oneDay =think.ms('1 days');
         // let oneDay = 1000*60*60*8 + 1000*60;
-        let oneDay = 1000 * 60 * 30;
+        let half_hour = 1000 * 60 * 30;
         let list: any = [];
         for (let order of orderList) {
             let created_time = new Date(order.created_at).getTime();
-            if (now - created_time > oneDay) {
+            if (now - created_time > half_hour) {
                 list.push(order);
                 console.log(created_time);
                 await think.model('order').where({id: order.id}).update({

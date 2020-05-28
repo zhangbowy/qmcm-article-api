@@ -22,7 +22,7 @@ export default class extends Base {
             const data = await model.goodsList({page, limit, shop_id,status,name});
             return this.success(data, '请求成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 
@@ -57,8 +57,8 @@ export default class extends Base {
             const current_price = this.post('current_price');
             const weight = this.post('weight');
             const sum_stock = this.post('sum_stock');
-            const min_buy = this.post('min_buy');
-            const max_buy = this.post('max_buy');
+            // const min_buy = this.post('min_buy');
+            // const max_buy = this.post('max_buy');
             const desc = this.post('desc');
             const images = JSON.stringify(this.post('images'));
             const thumb_image_path = this.post('images')[0];
@@ -97,15 +97,15 @@ export default class extends Base {
             // if(old_price > current_price) {
             //     return this.fail(-1, '商品现价不能大于划线价!', []);
             // }
-            if(min_buy < 1) {
-                return this.fail(-1, '最小购买数量为1!', []);
-            }
-            if(max_buy < min_buy) {
-                return this.fail(-1, '最大购买数量不能小于起购数量!', []);
-            }
-            if(max_buy > sum_stock) {
-                return this.fail(-1, '最大购买数量不能超过库存!', []);
-            }
+            // if(min_buy < 1) {
+            //     return this.fail(-1, '最小购买数量为1!', []);
+            // }
+            // if(max_buy < min_buy) {
+            //     return this.fail(-1, '最大购买数量不能小于起购数量!', []);
+            // }
+            // if(max_buy > sum_stock) {
+            //     return this.fail(-1, '最大购买数量不能超过库存!', []);
+            // }
             const params: any = {
                 name,
                 category_id,
@@ -113,8 +113,8 @@ export default class extends Base {
                 sum_stock,
                 old_price,
                 current_price,
-                min_buy,
-                max_buy,
+                // min_buy,
+                // max_buy,
                 desc,
                 images,
                 sku_show,
@@ -197,8 +197,8 @@ export default class extends Base {
             const current_price = this.post('current_price');
             const weight = this.post('weight');
             const sum_stock = this.post('sum_stock');
-            const min_buy = this.post('min_buy');
-            const max_buy = this.post('max_buy');
+            // const min_buy = this.post('min_buy');
+            // const max_buy = this.post('max_buy');
             const desc = this.post('desc');
             const images = JSON.stringify(this.post('images'));
             const thumb_image_path = this.post('images')[0];
@@ -245,8 +245,8 @@ export default class extends Base {
                 sum_stock,
                 weight,
                 current_price,
-                min_buy,
-                max_buy,
+                // min_buy,
+                // max_buy,
                 desc,
                 images,
                 sku_show,
@@ -270,7 +270,7 @@ export default class extends Base {
             let res: any = await model.editGoods(id, params);
             return this.success(res, '编辑成功!');
         }catch (e) {
-            this.dealErr(e)
+            this.dealErr(e);
         }
     }
 

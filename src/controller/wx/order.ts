@@ -149,14 +149,15 @@ export default class extends Base {
                      */
                     await this.changeSumStock(item_v, 0);
                     await this.model("item").where({id: item_v.item_id}).increment('sale_num', item_v.buy_num);
-                    item_v.order_id = order_id
+                    item_v.order_id = order_id;
                 }
                 /**
                  * 订单商品信息存库
                  */
-                // for(let item_v of item_list) {
-                    await this.model('order_item').addMany(item_list);
-                // }
+                for(let item_v of item_list) {
+                    await this.model('order_item').add(item_v);
+                    // await this.model('order_item').addMany(item_list);
+                }
                 return this.success({
                     order_no
                 })
@@ -941,19 +942,28 @@ export default class extends Base {
     async changeSumStock($item: any,$add: any) {
         try {
             let res: any = await this.model('item').where({id: $item.item_id}).find();
-            let sku_list = JSON.parse(res.sku_list);
-            for (let sku_v of sku_list) {
-                if ($item.sku_id == sku_v.sku_id) {
-                    if ($add) {
-                        sku_v.num = sku_v.num + $item.buy_num;
-                    } else {
-                        sku_v.num = sku_v.num - $item.buy_num;
+            if ($item.sku_id) {
+                let sku_list = JSON.parse(res.sku_list);
+                for (let sku_v of sku_list) {
+                    if ($item.sku_id == sku_v.sku_id) {
+                        if ($add) {
+                            sku_v.num = sku_v.num + $item.buy_num;
+                        } else {
+                            sku_v.num = sku_v.num - $item.buy_num;
+                        }
+                        break;
                     }
-                    break;
                 }
+                let new_sku_list: any = JSON.stringify(sku_list);
+                 await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list})
             }
-            let new_sku_list: any = JSON.stringify(sku_list);
-            return await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list});
+            let sum_stock = res.sum_stock;
+            if ($add) {
+                sum_stock = sum_stock + $item.buy_num;
+            } else {
+                sum_stock= sum_stock- $item.buy_num;
+            }
+            return await this.model('item').where({id: $item.item_id}).update({sum_stock})
         }catch ($err) {
             this.dealErr($err);
         }

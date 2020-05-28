@@ -8,7 +8,7 @@ export default class extends Base {
    * 订单列表
    * @param {currentPage}
    * @param {pageSize}
-   * @param {status} 订单状态 状态 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复
+   * @param {status} 订单状态 状态 -2、已关闭/取消订单 0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9、已接单(designer_status 1、待接单 2、待指派设计师 3、设计师处理中 4、处理完成) 10、待打印
    * @param {order_no} 订单编号
    * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
    * @return order_list
@@ -31,19 +31,19 @@ export default class extends Base {
       if (order_type) {
         where.order_type = order_type
       }
-      let res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
+      let res = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
       // let res = await this.model('order').group('status').where(where).countSelect();
       return this.success(res, '请求成功!');
     }catch (e) {
-      this.dealErr(e)
+      this.dealErr(e);
     }
   }
 
   /**
    * 订单状态统计
    * @param {order_no} 订单编号
-   * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
-   * returns {status: countNum}
+   * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价  6、 询价回复  7、 待派单  8、 派单中  9、 已接单( designer_status  1、 待接单  2、 待指派设计师  3、 设计师处理中  4、 处理完成)  10、 待打印
+   * returns [ {_status: 状态, 状态数字: number, count: number} ...];
    */
   async orderCountAction() {
     try {
@@ -155,12 +155,12 @@ export default class extends Base {
       const order_no: any = this.post('order_no');
       // @ts-ignore
       const shop_id = this.ctx.state.admin_info.shop_id;
-      let res = await this.model('order').where({shop_id, order_no}).find();
-      if (Object.keys(res).length == 0) {
+      const res = await this.model('order').where({shop_id, order_no}).find();
+      if (think.isEmpty(res)) {
         return this.fail(-1, '该订单不存在!')
       }
       return this.success(res, '请求成功!');
-    }catch (e) {
+    } catch (e) {
       this.dealErr(e);
     }
   }
@@ -281,7 +281,10 @@ export default class extends Base {
       }
       let _status = '已完成';
       let res: any = await this.model('order').where({shop_id, id: order_id}).update({_status, status: 4});
-      let orderUpdate: any = await this.model('order_item').where({ order_id: order_id}).update({item_status:3, _item_status: _status});
+      let orderUpdate: any = await this.model('order_item').where({order_id: order_id}).update({
+        item_status: 3,
+        _item_status: _status
+      });
       if (orderUpdate) {
         return this.success(res, '确认收货成功!');
       }
