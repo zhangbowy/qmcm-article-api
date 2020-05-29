@@ -16,7 +16,7 @@ export = [
   },
   {
     handle: 'resource',
-    enable: true,
+    enable: isDev,
     options: {
       root: path.join(think.ROOT_PATH, 'www'),
       publicPath: /^\/(static|favicon\.ico|MP_verify_mwTN1uvgPMv6HXzM\.txt)/
