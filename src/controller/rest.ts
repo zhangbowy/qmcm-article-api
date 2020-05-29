@@ -42,10 +42,11 @@ export default class extends think.Controller {
         if (fs.existsSync(path)) {
             files = fs.readdirSync(path);
             // tslint:disable-next-line:only-arrow-functions
+            let _this = this
             files.forEach(function(file: any, index: any) {
                 const curPath = path + "/" + file;
                 if (fs.statSync(curPath).isDirectory()) {
-                    this.deleteFolder(curPath);
+                    _this.deleteFolder(curPath);
                 } else {
                     fs.unlinkSync(curPath);
                 }
