@@ -9,7 +9,7 @@ export default class extends Base {
      */
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
-        const redirectUrl = "http://cxapi.tecqm.club/api/wx/user/auth";
+        const redirectUrl = "http://cxgh.tecqm.club/api/wx/user/auth";
         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
         return this.success(url);
     }
