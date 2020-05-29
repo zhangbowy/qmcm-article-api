@@ -22,13 +22,13 @@ export default class extends Base {
                 // region
             };
             // this.ctx.set('Access-Control-Allow-Origin', this.ctx.header("origin") || "*");
-            let origin = this.header("origin");
+            // let origin = this.header("origin");
             // this.ctx.set({
             //     "Access-Control-Allow-Origin": origin,
             //     "Access-Control-Allow-Headers": "x-requested-with,content-type",
             // });
-            return  this.redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect');
-            return  this.redirect('http://cxgh.tecqm.club/');
+            // return  this.redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect');
+            // return  this.redirect('http://cxgh.tecqm.club/');
             return this.success(resObj, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
