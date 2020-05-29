@@ -1,19 +1,19 @@
 import { think } from 'thinkjs';
-import restController from '../rest'
+import restController from '../rest';
 export default class extends restController {
   async __before() {
     this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
-    this.header('Access-Control-Allow-Headers', ["x-requested-with",'origin','content-type','design_sign']);
+    this.header('Access-Control-Allow-Headers', ["x-requested-with", 'origin', 'content-type', 'design_sign']);
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
-      if(this.ctx.path.indexOf('designer/user/login') === -1 && this.ctx.path.indexOf('designer/design/downLoad') === -1) {
+      if (this.ctx.path.indexOf('designer/user/login') === -1 && this.ctx.path.indexOf('designer/design/downLoad') === -1) {
         const design_sign = this.header("design_sign");
         if (think.isEmpty(design_sign)) {
           return this.fail(402, '未登录!', []);
         }
-        let tokenFuc =  think.service('token');
-        let admin_data = await tokenFuc.parse1(design_sign);
+        const tokenFuc =  think.service('token');
+        const admin_data = await tokenFuc.parse1(design_sign);
         if (admin_data == null) {
           return this.fail(402, '未登录!', []);
         }
@@ -23,7 +23,7 @@ export default class extends restController {
         if (think.isEmpty(designer_info)) {
           return this.fail(402, '未登录!', []);
         }
-        this.ctx.state['designer_info'] = designer_info;
+        this.ctx.state.designer_info = designer_info;
         // let Origin = this.ctx.req.headers.origin;
         // if(!Origin) {
         //   return this.fail(1001,'域名未配置!')
@@ -41,13 +41,12 @@ export default class extends restController {
         //   return this.success('','已登录')
         // }
       }
-    }catch (e) {
-     return  this.fail(1001, e)
+    } catch (e) {
+     return  this.fail(1001, e);
     }
   }
 
-
   __call() {
-    return this.fail(404,'design_controller');
+    return this.fail(404, 'design_controller');
   }
 }

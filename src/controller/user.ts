@@ -11,7 +11,7 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('user').where({shop_id}).page(page, limit).countSelect();
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }

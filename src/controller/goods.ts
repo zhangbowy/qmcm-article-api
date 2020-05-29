@@ -19,9 +19,9 @@ export default class extends Base {
             const name: string = this.post('name') || "";
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const data = await model.goodsList({page, limit, shop_id,status,name});
+            const data = await model.goodsList({page, limit, shop_id, status, name});
             return this.success(data, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -69,7 +69,7 @@ export default class extends Base {
             /**
              * 查询商品分类是否存在
              */
-            if(category_id) {
+            if (category_id) {
                 const category  =  await this.model('item_category').where({id: category_id}).find();
                 if (think.isEmpty(category)) {
                     return this.fail(-1, '商品分类不存在!');
@@ -132,7 +132,7 @@ export default class extends Base {
                 if (think.isEmpty(custom)) {
                     return this.fail(-1, '定制分类不存在!');
                 }
-                params.custom_category_id = custom_category_id
+                params.custom_category_id = custom_category_id;
             }
             const model = this.model('item') as ItemModel;
             const res = await model.addGoods(params);
@@ -140,7 +140,7 @@ export default class extends Base {
                 return this.success(res, "添加成功!");
             }
             return this.fail(-1, '添加失敗', []);
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -155,12 +155,12 @@ export default class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = this.post('id');
             const model = this.model('item') as ItemModel;
-            const res = await model.getGoodById(id,shop_id);
+            const res = await model.getGoodById(id, shop_id);
             res.images = JSON.parse(res.images);
             res.sku_list = JSON.parse(res.sku_list);
             res.sku_show = JSON.parse(res.sku_show);
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -211,7 +211,7 @@ export default class extends Base {
             /**
              * 查询商品分类是否存在
              */
-            if(category_id) {
+            if (category_id) {
                 const category  =  await this.model('item_category').where({id: category_id}).find();
                 if (think.isEmpty(category)) {
                     return this.fail(-1, '商品分类不存在!');
@@ -264,12 +264,12 @@ export default class extends Base {
                 if (think.isEmpty(custom)) {
                     return this.fail(-1, '定制分类不存在!');
                 }
-                params.custom_category_id = custom_category_id
+                params.custom_category_id = custom_category_id;
             }
             const model = this.model('item') as ItemModel;
-            let res: any = await model.editGoods(id, params);
+            const res: any = await model.editGoods(id, params);
             return this.success(res, '编辑成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -288,7 +288,7 @@ export default class extends Base {
                 return this.fail(-1, '商品不存在!', res);
             }
             return this.success(res, '刪除成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -302,18 +302,18 @@ export default class extends Base {
         try {
             const id: number = this.post('id');
             const status: number = Number(this.post('status'));
-            let statusList = [1,2,3];
+            const statusList = [1, 2, 3];
             if (!statusList.includes(status)) {
                 return this.fail(-1, '该商品状态不存在!');
             }
             const model = this.model('item') as ItemModel;
-            let res: any = await model.where({id}).update({status});
+            const res: any = await model.where({id}).update({status});
             if (!res) {
                 return this.fail(-1, '商品不存在!', res);
             }
             return this.success(res, '操作成功!');
-        }catch (e) {
-            return this.fail(-1,e);
+        } catch (e) {
+            return this.fail(-1, e);
         }
     }
 
@@ -324,13 +324,13 @@ export default class extends Base {
         try {
             const page: number = this.post('currentPage') || 1;
             const limit: number = this.post('pageSize') || 10;
-            const cateModel = this.model('item_category') as cateModel;
+            const catemodel = this.model('item_category') as cateModel;
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const data = await cateModel.categoryList({page, limit, shop_id});
-            let res =  this.getTree(data,0, 'id','parent_id');
+            const data = await catemodel.categoryList({page, limit, shop_id});
+            const res =  this.getTree(data, 0, 'id', 'parent_id');
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -352,7 +352,7 @@ export default class extends Base {
             const image_path: number = this.post('image_path') || "";
             const logo: number = this.post('logo');
             const link: number = this.post('link');
-            const params:object = {
+            const params: object = {
                 category_name,
                 parent_id,
                 image_path,
@@ -360,11 +360,11 @@ export default class extends Base {
                 shop_id,
                 logo
             };
-            let timer = 1;
+            const timer = 1;
             if (parent_id != 0) {
-                const res = await this.model('item_category').where({id:parent_id}).find();
-                if(Object.keys(res).length == 0) {
-                    return this.fail(-1, '该上级分类不存在!')
+                const data = await this.model('item_category').where({id: parent_id}).find();
+                if (Object.keys(data).length == 0) {
+                    return this.fail(-1, '该上级分类不存在!');
                 }
                 // let level = await this.getLevel(parent_id,timer);
                 // if(level > 2)
@@ -375,24 +375,24 @@ export default class extends Base {
             }
             const res = await this.model('item_category').add(params);
             if (res) {
-                return this.success(res, '添加成功!')
+                return this.success(res, '添加成功!');
             }
             return this.fail(-1, '添加失败!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
-    async getLevel(parent_id: number,timer: number) {
-        const res = await this.model('item_category').where({id:parent_id}).find();
-        ++ timer
-        if(res.parent_id == 0) {
+    async getLevel(parent_id: number, timer: number) {
+        const res = await this.model('item_category').where({id: parent_id}).find();
+        ++ timer;
+        if (res.parent_id == 0) {
             // @ts-ignore
-            return  new Promise((resolve,reject) => {
+            return  new Promise((resolve, reject) => {
                 // @ts-ignore
-                resolve(timer)
-            })
+                resolve(timer);
+            });
         } else {
-           this.getLevel(res.parent_id,timer)
+           this.getLevel(res.parent_id, timer);
         }
     }
 
@@ -413,18 +413,18 @@ export default class extends Base {
             const image_path: number = this.post('image_path');
             const link: number = this.post('link');
             const logo: number = this.post('logo');
-            const params:object = {
+            const params: object = {
                 category_name,
                 image_path,
                 link,
                 logo
             };
-            const res: any = await this.model('item_category').where({id,shop_id}).update(params);
+            const res: any = await this.model('item_category').where({id, shop_id}).update(params);
             if (res) {
                 return this.success(res, '编辑成功!');
             }
-            return this.fail(-1, '分类不存在!')
-        }catch (e) {
+            return this.fail(-1, '分类不存在!');
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -438,20 +438,20 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = Number(this.post('id'));
-            let category = await this.model('item_category').where({id:id}).find();
+            const category = await this.model('item_category').where({id}).find();
             if (Object.keys(category).length == 0) {
-                return this.fail(-1,'分类不存在');
+                return this.fail(-1, '分类不存在');
             }
-            let model = this.model('item_category') as item_category;
-            let ids = await model.getChild(id);
-            let res:number = await this.model('item_category').where({id:['in',ids],shop_id}).update({del:1});
+            const model = this.model('item_category') as item_category;
+            const ids = await model.getChild(id);
+            const res: number = await this.model('item_category').where({id: ['in', ids], shop_id}).update({del: 1});
             if (res) {
-                const data: any = await this.model('item').where({id:['in',ids],shop_id}).update({category_id:0});
-                return this.success("", '删除成功!')
+                const data: any = await this.model('item').where({id: ['in', ids], shop_id}).update({category_id: 0});
+                return this.success("", '删除成功!');
             } else {
                 return this.fail(-1, '分类不存在!');
             }
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }

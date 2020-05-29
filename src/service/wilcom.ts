@@ -1,8 +1,8 @@
 import { think } from 'thinkjs';
 const path = require('path');
-var COS = require('cos-nodejs-sdk-v5');
+const COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
-var rp = require('request-promise');
+const rp = require('request-promise');
 import func from './../utils/func';
 const appId = think.config('wilcom').appId;
 const appKey =  think.config('wilcom').appKey;
@@ -15,22 +15,21 @@ module.exports = class extends think.Service {
      * 根据图片获取刺绣预览图
      * @$image 图片base64字符串
      */
-     async getEmbByImg($image: string,$width: any, $height: any) {
+     async getEmbByImg($image: string, $width: any, $height: any) {
 
-
-        const width = $width|| 100;
+        const width = $width || 100;
         const height = $height || 100;
         const base64Image = $image;
-        let options = {
+        const options = {
             method: 'POST',
             uri: 'http://ewa.wilcom.com/2.0/api/bitmapartdesign',
             // uri: 'http://ewa.wilcom.com/2.0/api/vectorArtDesign',
             body: {
-                appId: appId,
-                appKey: appKey,
+                appId,
+                appKey,
                 requestXml: `<xml>
-                  <bitmap 
-                    file="pic.png" 
+                  <bitmap
+                    file="pic.png"
                     remove_background="true"
                   />
 <!--                    <vector-->
@@ -38,18 +37,18 @@ module.exports = class extends think.Service {
 <!--                     dpi="300"-->
 <!--                     remove_background="true"-->
 <!--                    />-->
-                  <autodigitize_options 
+                  <autodigitize_options
                      width = "${width}"
                      height= "${height}"
                   />
                   <output
-                     trueview_file="final_design_trueview.png" 
-                     design_file="final_design.emb" 
-                     dpi ="270" 
+                     trueview_file="final_design_trueview.png"
+                     design_file="final_design.emb"
+                     dpi ="270"
                   />
                   <files>
-                   <file 
-                     filename="pic.png" 
+                   <file
+                     filename="pic.png"
                      filecontents="${base64Image}"
                    />
                   </files>
@@ -60,16 +59,16 @@ module.exports = class extends think.Service {
 
         const result = await rp(options);
 
-        var embData = func.getFilecontentsEMB(result);
-        var pngData = func.getFilecontentsPNG(result);
+        const embData = func.getFilecontentsEMB(result);
+        const pngData = func.getFilecontentsPNG(result);
         if (!embData) {
-            throw '获取design错误'
+            throw new Error('获取design错误');
         }
-        return embData
+        return embData;
         // req.embDataBuffer = embData;//存储生成的 emb data
         // req.pngData = pngData; //存储生成的 png data
-        //console.log('图片--》design api返回成功')
-        //console.log('embData==>',embData);
+        // console.log('图片--》design api返回成功')
+        // console.log('embData==>',embData);
 
     }
 
@@ -78,8 +77,8 @@ module.exports = class extends think.Service {
             method: 'POST',
             uri: 'http://ewa.wilcom.com/2.0/api/designInfo',
             body: {
-                appId: appId,
-                appKey: appKey,
+                appId,
+                appKey,
                 requestXml: `<xml>
                     <files>
                     <file filename="design.EMB" filecontents="${$embData}" />
@@ -88,9 +87,9 @@ module.exports = class extends think.Service {
             },
             json: true
         };
-        //emb info
+        // emb info
         const resForInfo = await rp(options3);
-         return  resForInfo
+        return  resForInfo;
     }
 
-}
+};

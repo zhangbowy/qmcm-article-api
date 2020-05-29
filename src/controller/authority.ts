@@ -8,10 +8,10 @@ module.exports = class extends Base {
      */
     async authorityListAction(): Promise<void> {
         try {
-            const res = await this.model('authority').where({is_show: 1,only_role_type:3}).fieldReverse('del').select();
-            const data = this.getTree(res,0);
-            return this.success(data)
-        }catch (e) {
+            const res = await this.model('authority').where({is_show: 1, only_role_type: 3}).fieldReverse('del').select();
+            const data = this.getTree(res, 0);
+            return this.success(data);
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -22,9 +22,9 @@ module.exports = class extends Base {
     async roleListAction(): Promise<void> {
         try {
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const res = await this.model('admin_role').where({shop_id, del:0, role_type:['NOTIN', [1, 2]]}).countSelect();
-            return this.success(res)
-        }catch (e) {
+            const res = await this.model('admin_role').where({shop_id, del: 0, role_type: ['NOTIN', [1, 2]]}).countSelect();
+            return this.success(res);
+        } catch (e) {
            this.dealErr(e);
         }
     }
@@ -36,16 +36,16 @@ module.exports = class extends Base {
         try {
             const admin_role_id = this.get('admin_role_id');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const admin_role = await this.model('admin_role').where({shop_id,admin_role_id: admin_role_id,role_type:['NOTIN', [1, 2]]}).find();
+            const admin_role = await this.model('admin_role').where({shop_id, admin_role_id, role_type: ['NOTIN', [1, 2]]}).find();
             if (think.isEmpty(admin_role)) {
-                return this.fail(-1, '该角色不存在!')
+                return this.fail(-1, '该角色不存在!');
             }
-            const auth_list = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
+            const auth_list = await this.model('auth_give').where({shop_id, admin_role_id, del: 0}).getField('auth_id');
             // const res = await this.model('authority').where({is_page: 1, auth_id:['in',auth_list]}).getField('id');
             // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
             admin_role.authority_list = auth_list;
             return this.success(admin_role);
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -61,27 +61,28 @@ module.exports = class extends Base {
             if (authority_list.length == 0) {
                 return this.fail(-1, '赋予角色的权限不能为空!');
             }
-            const authority_tree =  await this.model('authority').where({id:['IN',authority_list]}).select();
-            const pageList = authority_tree.filter(function(val:any,index:any){
-                return (val.is_page == 1 && val.pid!=0)
+            const authority_tree =  await this.model('authority').where({id: ['IN', authority_list]}).select();
+            // tslint:disable-next-line:only-arrow-functions
+            const pageList = authority_tree.filter(function(val: any, index: any) {
+                return (val.is_page == 1 && val.pid != 0);
             });
             if (pageList.length == 0) {
                 return this.fail(-1, '请至少选择一个页面的权限!');
             }
             const admin_role_id = await this.model('admin_role').add({admin_role_name, shop_id});
             const get_auth_list = [];
-            for (let auth_v of authority_list) {
-                let obj = {
-                    admin_role_id:admin_role_id,
-                    auth_id:auth_v,
+            for (const auth_v of authority_list) {
+                const obj = {
+                    admin_role_id,
+                    auth_id: auth_v,
                     shop_id
                 };
-                get_auth_list.push(obj)
+                get_auth_list.push(obj);
             }
             await this.model('auth_give').addMany(get_auth_list);
-            await this.saveSystemLog('添加权限角色',{'角色名称':admin_role_name,'赋予的权限':authority_list});
+            await this.saveSystemLog('添加权限角色', {角色名称: admin_role_name, 赋予的权限: authority_list});
             return this.success([], '添加成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -94,32 +95,33 @@ module.exports = class extends Base {
             const admin_role_id = this.post('admin_role_id');
             const admin_role_name = this.post('admin_role_name');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const authority_list  = typeof this.post('authority_list') == 'string'?this.post('authority_list').split(','):this.post('authority_list');
+            const authority_list  = typeof this.post('authority_list') == 'string' ? this.post('authority_list').split(',') : this.post('authority_list');
             if (authority_list.length == 0) {
                 return this.fail(-1, '赋予角色的权限不能为空!');
             }
-            const authority_tree =  await this.model('authority').where({id:['IN',authority_list]}).select();
-            const pageList = authority_tree.filter(function(val:any,index:any){
-                return (val.is_page == 1 && val.pid!=0)
+            const authority_tree =  await this.model('authority').where({id: ['IN', authority_list]}).select();
+            // tslint:disable-next-line:only-arrow-functions
+            const pageList = authority_tree.filter(function(val: any, index: any) {
+                return (val.is_page == 1 && val.pid != 0);
             });
             if (pageList.length == 0) {
                 return this.fail(-1, '请至少选择一个页面的权限!');
             }
 
-            await this.model('admin_role').where({admin_role_id,shop_id}).update({admin_role_name});
+            await this.model('admin_role').where({admin_role_id, shop_id}).update({admin_role_name});
             const get_auth_list = [];
-            for (let auth_v of authority_list) {
-                let obj = {
-                    admin_role_id:admin_role_id,
-                    auth_id:auth_v,
+            for (const auth_v of authority_list) {
+                const obj = {
+                    admin_role_id,
+                    auth_id: auth_v,
                     shop_id
                 };
                 get_auth_list.push(obj);
             }
-            await this.model('auth_give').where({admin_role_id,shop_id}).update({del:1});
+            await this.model('auth_give').where({admin_role_id, shop_id}).update({del: 1});
             await this.model('auth_give').addMany(get_auth_list);
             this.success([], '编辑成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -132,11 +134,11 @@ module.exports = class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const admin_role = await this.model('admin_role').where({shop_id, admin_role_id}).update({del: 1});
             if (!admin_role) {
-                return this.fail(-1, '该角色不存在!')
+                return this.fail(-1, '该角色不存在!');
             }
-            const res = await this.model('admin').where({shop_id,role_id:admin_role_id}).update({del: 1});
-            return this.success([], '删除成功!')
-        }catch (e) {
+            const res = await this.model('admin').where({shop_id, role_id: admin_role_id}).update({del: 1});
+            return this.success([], '删除成功!');
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -150,15 +152,15 @@ module.exports = class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const name: string = this.post('name') || "";
             const res = await this.model('admin')
-                .where({'admin.shop_id': shop_id,'admin.role_type':3, 'admin.del':0})
+                .where({'admin.shop_id': shop_id, 'admin.role_type': 3, 'admin.del': 0})
                 .join({
                 table: 'admin_role',
-                join: 'left', //join 方式，有 left, right, inner 3 种方式
+                join: 'left', // join 方式，有 left, right, inner 3 种方式
                 as: 'c', // 表别名
-                on: ['role_id', 'admin_role_id']}) //ON 条件
+                on: ['role_id', 'admin_role_id']}) // ON 条件
                 .field('admin.id,admin.role_id,admin.name,admin.phone,admin.created_at,admin.updated_at,admin_role_name as role_name').page(page, limit).countSelect();
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
            this.dealErr(e);
         }
     }
@@ -177,7 +179,7 @@ module.exports = class extends Base {
             if (!think.isEmpty(is_use_phone)) {
                 return this.fail(-1, '该手机号已被使用!');
             }
-            const role_info = await this.model('admin_role').where({shop_id, admin_role_id:role_id,  del: 0}).find();
+            const role_info = await this.model('admin_role').where({shop_id, admin_role_id: role_id,  del: 0}).find();
             if (think.isEmpty(role_info)) {
                 return this.fail(-1, '该角色不存在!');
             }
@@ -192,7 +194,7 @@ module.exports = class extends Base {
                 return this.success([], '创建成功!');
             }
             return this.fail(-1, '创建失败!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -207,33 +209,33 @@ module.exports = class extends Base {
             const password = this.post('password');
             const role_id = this.post('role_id');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const is_admin = await this.model('admin').where({shop_id, id ,del: 0}).find();
+            const is_admin = await this.model('admin').where({shop_id, id , del: 0}).find();
             if (think.isEmpty(is_admin)) {
                 return this.fail(-1, '该管理员不存在!');
             }
-            const is_use_phone = await this.model('admin').where({phone, del: 0,id:['NOTIN',[id]]}).find();
+            const is_use_phone = await this.model('admin').where({phone, del: 0, id: ['NOTIN', [id]]}).find();
             if (!think.isEmpty(is_use_phone)) {
                 return this.fail(-1, '该手机号已被使用!');
             }
-            const role_info = await this.model('admin_role').where({shop_id, admin_role_id:role_id, del: 0}).find();
+            const role_info = await this.model('admin_role').where({shop_id, admin_role_id: role_id, del: 0}).find();
             if (think.isEmpty(role_info)) {
                 return this.fail(-1, '该角色不存在!');
             }
-            let udpOption: any = {
+            const udpOption: any = {
                 name,
                 phone,
                 role_id
             };
             if (password) {
                 const pwd = new Buffer(password, 'utf-8' );
-                udpOption.pwd = pwd
+                udpOption.pwd = pwd;
             }
-            const admin = await this.model('admin').where({id, shop_id,del: 0}).update(udpOption);
+            const admin = await this.model('admin').where({id, shop_id, del: 0}).update(udpOption);
             if (admin) {
                 return this.success([], '修改成功!');
             }
             return this.fail(-1, '修改失败!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -244,13 +246,13 @@ module.exports = class extends Base {
         try {
             const id = this.post('id');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const res = await this.model('admin').where({id,shop_id}).update({del: 1});
+            const res = await this.model('admin').where({id, shop_id}).update({del: 1});
             if (!res) {
-                return this.fail(-1, '管理员不存在!')
+                return this.fail(-1, '管理员不存在!');
             }
-            return this.success([], '删除成功!')
-        }catch (e) {
+            return this.success([], '删除成功!');
+        } catch (e) {
             this.dealErr(e);
         }
     }
-}
+};

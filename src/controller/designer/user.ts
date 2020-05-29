@@ -26,20 +26,20 @@ export default class extends Base {
                 return  this.fail(-1, "用户名或密码不能为空!", []);
             }
             designer_password = think.md5(designer_password);
-            const res = await this.model('designer').where({designer_phone,designer_password}).find();
+            const res = await this.model('designer').where({designer_phone, designer_password}).find();
             if (!think.isEmpty(res)) {
-                    if(res.status == 0) {
+                    if (res.status == 0) {
                         return  this.fail(-1, "该账号已禁用,请联系管理员!", []);
                     }
-                    let tokenFuc =  think.service('token');
+                    const tokenFuc =  think.service('token');
                     /**
                      * 生成token
                      */
-                    let info = {
+                    const info = {
                         // exp: Math.floor(Date.now() / 1000) + (60 * 60),
-                        designer_id:res.designer_id,
+                        designer_id: res.designer_id,
                     };
-                    let token = await tokenFuc.create1(info);
+                    const token = await tokenFuc.create1(info);
                     await this.cache(`design-${res.designer_id}`, res, {
                         type: 'redis',
                         redis: {
@@ -54,22 +54,22 @@ export default class extends Base {
                     //         timeout:  60 * 60 * 1000
                     //     }
                     // });
-                    return this.success({design_sign: token,designer_id:res.designer_id}, "登录成功!");
+                    return this.success({design_sign: token, designer_id: res.designer_id}, "登录成功!");
             } else {
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
     async infoAction(): Promise<void> {
         try {
             const designer_info = this.ctx.state.designer_info;
-            let shop_id = designer_info.shop_id;
-            let designer_id = designer_info.designer_id;
-            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del:0}).find()
+            const shop_id = designer_info.shop_id;
+            const designer_id = designer_info.designer_id;
+            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del: 0}).find();
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -82,7 +82,7 @@ export default class extends Base {
             // @ts-ignore
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -110,11 +110,11 @@ export default class extends Base {
             fontSize: 60, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
         };
-        let captcha = new ThinkSvgCaptcha(defaultOptions);
-        let c= captcha.create();
-        await this.session('captcha',c.text);
+        const captcha = new ThinkSvgCaptcha(defaultOptions);
+        const c = captcha.create();
+        await this.session('captcha', c.text);
         this.ctx.type = 'image/svg+xml';
-        return this.ctx.body = c.data
+        return this.ctx.body = c.data;
         // captcha.svgCaptcha(text);
     }
     async editUserInfoAction() {

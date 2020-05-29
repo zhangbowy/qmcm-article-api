@@ -19,29 +19,29 @@ export default class extends Base {
             const limit: number = this.post('pageSize') || 10;
             const status = 3;
             const name: string = this.post('name') || "";
-            const category_id: number = Number(this.post('category_id')|| 0) ;
+            const category_id: number = Number(this.post('category_id') || 0) ;
             let categorys: any;
-            if(category_id != 0) {
-                let categoryItem: object = await  this.model('item_category').where({id:category_id});
-                if(Object.keys(categoryItem).length == 0) {
-                    return this.fail(-1,'商品分类不存在')
+            if (category_id != 0) {
+                const categoryItem: object = await  this.model('item_category').where({id: category_id});
+                if (Object.keys(categoryItem).length == 0) {
+                    return this.fail(-1, '商品分类不存在');
                 }
                 // @ts-ignore
                 // if (categoryItem.parent_id == 0) {
                 //     categorys = category_id
                 // } else {
-                    const categoryModel = this.model('item_category') as item_category;
-                    categorys = await categoryModel.getChild(category_id);
+                const categoryModel = this.model('item_category') as item_category;
+                categorys = await categoryModel.getChild(category_id);
                 // }
             } else {
-                categorys = 0
+                categorys = 0;
             }
             const model = this.model('item') as ItemModel;
             // @ts-ignore
             const shop_id = this.ctx.state.shop_id;
-            const data = await model.goodsList({page, limit, shop_id, status,name,categorys});
+            const data = await model.goodsList({page, limit, shop_id, status, name, categorys});
             return this.success(data, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -63,9 +63,9 @@ export default class extends Base {
             /**
              * 商品的浏览量增加1
              */
-            await this.model('item').where({id: id}).increment('pv', 1);
+            await this.model('item').where({id}).increment('pv', 1);
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -77,13 +77,13 @@ export default class extends Base {
         try {
             const page: number = this.post('currentPage') || 1;
             const limit: number = this.post('pageSize') || 10;
-            const cateModel = this.model('item_category') as cateModel;
+            const catemodel = this.model('item_category') as cateModel;
             // @ts-ignore
             const shop_id = this.ctx.state.shop_id;
-            const data = await cateModel.categoryList({page, limit, shop_id});
-            let res = this.getTree(data,0, 'id', 'parent_id');
+            const data = await catemodel.categoryList({page, limit, shop_id});
+            const res = this.getTree(data, 0, 'id', 'parent_id');
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }

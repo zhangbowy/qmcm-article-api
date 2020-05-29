@@ -15,20 +15,20 @@ exports.model = {
     mysql: {
         handle: mysql,
         // database: 'yuncixiu', //数据库名
-        database: 'yuncixiu_v3', //数据库名
-        prefix: '',//表前缀
+        database: 'yuncixiu_v3', // 数据库名
+        prefix: '', // 表前缀
         encoding: 'utf8',
         // host: '129.211.65.201',//host
-        host: '192.168.31.4',//host
-        port: 3306,//端口
+        host: '192.168.31.4', // host
+        port: 3306, // 端口
         // user: 'yuncixiu',//用户名
-        user: 'cx03',//用户名
+        user: 'cx03', // 用户名
         // password: 'PCSXsX2HCJnfCYEb',//密码
-        password: 'yuncixiu03',//密码
+        password: 'yuncixiu03', // 密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,
-        connectionLimit:10,
+        connectionLimit: 10,
         charset: 'utf8mb4'
     }
 };
@@ -46,4 +46,4 @@ exports.cache = {
         password: '',
         log_connect: true
     }
-}
+};

@@ -22,9 +22,9 @@ interface GoodsListParams {
     page?: number;
     limit?: number;
     shop_id: number;
-    status: number,
-    name: string
-    categorys?: string
+    status: number;
+    name: string;
+    categorys?: string;
 }
 export default class extends think.Model {
     async goodsList($data: GoodsListParams) {
@@ -32,11 +32,11 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
-        let where: any = {name:['like',`%${$data.name}%`], del: 0, shop_id: $data.shop_id};
-        if($data.categorys) {
-            where.category_id = ['in',$data.categorys]
+        const where: any = {name: ['like', `%${$data.name}%`], del: 0, shop_id: $data.shop_id};
+        if ($data.categorys) {
+            where.category_id = ['in', $data.categorys];
         }
-        if($data.status == -1) {
+        if ($data.status == -1) {
 
             // @ts-ignore
             return this.setRelation(false).field('sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
@@ -63,7 +63,7 @@ export default class extends think.Model {
     //         },
     //     };
     // }
-    async getGoodById($id: number,shop_id: number) {
+    async getGoodById($id: number, shop_id: number) {
         // const shop_id = this.ctx.state.admin_info.shop_id;
         // const id = this.post('id');
         // const name = this.post('name');
@@ -80,12 +80,12 @@ export default class extends think.Model {
         // const sku_show = JSON.stringify(this.post('sku_show'));
         // const sku_list = JSON.stringify(this.post('sku_list'));
         // const detail = this.post('detail');
-        return this.field('shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,sku_list,sku_show,detail,desc,express_fee,express_template_id,custom_category_id,is_custom,express_type,sale_num,pv').where({id: $id,shop_id}).find();
+        return this.field('shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,sku_list,sku_show,detail,desc,express_fee,express_template_id,custom_category_id,is_custom,express_type,sale_num,pv').where({id: $id, shop_id}).find();
     }
     async deleteGoods($id: number) {
         return this.where({id: $id}).update({del: 1});
     }
-    async editGoods($id: number,$data: any) {
+    async editGoods($id: number, $data: any) {
         return this.where({id: $id}).update($data);
     }
 }

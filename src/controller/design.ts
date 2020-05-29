@@ -10,9 +10,9 @@ export default class extends Base {
         try {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
-            const res = await this.model('designer_team').fieldReverse('del').where({shop_id,del: 0}).countSelect();
+            const res = await this.model('designer_team').fieldReverse('del').where({shop_id, del: 0}).countSelect();
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -28,7 +28,7 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const designer_team_name = this.post('designer_team_name');
             const designer_team_id: any = await this.model('designer_team').add({designer_team_name, shop_id});
-            if(!designer_team_id) {
+            if (!designer_team_id) {
                 return  this.fail(-1, '团队添加失败!');
             }
             const designer_name = this.post('designer_name');
@@ -42,7 +42,7 @@ export default class extends Base {
              */
             const is_leader =  1;
             const designer_password = think.md5('888888');
-            const default_password ='888888';
+            const default_password = '888888';
             const params = {
                 designer_name,
                 designer_phone,
@@ -57,7 +57,7 @@ export default class extends Base {
                 return  this.fail(-1, '添加失败!');
             }
             return this.success([], '添加成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -86,7 +86,7 @@ export default class extends Base {
                 return  this.fail(-1, '修改失败!');
             }
             return this.success([], '修改成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -98,12 +98,12 @@ export default class extends Base {
     async delDesignerAction(): Promise<any>  {
         try {
             const designer_team_id = this.post('designer_team_id');
-            const res = await this.model('designer_team').where({designer_team_id}).update({del:1});
+            const res = await this.model('designer_team').where({designer_team_id}).update({del: 1});
             if (!res) {
                 return  this.fail(-1, '设计师团队不存在!');
             }
             return this.success([], '删除成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }

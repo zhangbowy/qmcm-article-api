@@ -7,7 +7,7 @@ interface GoodsListParams {
     limit?: number;
     shop_id: number;
     gallery_group_id?: any;
-    img_name?: string | number
+    img_name?: string | number;
 }
 export default class extends think.Model {
     async list($data: GoodsListParams) {
@@ -15,15 +15,12 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
-        if($data.gallery_group_id == -1)
-        {
+        if ($data.gallery_group_id == -1) {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id,img_name:['like',`%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
-        }
-        else
-        {
+            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
+        } else {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id,gallery_group_id: ['in', $data.gallery_group_id],img_name:['like',`%${$data.img_name}%`]}).page(page, limit).countSelect({cache: false});
+            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, gallery_group_id: ['in', $data.gallery_group_id], img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).countSelect({cache: false});
         }
     }
     async addImage($data: any) {
@@ -38,13 +35,13 @@ export default class extends think.Model {
     /**
      * 图片设置分组
      */
-    async setGroup($ids: number,$group_id: number) {
-        return this.where({id: ['IN', $ids]}).update({gallery_group_id:$group_id});
+    async setGroup($ids: number, $group_id: number) {
+        return this.where({id: ['IN', $ids]}).update({gallery_group_id: $group_id});
     }
     /**
      * 编辑图片
      */
-    async editImg($id: number,$data: any) {
+    async editImg($id: number, $data: any) {
         return this.where({id: $id}).update($data);
     }
     // /**

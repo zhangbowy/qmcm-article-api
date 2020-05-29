@@ -9,7 +9,7 @@ interface UploadRes {
     Location: string;
     statusCode: number;
     headers?: any;
-    ETag: string
+    ETag: string;
 }
 
 const rename = think.promisify(fs.rename, fs);
@@ -67,12 +67,14 @@ export default class extends Base {
     async uploadCodeAction() {
 
         const file = this.file('file');
-        let typeArr = [1,2,3];
+        const typeArr = [1, 2, 3];
         const type = Number(this.post('type'));
         if (!typeArr.includes(type)) {
             return  this.fail(-1, 'type不正确', []);
         }
+        // tslint:disable-next-line:prefer-const
         let currentPath;
+        // tslint:disable-next-line:prefer-const
         let resultPath;
         if (!file || !file.type) {
             return  this.fail(-1, '文件不能为空', []);
@@ -81,25 +83,25 @@ export default class extends Base {
             return  this.fail(-1, '上传类型不能为空', []);
         }
         // tslint:disable-next-line:triple-equals
-        if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
+        if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
             let filepath;
-            if( type == 1) {
+            if ( type == 1) {
                 filepath = path.join('/root/release/ghao');
-            } else if(type == 2)  {
+            } else if (type == 2)  {
                 filepath = path.join('/root/release/admin');
             } else {
                 filepath = path.join('/root/release/design');
             }
             deleteFolder(filepath);
-            var zip = new AdmZip(file.path);
-            console.log(filepath,'filepath');
-            let path1 = path.dirname(filepath);
+            const zip = new AdmZip(file.path);
+            console.log(filepath, 'filepath');
+            const path1 = path.dirname(filepath);
             await think.mkdir(path1);
-            let day = await think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+            const day = await think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
             await think.timeout(2000);
             await zip.extractAllTo(filepath, true);
-            let verPath =  path.join(filepath,day+"/");
-            console.log(verPath,'verPath');
+            const verPath =  path.join(filepath, day + "/");
+            console.log(verPath, 'verPath');
             /**
              * 上传时间
              */
@@ -117,12 +119,13 @@ export default class extends Base {
 
     }
 }
-function deleteFolder(path: any) {
+function deleteFolder($path: any) {
     let files = [];
-    if (fs.existsSync(path)) {
-        files = fs.readdirSync(path);
-        files.forEach(function (file:any, index: any) {
-            let curPath = path + "/" + file;
+    if (fs.existsSync($path)) {
+        files = fs.readdirSync($path);
+        // tslint:disable-next-line:only-arrow-functions
+        files.forEach(function(file: any, index: any) {
+            const curPath = $path + "/" + file;
             if (fs.statSync(curPath).isDirectory()) {
                 deleteFolder(curPath);
             } else {

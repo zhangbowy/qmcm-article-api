@@ -3,6 +3,7 @@ import {think} from "thinkjs";
 const path = require('path');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
+const pinyin = require("node-pinyin");
 const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
 
@@ -13,7 +14,7 @@ export default class extends Base {
         try {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
             const designer_team_id: boolean = this.ctx.state.designer_info.designer_team_id;
-            if(!is_leader_info) {
+            if (!is_leader_info) {
                 return  this.fail(-1, '权限不足!');
             }
             const page: number = this.get('currentPage') || 1;
@@ -21,13 +22,12 @@ export default class extends Base {
 
             const shop_id: boolean = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
-            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,status,created_at,updated_at').where({designer_id:['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
+            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,status,created_at,updated_at').where({designer_id: ['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
-
 
     /**
      * 添加设计师
@@ -38,7 +38,7 @@ export default class extends Base {
         try {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
             const designer_team_id: boolean = this.ctx.state.designer_info.designer_team_id;
-             if(!is_leader_info) {
+            if (!is_leader_info) {
                  return  this.fail(-1, '权限不足!');
              }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
@@ -54,7 +54,7 @@ export default class extends Base {
              */
             const is_leader =  0;
             const designer_password = think.md5('888888');
-            const default_password ='888888';
+            const default_password = '888888';
             const params = {
                 designer_team_id,
                 designer_name,
@@ -69,12 +69,11 @@ export default class extends Base {
             if (!res) {
                 return  this.fail(-1, '添加失败!');
             }
-            return this.success({designer_id:res, designer_phone, default_password}, '添加成功!');
-        }catch ($err) {
+            return this.success({designer_id: res, designer_phone, default_password}, '添加成功!');
+        } catch ($err) {
             this.dealErr($err);
         }
     }
-
 
     /**
      * 编辑设计师
@@ -117,14 +116,14 @@ export default class extends Base {
     async setEnabledAction(): Promise<any>  {
         try {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
-            if(!is_leader_info) {
+            if (!is_leader_info) {
                 return  this.fail(-1, '权限不足!');
             }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_id = this.post('designer_id');
             const status1 = Number(this.post('status'));
             let status;
-            if(status1)  {
+            if (status1)  {
                 status = 1;
             } else {
                 status = 0;
@@ -138,11 +137,10 @@ export default class extends Base {
                 return  this.fail(-1, '操作失败!');
             }
             return this.success([], '操作成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
-
 
     /**
      * 删除设计师
@@ -152,7 +150,7 @@ export default class extends Base {
     async delDesignerAction(): Promise<any>  {
         try {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
-            if(!is_leader_info) {
+            if (!is_leader_info) {
                 return  this.fail(-1, '权限不足!');
             }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
@@ -164,7 +162,7 @@ export default class extends Base {
                 return  this.fail(-1, '没有这个设计师!');
             }
             return this.success([], '删除成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -189,7 +187,7 @@ export default class extends Base {
             /**
              * 默认条件 查团队的花样
              */
-            let where: any = {shop_id, designer_team_id, del: 0, design_name: ['like', `%${design_name}%`]};
+            const where: any = {shop_id, designer_team_id, del: 0, design_name: ['like', `%${design_name}%`]};
             /**
              * 普通设计师
              */
@@ -203,16 +201,17 @@ export default class extends Base {
                  * 设计师管理员 灵活查下级
                  */
                 if (designer_id) {
-                    where.designer_id = designer_id
+                    where.designer_id = designer_id;
                 }
             }
 
             if (status) {
-                where.status = status
+                where.status = status;
             }
+            // tslint:disable-next-line:max-line-length
             const res = await this.model('design').where(where).order('created_at DESC').page(page, limit).countSelect();
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -237,7 +236,7 @@ export default class extends Base {
             /**
              * 默认条件 查团队的花样
              */
-            let where: any = {shop_id, designer_team_id, del: 0, design_name: ['like', `%${design_name}%`]};
+            const where: any = {shop_id, designer_team_id, del: 0, design_name: ['like', `%${design_name}%`]};
             /**
              * 普通设计师
              */
@@ -251,39 +250,39 @@ export default class extends Base {
                  * 设计师管理员 灵活查下级
                  */
                 if (designer_id) {
-                    where.designer_id = designer_id
+                    where.designer_id = designer_id;
                 }
             }
-            let statusList = [
+            const statusList = [
                 {
-                    _status:"全部",
-                    status:0,
-                    count:0
+                    _status: "全部",
+                    status: 0,
+                    count: 0
                 },
                 {
-                    _status:"待标定价格",
-                    status:1,
-                    count:0
+                    _status: "待标定价格",
+                    status: 1,
+                    count: 0
                 },
                 {
-                    _status:"待上架",
-                    status:2,
-                    count:0
+                    _status: "待上架",
+                    status: 2,
+                    count: 0
 
                 },
                 {
-                    _status:"已上架",
-                    status:3,
-                    count:0
+                    _status: "已上架",
+                    status: 3,
+                    count: 0
                 }
             ];
             const res = await this.model('design').where(where).order('created_at DESC').count('status');
-            for (let item of statusList) {
+            for (const item of statusList) {
                 where.status = item.status;
                 const count =  await this.model('design').where(where).order('created_at DESC').count('status');
-                let index = statusList.indexOf(item);
-                statusList[index].count = count
-            };
+                const index = statusList.indexOf(item);
+                statusList[index].count = count;
+            }
             statusList[0].count = res;
             return this.success(statusList, '请求成功!');
         } catch ($err) {
@@ -291,10 +290,8 @@ export default class extends Base {
         }
     }
 
-
     async addDesignAction(): Promise<any> {
         try {
-
             /**
              * 设计师信息
              */
@@ -312,14 +309,14 @@ export default class extends Base {
             if (!file || !file.type) {
                 return this.fail(-1, '导入文件不能为空', []);
             }
-            const filepath = path.join(think.ROOT_PATH,'www/static/updesign/');
-            if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
-                let res: any = await this.exportFile(file.path);
-                if (typeof res == 'string') {
-                    deleteFolder(filepath);
+            const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
+            if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
+                const res: any = await this.exportFile(file.path);
+                if (typeof res === 'string') {
+                    this.deleteFolder(filepath);
                     return this.fail(-1, res);
                 }
-                let param: any = res.fileObj;
+                const param: any = res.fileObj;
                 param.design_name = design_name;
                 param.designer_id = designer_id;
                 param.shop_id = shop_id;
@@ -328,13 +325,13 @@ export default class extends Base {
                 /**
                  * 上传到腾讯OSS
                  */
-                let ossRes: any = await oss.uploadFiles(res.fileList);
+                const ossRes: any = await oss.uploadFiles(res.fileList);
 
                 const design_id = await this.model('design').add(param);
                 if (!design_id) {
                     return this.fail(-1, "添加失败!");
                 }
-                deleteFolder(filepath);
+                this.deleteFolder(filepath);
                 return this.success([], "添加成功!");
             } else {
                 return this.fail(-1, '上传文件格式必须为zip');
@@ -384,9 +381,9 @@ export default class extends Base {
             //     shop_id,
             //     designer_team_id
             // };
-            let param: any = await this.uploadDesign();
-            if (typeof param == "string") {
-                return this.fail(-1, param)
+            const param: any = await this.uploadDesign();
+            if (typeof param === "string") {
+                return this.fail(-1, param);
             }
             param.design_name = design_name;
             param.designer_id = designer_id;
@@ -397,10 +394,104 @@ export default class extends Base {
                 return  this.fail(-1, '添加失败');
             }
             return this.success([], "上传成功!");
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
+
+    /**
+     * 编辑花样
+     * @params {dst} dst文件路径
+     * @params {emb} emb文件路径
+     * @params {png} png文件路径
+     * @params {txt_png} 工艺单预览图
+     * @params {design_name} 花样名称
+     * @returns boolean
+     */
+    async editDesignAction1() {
+        try {
+            /**
+             * 设计师信息
+             */
+            const designer_info = this.ctx.state.designer_info;
+            const shop_id: number = designer_info.shop_id;
+            const designer_id: number = designer_info.designer_id;
+            const designer_team_id: number = designer_info.designer_team_id;
+            /**
+             * 请求参数
+             */
+            // const design_name: string = this.post('design_name');
+            // const dst_path: string = this.post('dst_path');
+            // const emb_path: string = this.post('emb_path');
+            // const png_path: string = this.post('png_path');
+            // const txt_png_path: string = this.post('txt_png_path');
+            // const txt_file_path: string = designer_info.designer_team_id;
+            // const params: object = {
+            //     design_name,
+            //     dst_path,
+            //     emb_path,
+            //     png_path,
+            //     txt_png_path,
+            //     designer_id,
+            //     shop_id,
+            //     designer_team_id
+            // };
+            const design_id: number = this.post('design_id');
+            const design = await this.model('design').where({shop_id, designer_id, designer_team_id, design_id}).find();
+            if (think.isEmpty(design)) {
+                return this.fail(-1, '花样不存在或不属于你');
+            }
+
+            const param: any = await this.uploadDesign();
+            if (typeof param === "string") {
+                return this.fail(-1, param);
+            }
+            // param.design_name = design_name;
+            // param.designer_id = designer_id;
+            // param.shop_id = shop_id;
+            // param.designer_team_id = designer_team_id;
+            const res = await this.model('design').where({shop_id, designer_id, designer_team_id, design_id}).update(param);
+            if (!res) {
+                return  this.fail(-1, '修改失败');
+            }
+            return this.success([], "修改成功!");
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 编辑花样
+     * @param {dst_path} dst文件路径
+     * @param {emb_path} emb文件路径
+     * @param {prev_png_path} png预览图文件路径
+     * @param {txt_png_path} 工艺单预览图路径
+     * @returns boolean
+     */
+    async editDesignAction(): Promise<any> {
+        try {
+            const shop_id: number = this.ctx.state.designer_info.shop_id;
+            const designer_id: number = this.ctx.state.designer_info.designer_id;
+            const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
+            const design_id: number = Number(this.post('design_id'));
+            const dst_path: string = this.post('dst_path');
+            const emb_path: string = this.post('emb_path');
+            const prev_png_path: string = this.post('prev_png_path');
+            const txt_png_path: string = this.post('txt_png_path');
+            const res = await this.model('design').where({designer_team_id, design_id, shop_id, designer_id}).update({
+                dst_path,
+                emb_path,
+                prev_png_path,
+                txt_png_path
+            });
+            if (!res) {
+                return this.fail(-1, '花样不存在或不是属于你的花样');
+            }
+            return this.success([], '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+   }
 
     /**
      * 删除花样
@@ -417,7 +508,7 @@ export default class extends Base {
                 return  this.fail(-1, '没有这个花样!');
             }
             return this.success([], '删除成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -430,7 +521,7 @@ export default class extends Base {
     async setPriceAction(): Promise<any>  {
         try {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
-            if(!is_leader_info) {
+            if (!is_leader_info) {
                 return  this.fail(-1, '权限不足!');
             }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
@@ -438,20 +529,20 @@ export default class extends Base {
             const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
             const design_id = this.post('design_id');
             const price = this.post('price');
-            let designs =  await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).find();
+            const designs =  await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).find();
             if (think.isEmpty(designs)) {
                 return  this.fail(-1, '没有这个花样!');
             }
             const updateOptions: any = {
                 price
             };
-            if(designs.status == 1) {
+            if (designs.status == 1) {
                 updateOptions.status = 2;
-                updateOptions._status = '待上架'
+                updateOptions._status = '待上架';
             }
             const design: any = await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).update(updateOptions);
             return this.success([], '操作成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -468,21 +559,21 @@ export default class extends Base {
             const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
             const design_id = this.post('design_id');
             const status = this.post('status');
-            let designs =  await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).find();
+            const designs =  await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).find();
             if (think.isEmpty(designs)) {
                 return  this.fail(-1, '没有这个花样!');
             }
             if (designs.status == 1) {
                 return  this.fail(-1, '该花样还未标定价格!');
             }
-            if(status !=2 && status !=3) {
+            if (status != 2 && status != 3) {
                 return  this.fail(-1, '不被允许的状态!');
             }
             let _status;
-            if (status ==1 ) {
-                _status = '待上架'
+            if (status == 1 ) {
+                _status = '待上架';
             } else {
-                _status = '已上架'
+                _status = '已上架';
             }
             const updateOptions: any = {
                 status,
@@ -490,7 +581,7 @@ export default class extends Base {
             };
             const design: any = await this.model('design').where({shop_id, designer_team_id, design_id, del: 0}).update(updateOptions);
             return this.success([], '操作成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -498,48 +589,49 @@ export default class extends Base {
     /**
      * 上传花样文件
      */
-    async uploadDesign(): Promise<Object> {
+    async uploadDesign(): Promise<any> {
         try {
             const emb_path = this.file('emb');
             const dst_path = this.file('dst');
             const prev_png_path = this.file('prev_png');
             const txt_png_path = this.file('txt_png');
             if (!emb_path || !emb_path.type) {
-                return 'emb不能为空'
+                return 'emb不能为空';
             }
             if (!dst_path || !dst_path.type) {
-                return  'dst不能为空'
+                return  'dst不能为空';
             }
             if (!prev_png_path || !prev_png_path.type) {
-                return  'png不能为空'
+                return  'png不能为空';
             }
             if (!txt_png_path || !txt_png_path.type) {
-                return  'txt_png不能为空'
+                return  'txt_png不能为空';
             }
-            let arrObj = {
-                emb_path:"emb" ,
-                dst_path:"dst" ,
-                prev_png_path:"prev_png" ,
-                txt_png_path:"txt_png" ,
+            const arrObj = {
+                emb_path: "emb" ,
+                dst_path: "dst" ,
+                prev_png_path: "prev_png" ,
+                txt_png_path: "txt_png" ,
             };
-            let resultObj = {};
+            const resultObj = {};
             const oss = await think.service('oss');
             const design_info = this.ctx.state.designer_info;
             const shop_id: number = design_info.shop_id;
             const designer_id: number = design_info.designer_id;
-            // @ts-ignore
-            for (let k in arrObj) {
+            // tslint:disable-next-line:forin
+            for (const k in arrObj) {
                 const fileName = think.uuid('v4');
                 const gs = this.file(arrObj[k]).type.substring(6, this.file(arrObj[k]).type.length);
-                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                let filePath = `/design/${shop_id}/${designer_id}/${day}/${fileName}.${gs}`;
+                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                const extname = path.extname(this.file(arrObj[k]).path);
+                const filePath = `/design/${shop_id}/${designer_id}/${day}/${fileName}${extname}`;
                 /**
                  * 上传到腾讯OSS
                  */
-                let res: any = await oss.upload(this.file(arrObj[k]).path, filePath);
+                const res: any = await oss.upload(this.file(arrObj[k]).path, filePath);
                 resultObj[k] =  'http://' + res.Location;
             }
-            return resultObj
+            return resultObj;
         } catch ($err) {
             this.dealErr($err);
         }
@@ -548,7 +640,7 @@ export default class extends Base {
     /**
      * 上传图片
      * @params image file
-     * @params type 上传类型
+     * @params type 上传类型 design
      * @return IMAGE PATH
      */
     async uploadImgAction() {
@@ -557,111 +649,129 @@ export default class extends Base {
             const shop_id: number = design_info.shop_id;
             const designer_team_id: number = design_info.designer_team_id;
             const file = this.file('image');
-            if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
-                const fileName = think.uuid('v4');
-                const gs = file.type.substring(6, file.type.length);
-                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                let filePath = `/design/avatar/${shop_id}/${designer_team_id}/${day}/${fileName}.${gs}`;
+            const fileName = think.uuid('v4');
+            // const gs = file.type.substring(6, file.type.length);
+            const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+            let filePath;
+            // @ts-ignore
+            const upload_type = this.post('type') || "";
+            /**
+             * 获取文件后缀
+             */
+            const extname = path.extname(file.path);
+            console.log(extname);
+            if (file && file.type) {
+
+                if (upload_type == 'design') {
+                    // filePath = `/design/${shop_id}/${designer_team_id}/${day}/${fileName}.${gs}`;
+                    filePath = `/design/${shop_id}/${designer_team_id}/${day}/${fileName}${extname}`;
+                } else {
+                    filePath = `/design/avatar/${shop_id}/${designer_team_id}/${day}/${fileName}${extname}`;
+                    if (file && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
+
+                    } else {
+                        this.fail(-1, '请上传png或jpg格式的图片', []);
+                    }
+                }
+
                 /**
                  * 上传到腾讯OSS
                  */
                 const oss = await think.service('oss');
-                let res: any = await oss.upload(file.path, filePath);
-                return this.success('http://' + res.Location);
+                const res: any = await oss.upload(file.path, filePath);
+                return this.success('http://' + res.Location, '上传成功!');
             } else {
-                this.fail(-1, '请上传png或jpg格式的图片', []);
+                this.fail(-1, '文件不能为空!');
             }
-        }catch (e) {
+        } catch (e) {
            this.dealErr(e);
         }
     }
 
-
     async getDesignInfoAction() {
         try {
-            let url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/b4f05d1d-1b2e-4ad1-90f6-ec3623e5f4a5.ation/octet-stream';
-            let img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
+            const url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-29-12:33:43/�к���.EMB';
+            const img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
             const data = fs.readFileSync('1.EMB');
-            let imgBuffer: any  = await this.getBuffer(this, img, true);
+            const imgBuffer: any  = await this.getBuffer(this, img, true);
             const imgBase64 = imgBuffer.toString('base64');
 
-            let embBuffer: any  = await this.getBuffer(this, url, true);
+            const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');
 
             // const embData = await wilcom.getEmbByImg(imgBase64);
             const embBase64 = embBuffer.toString('base64');
             const design_info = await wilcom.getDesignInfo(embBase64);
-            return this.success(design_info)
-        }catch (e) {
+            return this.success(design_info);
+        } catch (e) {
             this.dealErr(e);
         }
     }
 
+    async exportFile($file: any, $filePath?: any) {
 
-    async exportFile($file: any,$filePath?: any) {
-
-        let obj = [
+        const obj = [
             '.DST',
             '.EMB',
             '.PNG',
             '-1.PNG',
         ];
-        let objName = {
-            '.DST':"dst_path",
-            '.EMB':"emb_path",
+        const objName = {
+            '.DST': "dst_path",
+            '.EMB': "emb_path",
             '.PNG': "prev_png_path",
-            '-1.PNG':"txt_png_path",
+            '-1.PNG': "txt_png_path",
         };
         const design_info = this.ctx.state.designer_info;
         const shop_id: number = design_info.shop_id;
         const designer_id: number = design_info.designer_id;
-        return new Promise((resolve,reject) => {
-            var zip = new AdmZip($file);
-            let aaa = zip.getEntries();
-            const filepath = path.join(think.ROOT_PATH,'www/static/updesign/');
-            let path1 = path.dirname(filepath);
+        return new Promise((resolve, reject) => {
+            const zip = new AdmZip($file);
+            const aaa = zip.getEntries();
+            const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
+            const path1 = path.dirname(filepath);
             think.mkdir(path1);
             zip.extractAllTo(filepath, true);
-            if(fs.existsSync(filepath)) {
+            if (fs.existsSync(filepath)) {
                 const files = fs.readdirSync(filepath);
                 if (files.length > 4) {
                     return resolve('请检查压缩包内是否包含多余文件!');
                 }
-                let fileList = [];
-                let fileObj = {};
-                let str = '';
-                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
-                let ossPath = `/design/${shop_id}/${designer_id}/${day}/`;
-                let fileLastList: any = [];
-                for (let  v of obj) {
-                    for (let item of files) {
-                        if (item.indexOf(v) >-1) {
-                            let obj = {
+                const fileList = [];
+                const fileObj = {};
+                const str = '';
+                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+                const ossPath = `/design/${shop_id}/${designer_id}/${day}/`;
+                const fileLastList: any = [];
+                for (const  v of obj) {
+                    for (const item of files) {
+                        if (item.indexOf(v) > -1) {
+                            const fileName = think.uuid('v4');
+                            const obj1 = {
                                 Bucket: 'cos-cx-n1-1257124629', /* 桶 */
                                 Region: 'ap-guangzhou',
-                                Key: ossPath + item,
-                                FilePath: filepath+item,
+                                Key: ossPath + fileName + v,
+                                FilePath: filepath + item,
                             };
-                            if (v == '.PNG' ) {
-                                if (item.indexOf('-1.PNG') == -1) {
-                                    fileList.push(obj);
+                            if (v === '.PNG' ) {
+                                if (item.indexOf('-1.PNG') === -1) {
+                                    fileList.push(obj1);
 
                                     fileLastList.push(v);
-                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                                 }
                             } else {
-                                fileList.push(obj);
-
+                                fileList.push(obj1);
                                 fileLastList.push(v);
-                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                             }
                         }
                     }
                     // if (fileLastList.includes(v)) {
                     //     return resolve(`后缀为${v}的文件重复`)
                     // }
-                    if(fileLastList.indexOf(v) == -1) {
-                        resolve(`后缀${v}的文件不存在`)
+                    if (fileLastList.indexOf(v) == -1) {
+                        resolve(`后缀${v}的文件不存在`);
                     }
                     // if (!files.indexOf(item)) {
                     //     // str+=item+','
@@ -685,17 +795,12 @@ export default class extends Base {
                 }
                 // const list = new Set(fileList);
                 // resolve( Array.from(list))
-                resolve({fileObj,fileList});
-            }else
-            {
-                console.log('无文件')
+                resolve({fileObj, fileList});
+            } else {
+                console.log('无文件');
             }
-        })
+        });
     }
-
-
-
-
 
     /**
      *  下载资源接口
@@ -705,31 +810,11 @@ export default class extends Base {
     async downLoadAction() {
         const file = this.get('url');
         const fileName = this.get('fileName');
-        const fileBuffer = await getBuffer(this, file,true);
-        await fs.writeFileSync('1.PNG',fileBuffer);
-        this.download('1.PNG', fileName+'.png');
+        const fileBuffer = await getBuffer(this, file, true);
+        await fs.writeFileSync('1.PNG', fileBuffer);
+        this.download('1.PNG', fileName + '.png');
     }
 
-
-}
-
-
-
-
-function deleteFolder(path: any) {
-    let files = [];
-    if (fs.existsSync(path)) {
-        files = fs.readdirSync(path);
-        files.forEach(function (file:any, index: any) {
-            let curPath = path + "/" + file;
-            if (fs.statSync(curPath).isDirectory()) {
-                deleteFolder(curPath);
-            } else {
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
 }
 
 /**
@@ -738,14 +823,14 @@ function deleteFolder(path: any) {
  * @param $filePath url
  * @param $buffer  output tpye of 1 buffer 0 base64
  */
-async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
+async function getBuffer($this: any, $filePath: any, $buffer?: boolean) {
 
     const { Writable } = require('stream');
     // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
     const res = await $this.fetch($filePath);
-    let chunks: any = [];
+    const chunks: any = [];
     let size = 0;
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         /**
          * 创建可写流
          */
@@ -754,15 +839,15 @@ async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
                 chunks.push(chunk);
                 console.log(chunk);
                 size += chunk.length;
-                callback()
+                callback();
             },
-            final(){
+            final() {
                 /**
                  * 拼接Buffer
                  */
-                let newBuffer = Buffer.concat(chunks,size);
+                const newBuffer = Buffer.concat(chunks, size);
                 // @ts-ignore
-                let img = 'data:image/png;base64,' + Buffer.from(newBuffer, 'utf8').toString('base64');
+                const img = 'data:image/png;base64,' + Buffer.from(newBuffer, 'utf8').toString('base64');
                 if ($buffer) {
                     resolve(newBuffer);
                 } else {
@@ -771,6 +856,6 @@ async function getBuffer($this: any,$filePath: any,$buffer?: boolean) {
             }
         });
         res.body.pipe(outStream);
-    })
+    });
 
 }

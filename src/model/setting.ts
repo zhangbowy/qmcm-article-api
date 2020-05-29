@@ -4,6 +4,6 @@ interface GetUserParams {
 }
 export default class extends think.Model {
   get pk() {
-      return 'setting_id'
+      return 'setting_id';
   }
 }

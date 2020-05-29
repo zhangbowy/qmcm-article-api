@@ -17,15 +17,15 @@ export default class extends Base {
             const page: number = this.post('currentPage') || 1;
             const limit: number = this.post('pageSize') || 10;
             const status = this.post('status') || 0;
-            let where: any = {};
+            const where: any = {};
             where.shop_id = shop_id;
             where.user_id = user_id;
             if (status) {
-                where.status =['in',status];
+                where.status = ['in', status];
             }
-            let res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
+            const res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
             return this.success(res, '请求成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -39,12 +39,12 @@ export default class extends Base {
             const user_id: any = this.ctx.state.userInfo.id;
             const order_no: any = this.get('order_no');
             const shop_id = this.ctx.state.shop_id;
-            let res = await this.model('order').setRelation('order_item').order('order_no DESC').where({user_id, shop_id, order_no}).find();
+            const res = await this.model('order').setRelation('order_item').order('order_no DESC').where({user_id, shop_id, order_no}).find();
             if (think.isEmpty(res)) {
                 return this.fail(-1, '该订单不存在!');
             }
-            return this.success(res,'请求成功!');
-        }catch ($err) {
+            return this.success(res, '请求成功!');
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -59,7 +59,7 @@ export default class extends Base {
     // async calculation() {
     async payAction() {
         try {
-            let shop_id = this.ctx.state.shop_id;
+            const shop_id = this.ctx.state.shop_id;
             const address_id: any = this.post('address_id');
             // const order_type: any = this.post('shopping_type') || 1;
             const pay_type: any = this.post('pay_type') || 1;
@@ -71,15 +71,15 @@ export default class extends Base {
             /**
              * 生成订单号
              */
-            let order_no = await this.generateOrderNumber();
+            const order_no = await this.generateOrderNumber();
             /**
              * 再次计算商品信息和价格
              */
-            let item_info: any = await this.calculation();
-            if (typeof item_info =='string') {
+            const item_info: any = await this.calculation();
+            if (typeof item_info == 'string') {
                 return this.fail(-1, item_info);
             }
-            let address = item_info.address;
+            const address = item_info.address;
             const receiver_name: string = address.name;
             const receiver_phone: string = address.phone;
             const receiver_address: string = `${address.province}${address.city}${address.area}${address.address}`;
@@ -91,7 +91,7 @@ export default class extends Base {
              */
             const order_type = item_info.order_type || 1;
             let _status;
-            let status = 1
+            let status = 1;
             switch (order_type) {
                 case 1:
                     _status = '待付款';
@@ -107,8 +107,8 @@ export default class extends Base {
                     status = 5;
                     break;
             }
-            let _order_type =  getOrderType(order_type);
-            let order_id = await this.model('order').add({
+            const _order_type =  getOrderType(order_type);
+            const order_id = await this.model('order').add({
                 user_id,
                 _status,
                 status,
@@ -123,15 +123,15 @@ export default class extends Base {
                 order_no,
                 shop_id,
                 buyer_message,
-                _order_type: _order_type,
+                _order_type,
                 designer_id: item_info.item_list[0].designer_id,
                 designer_team_id: item_info.item_list[0].designer_team_id,
-                custom_template_id:item_info.item_list[0].custom_template_id
+                custom_template_id: item_info.item_list[0].custom_template_id
 
             });
             if (order_id) {
-                let item_list = item_info.item_list;
-                for (let item_v of item_list) {
+                const item_list = item_info.item_list;
+                for (const item_v of item_list) {
                     // let res: any = await this.model('item').where({id: item_v.item_id}).find();
                     // let sku_list = JSON.parse(res.sku_list);
                     // for (let sku_v of sku_list) {
@@ -154,17 +154,17 @@ export default class extends Base {
                 /**
                  * 订单商品信息存库
                  */
-                for(let item_v of item_list) {
+                for (const item_v of item_list) {
                     await this.model('order_item').add(item_v);
                     // await this.model('order_item').addMany(item_list);
                 }
                 return this.success({
                     order_no
-                })
+                });
             } else {
                 return this.fail(-1, "创建订单失败!");
             }
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -175,7 +175,7 @@ export default class extends Base {
      */
     async generateOrderNumber() {
         const date = new Date();
-        return date.getFullYear() + _.padStart(date.getMonth()+1, 2, '0') + _.padStart(date.getDate(), 2, '0') + _.padStart(date.getHours(), 2, '0') + _.padStart(date.getMinutes(), 2, '0') + _.padStart(date.getSeconds(), 2, '0')+ date.getMilliseconds() + _.random(100000, 999999);
+        return date.getFullYear() + _.padStart(date.getMonth() + 1, 2, '0') + _.padStart(date.getDate(), 2, '0') + _.padStart(date.getHours(), 2, '0') + _.padStart(date.getMinutes(), 2, '0') + _.padStart(date.getSeconds(), 2, '0') + date.getMilliseconds() + _.random(100000, 999999);
     }
 
     /**
@@ -203,10 +203,10 @@ export default class extends Base {
             // item_info.is_choose_design = cart_v.design_info.is_choose_design;
             // item_info.custom_image = cart_v.design_info.custom_image;
             // item_info.preview_image = cart_v.design_info.preview_image
-            let cart_list: any = this.post('cart_list');
+            const cart_list: any = this.post('cart_list');
 
-            if(cart_list.length == 0) {
-                return  '商品不能为空!'
+            if (cart_list.length == 0) {
+                return  '商品不能为空!';
             }
             /**
              * 收货地址id
@@ -220,15 +220,15 @@ export default class extends Base {
                 /**
                  * 默认地址
                  */
-                address = await this.model('address').where({user_id, shop_id,is_default: 1}).find();
-                if(Object.keys(address).length == 0) {
+                address = await this.model('address').where({user_id, shop_id, is_default: 1}).find();
+                if (Object.keys(address).length == 0) {
                     address = await this.model('address').where({user_id, shop_id}).find();
                     if (think.isEmpty(address)) {
                         // return  '请先添加收货地址!'
                     }
                 }
             } else {
-                address = await this.model('address').where({user_id, shop_id,address_id}).find();
+                address = await this.model('address').where({user_id, shop_id, address_id}).find();
             }
             /**
              * 总支付
@@ -238,13 +238,13 @@ export default class extends Base {
              * 总快递费
              */
             let express_amount: any = [];
-            let item_list: any = [];
+            const item_list: any = [];
 
             /**
              *  购物类型 / 订单类型
              */
-            let order_type = cart_list[0].shopping_type;
-            for (let cart_v of cart_list) {
+            const order_type = cart_list[0].shopping_type;
+            for (const cart_v of cart_list) {
                 if (order_type != cart_v.shopping_type) {
                     const _shopping_type = getOrderType(cart_v.shopping_type);
                     const _order_type = getOrderType(order_type);
@@ -255,38 +255,38 @@ export default class extends Base {
                     /**
                      * 购物车里的每一项
                      */
-                    let item: any = await this.model('item').where({id: cart_v.item_id}).find();
+                    const item: any = await this.model('item').where({id: cart_v.item_id}).find();
                     if (item.id) {
                         let express_rule;
                         if (item.express_template_id) {
                             /**
                              * 物流模板规则
                              */
-                            express_rule  = await this.model('express_template').where({express_template_id:item.express_template_id}).find();
+                            express_rule  = await this.model('express_template').where({express_template_id: item.express_template_id}).find();
                         }
                         /**
                          * sku列表
                          */
-                        let sku_list = JSON.parse(item.sku_list);
+                        const sku_list = JSON.parse(item.sku_list);
 
-                            if(sku_list.length == 0 ) {
+                        if (sku_list.length == 0 ) {
 
                                 /**
                                  * 判断库存
                                  */
                                 if ( item.sum_stock  == 0) {
-                                    return  item.name+'库存不足';
+                                    return  item.name + '库存不足';
                                     break;
                                 }
                                 if (cart_v.buy_num <= 0) {
-                                    return `商品【${item.name}】购买数量不能为0`
+                                    return `商品【${item.name}】购买数量不能为0`;
                                     break;
                                 }
                                 if (cart_v.buy_num > item.sum_stock ) {
-                                    return  item.name+'购买数量超出库存' + item.sum_stock;
+                                    return  item.name + '购买数量超出库存' + item.sum_stock;
                                     break;
                                 }
-                                if(item.express_type == 0) {
+                                if (item.express_type == 0) {
                                     express_amount.push(0);
                                 }
                                 // pay_amount += item.current_price * cart_v.buy_num;
@@ -308,7 +308,7 @@ export default class extends Base {
                                  * 统一运费
                                  */
                                 if (item.express_type == 1) {
-                                    express_amount.push(Number(item.express_fee))
+                                    express_amount.push(Number(item.express_fee));
                                 }
                                 /**
                                  * 物流模板计费
@@ -323,21 +323,21 @@ export default class extends Base {
                                          * type 1 重量 2 件数
                                          */
                                         express_rule.region_rules = JSON.parse(express_rule.region_rules);
-                                        if(express_rule.express_template_type == 1) {
-                                            let priceList = [];
-                                            for (let region_v of express_rule.region_rules) {
-                                                if(region_v.region.includes(address.city_code)) {
-                                                    let coutinue = item.weight - Number(region_v.first_number)>0?Math.ceil(item.weight - Number(region_v.first_number)):0;
-                                                    price =  Number(region_v.first_amount) + (coutinue /region_v.continue_number) * Number(region_v.continue_amount);
-                                                    priceList.push(price)
+                                        if (express_rule.express_template_type == 1) {
+                                            const priceList = [];
+                                            for (const region_v of express_rule.region_rules) {
+                                                if (region_v.region.includes(address.city_code)) {
+                                                    const coutinue = item.weight - Number(region_v.first_number) > 0 ? Math.ceil(item.weight - Number(region_v.first_number)) : 0;
+                                                    price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                    priceList.push(price);
                                                 }
                                             }
-                                            express_amount.push(maxPrice(priceList))
+                                            express_amount.push(maxPrice(priceList));
                                         } else {
-                                            let priceList = [];
-                                            for (let region_v of express_rule.region_rules) {
-                                                if(region_v.region.includes(address.city_code)) {
-                                                    let coutinue = cart_v.buy_num - Number(region_v.first_number)>0? Math.ceil(cart_v.buy_num - Number(region_v.first_number)):0;
+                                            const priceList = [];
+                                            for (const region_v of express_rule.region_rules) {
+                                                if (region_v.region.includes(address.city_code)) {
+                                                    const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
                                                     price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
                                                     priceList.push(price);
                                                 }
@@ -345,33 +345,33 @@ export default class extends Base {
                                             express_amount.push(maxPrice(priceList));
                                         }
                                     } else {
-                                        if(express_rule.express_template_type == 1) {
-                                            let coutinue = item.weight - express_rule.first_number>0? Math.ceil(item.weight - express_rule.first_number):0;
-                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount)
+                                        if (express_rule.express_template_type == 1) {
+                                            const coutinue = item.weight - express_rule.first_number > 0 ? Math.ceil(item.weight - express_rule.first_number) : 0;
+                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
                                         } else {
-                                            let coutinue = cart_v.buy_num - express_rule.first_number>0? Math.ceil(cart_v.buy_num - express_rule.first_number):0;
-                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount)
+                                            const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
+                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
                                         }
                                     }
-                                    express_amount.push(Number(price))
+                                    express_amount.push(Number(price));
                                 }
-                                let sku_name = item.name;
+                                const sku_name = item.name;
 
                                 /**
                                  * order_type为1 默认普通商品 的商品数据 baseData 只要里面的商品都会有的
                                  */
-                                let item_info: any = {
-                                    item_id:item.id,
-                                    name:item.name,
-                                    weight:item.weight,
-                                    image:item.thumb_image_path,
+                                const item_info: any = {
+                                    item_id: item.id,
+                                    name: item.name,
+                                    weight: item.weight,
+                                    image: item.thumb_image_path,
                                     sku_name,
-                                    sku_id:cart_v.sku_id || 0,
-                                    buy_num:cart_v.buy_num,
-                                    current_price:item.current_price,
-                                    category_id:item.category_id,
+                                    sku_id: cart_v.sku_id || 0,
+                                    buy_num: cart_v.buy_num,
+                                    current_price: item.current_price,
+                                    category_id: item.category_id,
                                     order_type: 1,
-                                    _order_type:'普通订单'
+                                    _order_type: '普通订单'
                                 };
 
                                 /**
@@ -394,13 +394,13 @@ export default class extends Base {
 
                                         if (cart_v.design_info.design_id) {
                                             item_info.design_id = cart_v.design_info.design_id;
-                                            const shop_id = this.ctx.state.shop_id;
-                                            const design = await this.model('design').where({shop_id, design_id: item_info.design_id,del: 0, status: 3}).find();
+                                            // const shop_id = this.ctx.state.shop_id;
+                                            const design = await this.model('design').where({shop_id, design_id: item_info.design_id, del: 0, status: 3}).find();
                                             if (think.isEmpty(design)) {
-                                                return '花样不存在!'
+                                                return '花样不存在!';
                                             }
 
-                                            let design_price = cart_v.buy_num * design.price;
+                                            const design_price = cart_v.buy_num * design.price;
 
                                             item_info.designer_id = design.designer_id;
                                             item_info.designer_team_id = design.designer_team_id;
@@ -440,27 +440,27 @@ export default class extends Base {
                                                 const custom_image_base64 = cart_v.design_info.custom_image.split(',')[1];
 
                                                 if (item_info.custom_template_id != 1) {
-                                                    const meta  = await sharp(Buffer.from(custom_image_base64,'base64')).metadata();
-                                                    item_info.design_width = meta.width/meta.height *  item_info.design_height
+                                                    const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
+                                                    item_info.design_width = meta.width / meta.height *  item_info.design_height;
                                                 }
-                                                let sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
-                                                let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                const sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
+                                                const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                 item_info.design_area_sqr = sqr;
                                                 item_info.emb_template_price = price;
                                                 pay_amount += price;
                                                 item_info.item_total_price += price;
                                                 const oss = await think.service('oss');
                                                 const fileName = think.uuid('v4');
-                                                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                                                let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                const filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
                                                 /**
                                                  * 上传到腾讯OSS
                                                  */
-                                                let res: any = await oss.upload(Buffer.from(custom_image_base64,'base64'), filePath, true);
+                                                const res: any = await oss.upload(Buffer.from(custom_image_base64, 'base64'), filePath, true);
                                                 item_info.custom_image = 'http://' + res.Location;
                                             } else {
-                                                let sqr =  item_info.top_font_width * item_info.top_font_height;
-                                                let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                const sqr =  item_info.top_font_width * item_info.top_font_height;
+                                                const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                 item_info.design_area_sqr = sqr;
                                                 item_info.emb_template_price = price;
                                                 pay_amount += price;
@@ -472,12 +472,12 @@ export default class extends Base {
 
                                         item_info.design_area_image = cart_v.design_info.design_area_image;
                                         item_info.preview_image = cart_v.design_info.preview_image;
-                                        item_info.order_type == 2;
+                                        item_info.order_type = 2;
                                         item_info.image = cart_v.design_info.preview_image;
                                         item_info._order_type = getOrderType(item_info.order_type);
 
                                     } else {
-                                        return  'design_info of empty'
+                                        return  'design_info of empty';
                                     }
                                 }
 
@@ -489,9 +489,9 @@ export default class extends Base {
 
                                         item_info.custom_template_id = cart_v.design_info.custom_template_id;
 
-                                        const emb_template:any =  await this.model('emb_template').where({emb_template_id: item_info.custom_template_id}).find();
+                                        const emb_template: any =  await this.model('emb_template').where({emb_template_id: item_info.custom_template_id}).find();
                                         if (think.isEmpty(emb_template)) {
-                                            return '定制模板不存在'
+                                            return '定制模板不存在';
                                         }
                                         item_info.special_template_name = emb_template.template_name;
                                         item_info.special_custom_width = cart_v.design_info.special_custom_width;
@@ -499,21 +499,21 @@ export default class extends Base {
                                         item_info.special_color_num = cart_v.design_info.special_color_num;
                                         item_info.special_custom_desc = cart_v.design_info.special_custom_desc;
                                         const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
-                                        let sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
-                                        let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                        const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
+                                        const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                         item_info.special_custom_sqr = sqr;
                                         item_info.special_custom_price = price;
                                         pay_amount += price;
                                         item_info.item_total_price += price;
-                                        item_info.special_base_price = price + item.current_price * cart_v.buy_num
+                                        item_info.special_base_price = price + item.current_price * cart_v.buy_num;
                                         const oss = await think.service('oss');
                                         const fileName = think.uuid('v4');
-                                        let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                                        let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                        const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                        const filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
                                         /**
                                          * 上传到腾讯OSS
                                          */
-                                        let res: any = await oss.upload(Buffer.from(special_custom_image_base64,'base64'), filePath, true);
+                                        const res: any = await oss.upload(Buffer.from(special_custom_image_base64, 'base64'), filePath, true);
                                         item_info.special_custom_image = 'http://' + res.Location;
 
                                         // item_info.design_area_image = cart_v.design_info.design_area_image;
@@ -524,10 +524,9 @@ export default class extends Base {
                                         item_info._order_type = getOrderType(item_info.order_type);
 
                                     } else {
-                                        return  'design_info of empty'
+                                        return  'design_info of empty';
                                     }
                                 }
-
 
                                 /**
                                  * 手绘订单
@@ -536,8 +535,8 @@ export default class extends Base {
                                     item_info.custom_template_id = 2;
                                     item_info.design_width = cart_v.design_info.design_width;
                                     item_info.design_height = cart_v.design_info.design_height;
-                                    let sqr  = item_info.design_width *  item_info.design_height;
-                                    let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                    const sqr  = item_info.design_width *  item_info.design_height;
+                                    const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                     pay_amount += price;
                                     item_info.design_area_sqr = sqr;
                                     item_info.emb_template_price = price;
@@ -551,12 +550,12 @@ export default class extends Base {
                                     item_info.design_area_image = cart_v.design_info.design_area_image;
                                     item_info.preview_image = cart_v.design_info.preview_image;
 
-                                    let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
-                                    let drawBuffer = Buffer.from(baseData, 'base64');
+                                    const baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g, '');
+                                    const drawBuffer = Buffer.from(baseData, 'base64');
                                     const fileName = think.uuid('v4');
                                     const oss = await think.service('oss');
                                     const filePath = `/demo/${1}/${fileName}.png`;
-                                    const res: any = await oss.upload(Buffer.from(drawBuffer), filePath,true);
+                                    const res: any = await oss.upload(Buffer.from(drawBuffer), filePath, true);
                                     item_info.draw_image = `http://${res.Location}`;
                                     item_info.image = cart_v.design_info.preview_image;
                                 }
@@ -564,7 +563,7 @@ export default class extends Base {
                                 pay_amount += item.current_price * cart_v.buy_num;
                                 item_list.push(item_info);
                             } else {
-                                for (let sku_v of sku_list) {
+                                for (const sku_v of sku_list) {
                                     if (cart_v.sku_id == sku_v.sku_id) {
                                         /**
                                          * 判断库存
@@ -574,7 +573,7 @@ export default class extends Base {
                                             break;
                                         }
                                         if (cart_v.buy_num <= 0) {
-                                            return  sku_v.sku_id + '购买数量不能为0'
+                                            return  sku_v.sku_id + '购买数量不能为0';
                                             break;
                                         }
                                         if (cart_v.buy_num > sku_v.num ) {
@@ -588,7 +587,7 @@ export default class extends Base {
                                          * 统一运费
                                          */
                                         if (item.express_type == 1) {
-                                            express_amount.push(Number(item.express_fee))
+                                            express_amount.push(Number(item.express_fee));
                                         }
                                         /**
                                          * 物流模板计费
@@ -604,20 +603,20 @@ export default class extends Base {
                                                  */
                                                 express_rule.region_rules = JSON.parse(express_rule.region_rules);
                                                 if (express_rule.express_template_type == 1) {
-                                                    let priceList = [];
-                                                    for (let region_v of express_rule.region_rules) {
+                                                    const priceList = [];
+                                                    for (const region_v of express_rule.region_rules) {
                                                         if (region_v.region.includes(address.city_code)) {
-                                                            let coutinue = sku_v.weight - Number(region_v.first_number)>0?Math.ceil(sku_v.weight - Number(region_v.first_number)):0;
-                                                            price =  Number(region_v.first_amount) + (coutinue /region_v.continue_number) * Number(region_v.continue_amount);
-                                                            priceList.push(price)
+                                                            const coutinue = sku_v.weight - Number(region_v.first_number) > 0 ? Math.ceil(sku_v.weight - Number(region_v.first_number)) : 0;
+                                                            price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                            priceList.push(price);
                                                         }
                                                     }
-                                                    express_amount.push(maxPrice(priceList))
+                                                    express_amount.push(maxPrice(priceList));
                                                 } else {
-                                                    let priceList = [];
-                                                    for (let region_v of express_rule.region_rules) {
-                                                        if(region_v.region.includes(address.city_code)) {
-                                                            let coutinue = cart_v.buy_num - Number(region_v.first_number)>0? Math.ceil(cart_v.buy_num - Number(region_v.first_number)):0;
+                                                    const priceList = [];
+                                                    for (const region_v of express_rule.region_rules) {
+                                                        if (region_v.region.includes(address.city_code)) {
+                                                            const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
                                                             price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
                                                             priceList.push(price);
                                                         }
@@ -625,34 +624,34 @@ export default class extends Base {
                                                     express_amount.push(maxPrice(priceList));
                                                 }
                                             } else {
-                                                if(express_rule.express_template_type == 1) {
-                                                    let coutinue = sku_v.weight - express_rule.first_number>0? Math.ceil(sku_v.weight - express_rule.first_number):0;
-                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount)
+                                                if (express_rule.express_template_type == 1) {
+                                                    const coutinue = sku_v.weight - express_rule.first_number > 0 ? Math.ceil(sku_v.weight - express_rule.first_number) : 0;
+                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
                                                 } else {
-                                                    let coutinue = cart_v.buy_num - express_rule.first_number>0? Math.ceil(cart_v.buy_num - express_rule.first_number):0;
-                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount)
+                                                    const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
+                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
                                                 }
                                             }
-                                            express_amount.push(Number(price))
+                                            express_amount.push(Number(price));
                                         }
                                         let sku_name = '';
-                                        for (let skus_v of sku_v.skus) {
-                                            if (sku_v.skus.indexOf(skus_v) == sku_v.skus.length -1) {
-                                                sku_name += `${skus_v.k}:${skus_v.v}`
+                                        for (const skus_v of sku_v.skus) {
+                                            if (sku_v.skus.indexOf(skus_v) == sku_v.skus.length - 1) {
+                                                sku_name += `${skus_v.k}:${skus_v.v}`;
                                             } else {
-                                                sku_name += `${skus_v.k}:${skus_v.v}; `
+                                                sku_name += `${skus_v.k}:${skus_v.v}; `;
                                             }
                                         }
-                                        let item_info: any = {
-                                            item_id:item.id,
-                                            name:item.name,
-                                            weight:sku_v.weight,
-                                            image:sku_v.images,
+                                        const item_info: any = {
+                                            item_id: item.id,
+                                            name: item.name,
+                                            weight: sku_v.weight,
+                                            image: sku_v.images,
                                             sku_name,
-                                            sku_id:cart_v.sku_id,
-                                            buy_num:cart_v.buy_num,
-                                            current_price:sku_v.current_price,
-                                            category_id:item.category_id,
+                                            sku_id: cart_v.sku_id,
+                                            buy_num: cart_v.buy_num,
+                                            current_price: sku_v.current_price,
+                                            category_id: item.category_id,
                                             order_type: 1,
                                             _order_type: '普通订单'
                                         };
@@ -682,15 +681,15 @@ export default class extends Base {
                                          * {design_price} 花样价格
                                          */
                                         if (cart_v.shopping_type == 2) {
-                                                if(cart_v.design_info) {
+                                                if (cart_v.design_info) {
                                                     if (cart_v.design_info.design_id) {
                                                         item_info.design_id = cart_v.design_info.design_id;
                                                         const shop_id = this.ctx.state.shop_id;
-                                                        const design = await this.model('design').where({shop_id, design_id: item_info.design_id,del: 0, status: 3}).find();
+                                                        const design = await this.model('design').where({shop_id, design_id: item_info.design_id, del: 0, status: 3}).find();
                                                         if (think.isEmpty(design)) {
-                                                            return '花样不存在!'
+                                                            return '花样不存在!';
                                                         }
-                                                        let design_price = cart_v.buy_num * design.price;
+                                                        const design_price = cart_v.buy_num * design.price;
 
                                                         item_info.designer_id = design.designer_id;
                                                         item_info.designer_team_id = design.designer_team_id;
@@ -728,27 +727,27 @@ export default class extends Base {
                                                             const custom_image_base64 = cart_v.design_info.custom_image.split(',')[1];
 
                                                             // if (item_info.custom_template_id != 1) {
-                                                                const meta  = await sharp(Buffer.from(custom_image_base64,'base64')).metadata();
-                                                                item_info.design_width = meta.width/meta.height *  item_info.design_height
+                                                            const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
+                                                            item_info.design_width = meta.width / meta.height *  item_info.design_height;
                                                             // }
-                                                            let sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
-                                                            let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                            const sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
+                                                            const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                             item_info.design_area_sqr = sqr;
                                                             item_info.emb_template_price = price;
                                                             pay_amount += price;
                                                             item_info.item_total_price += price;
                                                             const oss = await think.service('oss');
                                                             const fileName = think.uuid('v4');
-                                                            let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                                                            let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                                            const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                            const filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
                                                             /**
                                                              * 上传到腾讯OSS
                                                              */
-                                                            let res: any = await oss.upload(Buffer.from(custom_image_base64,'base64'), filePath, true);
+                                                            const res: any = await oss.upload(Buffer.from(custom_image_base64, 'base64'), filePath, true);
                                                             item_info.custom_image = 'http://' + res.Location;
                                                         } else {
-                                                            let sqr =  item_info.top_font_width * item_info.top_font_height;
-                                                            let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                            const sqr =  item_info.top_font_width * item_info.top_font_height;
+                                                            const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                             item_info.design_area_sqr = sqr;
                                                             item_info.emb_template_price = price;
                                                             pay_amount += price;
@@ -764,7 +763,7 @@ export default class extends Base {
                                                     item_info.image = cart_v.design_info.preview_image;
                                                     item_info._order_type = getOrderType(Number(item_info.order_type));
                                                 } else {
-                                                    return 'design_info of empty'
+                                                    return 'design_info of empty';
                                                 }
                                             }
 
@@ -778,7 +777,7 @@ export default class extends Base {
 
                                                 const emb_template: any =  await this.model('emb_template').where({emb_template_id: item_info.custom_template_id}).find();
                                                 if (think.isEmpty(emb_template)) {
-                                                   return '定制模板不存在'
+                                                   return '定制模板不存在';
                                                 }
                                                 item_info.special_template_name = emb_template.template_name;
                                                 item_info.special_custom_width = cart_v.design_info.special_custom_width;
@@ -787,21 +786,21 @@ export default class extends Base {
                                                 item_info.special_custom_desc = cart_v.design_info.special_custom_desc;
 
                                                 const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
-                                                let sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
-                                                let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
+                                                const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                 item_info.special_custom_sqr = sqr;
                                                 item_info.special_custom_price = price;
                                                 pay_amount += price;
                                                 item_info.item_total_price += price;
-                                                item_info.special_base_price = price + sku_v.current_price * cart_v.buy_num
+                                                item_info.special_base_price = price + sku_v.current_price * cart_v.buy_num;
                                                 const oss = await think.service('oss');
                                                 const fileName = think.uuid('v4');
-                                                let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                                                let filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                const filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
                                                 /**
                                                  * 上传到腾讯OSS
                                                  */
-                                                let res: any = await oss.upload(Buffer.from(special_custom_image_base64,'base64'), filePath, true);
+                                                const res: any = await oss.upload(Buffer.from(special_custom_image_base64, 'base64'), filePath, true);
                                                 item_info.special_custom_image = 'http://' + res.Location;
 
                                                 // item_info.design_area_image = cart_v.design_info.design_area_image;
@@ -812,7 +811,7 @@ export default class extends Base {
                                                 item_info._order_type = getOrderType(item_info.order_type);
 
                                             } else {
-                                                return  'design_info of empty'
+                                                return  'design_info of empty';
                                             }
                                         }
 
@@ -824,8 +823,8 @@ export default class extends Base {
 
                                             item_info.design_width = cart_v.design_info.design_width;
                                             item_info.design_height = cart_v.design_info.design_height;
-                                            let sqr  = item_info.design_width *  item_info.design_height
-                                            let price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                            const sqr  = item_info.design_width *  item_info.design_height;
+                                            const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                             pay_amount += price;
                                             item_info.item_total_price += price;
                                             item_info.design_area_sqr = sqr;
@@ -841,12 +840,12 @@ export default class extends Base {
                                              */
                                             item_info.design_area_image = cart_v.design_info.design_area_image;
                                             item_info.preview_image = cart_v.design_info.preview_image;
-                                            let baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g,'');
-                                            let drawBuffer = Buffer.from(baseData, 'base64');
+                                            const baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g, '');
+                                            const drawBuffer = Buffer.from(baseData, 'base64');
                                             const fileName = think.uuid('v4');
                                             const oss = await think.service('oss');
                                             const filePath = `/demo/${1}/${fileName}.png`;
-                                            const res: any = await oss.upload(Buffer.from(drawBuffer), filePath,true);
+                                            const res: any = await oss.upload(Buffer.from(drawBuffer), filePath, true);
                                             item_info.draw_image = `http://${res.Location}`;
                                             /**
                                              * 订单预览图变成设计预览图
@@ -867,17 +866,17 @@ export default class extends Base {
                 }
             }
             express_amount = (maxPrice(express_amount)) || 0;
-            let total_price = express_amount + pay_amount;
-            let result: object = {
+            const total_price = express_amount + pay_amount;
+            const result: object = {
                 item_list,
-                address:address,
-                item_price:pay_amount.toFixed(2),
-                express_amount:express_amount.toFixed(2),
-                total_price:total_price.toFixed(2),
-                order_type:order_type
+                address,
+                item_price: pay_amount.toFixed(2),
+                express_amount: express_amount.toFixed(2),
+                total_price: total_price.toFixed(2),
+                order_type
             };
             return result;
-        }catch ($err) {
+        } catch ($err) {
             return $err.message;
             this.dealErr($err);
         }
@@ -890,12 +889,12 @@ export default class extends Base {
      */
     async calculationAction() {
         try {
-            let res =  await this.calculation();
-            if (typeof res =='string') {
+            const res =  await this.calculation();
+            if (typeof res == 'string') {
                 return this.fail(-1, res);
             }
             return this.success(res, '获取成功');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -908,7 +907,7 @@ export default class extends Base {
     async cancelAction() {
         try {
             const order_no = this.post('order_no');
-            const res1: any = await this.model('order').where({order_no}).find();  //-2为已取消
+            const res1: any = await this.model('order').where({order_no}).find();  // -2为已取消
             // @ts-ignore
             if (think.isEmpty(res1)) {
                 return this.fail(-1, '订单不存在');
@@ -916,9 +915,9 @@ export default class extends Base {
             if (res1.status == -2) {
                 return this.fail(-1, '该订单已取消, 请勿重复操作!');
             }
-            const res: any = await this.model('order').where({order_no}).update({status:-2,_status:"已取消"});  //-2为已取消
+            const res: any = await this.model('order').where({order_no}).update({status: -2, _status: "已取消"});  // -2为已取消
 
-            for (let item_v of res1.order_item) {
+            for (const item_v of res1.order_item) {
                 /**
                  * 加存方法 现在sku是一个串  待优化
                  */
@@ -929,7 +928,7 @@ export default class extends Base {
                 await this.model("item").where({id: item_v.item_id}).decrement('sale_num', item_v.buy_num);
             }
             return this.success(res, '取消订单成功');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -939,12 +938,12 @@ export default class extends Base {
      * @param {$item} 商品
      * @param {$add} true 增加 , false 减少
      */
-    async changeSumStock($item: any,$add: any) {
+    async changeSumStock($item: any, $add: any) {
         try {
-            let res: any = await this.model('item').where({id: $item.item_id}).find();
+            const res: any = await this.model('item').where({id: $item.item_id}).find();
             if ($item.sku_id) {
-                let sku_list = JSON.parse(res.sku_list);
-                for (let sku_v of sku_list) {
+                const sku_list = JSON.parse(res.sku_list);
+                for (const sku_v of sku_list) {
                     if ($item.sku_id == sku_v.sku_id) {
                         if ($add) {
                             sku_v.num = sku_v.num + $item.buy_num;
@@ -954,21 +953,20 @@ export default class extends Base {
                         break;
                     }
                 }
-                let new_sku_list: any = JSON.stringify(sku_list);
-                 await this.model('item').where({id: $item.item_id}).update({sku_list:new_sku_list})
+                const new_sku_list: any = JSON.stringify(sku_list);
+                await this.model('item').where({id: $item.item_id}).update({sku_list: new_sku_list});
             }
             let sum_stock = res.sum_stock;
             if ($add) {
                 sum_stock = sum_stock + $item.buy_num;
             } else {
-                sum_stock= sum_stock- $item.buy_num;
+                sum_stock = sum_stock - $item.buy_num;
             }
-            return await this.model('item').where({id: $item.item_id}).update({sum_stock})
-        }catch ($err) {
+            return await this.model('item').where({id: $item.item_id}).update({sum_stock});
+        } catch ($err) {
             this.dealErr($err);
         }
     }
-
 
     /**
      * 确认收货
@@ -980,9 +978,9 @@ export default class extends Base {
             // @ts-ignore
             const user_id: any = this.ctx.state.userInfo.id;
             const shop_id: any = this.ctx.state.shop_id;
-            let orderInfo: any = await this.model('order').where({shop_id, order_no, user_id}).find();
+            const orderInfo: any = await this.model('order').where({shop_id, order_no, user_id}).find();
             if (think.isEmpty(orderInfo)) {
-                return this.fail(-1, '该订单不存在')
+                return this.fail(-1, '该订单不存在');
             }
             if (orderInfo.status != 3) {
                 let msg: string = '';
@@ -1003,10 +1001,10 @@ export default class extends Base {
                         msg = '该订单询价中!';
                         break;
                 }
-                return this.fail(-1, msg)
+                return this.fail(-1, msg);
             }
-            let _status = '已完成';
-            let res: any = await this.model('order').where({shop_id, order_no,user_id}).update({_status, status: 4});
+            const _status = '已完成';
+            const res: any = await this.model('order').where({shop_id, order_no, user_id}).update({_status, status: 4});
             if (res) {
                 return this.success(res, '请求成功!');
             }
@@ -1044,7 +1042,7 @@ export default class extends Base {
             if (think.isEmpty(order)) {
                 return this.fail(-1, '该订单不存在');
             }
-            let order_id = order.id;
+            const order_id = order.id;
 
             if (order.order_type != 3) {
                 return this.fail(-1, '此订单不是特殊定制订单, 无法询价');
@@ -1057,37 +1055,37 @@ export default class extends Base {
                     let msg: string = '';
                     switch (order.status) {
                         case 1:
-                            msg='该订单未支付!';
+                            msg = '该订单未支付!';
                             break;
                         case 4:
-                            msg='该订单已完成!';
+                            msg = '该订单已完成!';
                             break;
                         case -2:
-                            msg='该订单已关闭!';
+                            msg = '该订单已关闭!';
                             break;
                         case 2:
-                            msg='该订单等待发货!';
+                            msg = '该订单等待发货!';
                             break;
                         case 3:
-                            msg='该订单待收货!';
+                            msg = '该订单待收货!';
                             break;
                         case 4:
-                            msg='该订单已完成!';
+                            msg = '该订单已完成!';
                             break;
                         case 5:
-                            msg='该订单已在询价中!';
+                            msg = '该订单已在询价中!';
                             break;
                         case 7:
-                            msg='该订单待派单!';
+                            msg = '该订单待派单!';
                             break;
                         case 8:
-                            msg='该订单已在派单中';
+                            msg = '该订单已在派单中';
                             break;
                         case 9:
-                            msg='该订单设计师处理中!';
+                            msg = '该订单设计师处理中!';
                             break;
                         case 10:
-                            msg='该订单待打印!';
+                            msg = '该订单待打印!';
                             break;
                     }
                     return this.fail(-1, msg);
@@ -1098,9 +1096,9 @@ export default class extends Base {
             const _item_status = '询价中';
             const price = Number(this.post('price'));
 
-            let order_item = await this.model('order_item').where({order_id}).find();
+            const order_item = await this.model('order_item').where({order_id}).find();
             if (think.isEmpty(order_item)) {
-                return this.fail(-1, '该子订单不存在')
+                return this.fail(-1, '该子订单不存在');
             }
             if ( price < order_item.special_base_price) {
                 return this.fail(-1, `价格不能小于基础价【${order_item.special_base_price}】`);
@@ -1110,20 +1108,20 @@ export default class extends Base {
             const item_total_price = item_amount;
             await this.model('order').where({id: order_id}).update({
                 _status,
-                status:5,
+                status: 5,
                 item_amount,
                 buyer_message,
                 pay_amount,
             });
             const res = await this.model('order_item').where({order_id}).update({
-                item_status:5,
+                item_status: 5,
                 item_total_price,
             });
             if (!res) {
                 return this.fail(-1, '操作失败!');
             }
             this.success([], '操作成功!');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -1142,45 +1140,45 @@ export default class extends Base {
             const emb_template_id = $emb_template_id || 1;
             const template_type = this.get('template_type') || 1;
             const priceList = await this.model('emb_template_price').where({emb_template_id}).select();
-            let priceObj = {};
-            for (let v of priceList) {
-                if(!priceObj[v.width * v.height]) {
-                    priceObj[v.width * v.height] = v.price
+            const priceObj = {};
+            for (const v of priceList) {
+                if (!priceObj[v.width * v.height]) {
+                    priceObj[v.width * v.height] = v.price;
                 } else {
                     if (priceObj[v.width * v.height] < v.price) {
-                        priceObj[v.width * v.height] = v.price
+                        priceObj[v.width * v.height] = v.price;
                     }
                 }
             }
-            let areaList = Object.keys(priceObj);
+            const areaList = Object.keys(priceObj);
             // @ts-ignore
-            areaList.sort(function(a: number,b: number){
+            // tslint:disable-next-line:only-arrow-functions
+            areaList.sort(function(a: number, b: number) {
                 return a - b;
             });
             console.log(areaList);
-            let index: any = getIndex(areaList, sqr);
+            const index: any = getIndex(areaList, sqr);
             const  price = priceObj[areaList[index]] || 0;
             const result = {
                 price,
-                area:sqr,
+                "area": sqr,
                 'area=>price': priceObj,
                 // priceList,
             };
             // return this.success(result, '请求成功!');
             return price;
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
 
 }
 
-
-function getIndex (arr: any, num: number) {
-    for (var i = 0; i < arr.length; i++) {
+function getIndex(arr: any, num: number) {
+    for (let i = 0; i < arr.length; i++) {
         if (arr[i] > num) {
             if (i == 0) {
-                return i
+                return i;
             }
             // return i - 1;
             return i ;
@@ -1189,19 +1187,18 @@ function getIndex (arr: any, num: number) {
     // if (num < arr[0]) {
     //     return 0
     // } else {
-    return arr.length-1
+    return arr.length - 1;
     // }
 
 }
-
 
 /**
  * 取数组中最大
  */
 function maxPrice($data: any) {
-    var max = $data[0];
-    var len = $data.length;
-    for (var i = 1; i < len; i++){
+    let max = $data[0];
+    const len = $data.length;
+    for (let i = 1; i < len; i++) {
         if ($data[i] > max) {
             max = $data[i];
         }
@@ -1228,5 +1225,5 @@ function getOrderType($type: any) {
             _order_type = '手绘订单';
             break;
     }
-    return _order_type
+    return _order_type;
 }

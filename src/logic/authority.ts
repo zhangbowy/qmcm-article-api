@@ -46,7 +46,7 @@ export default class extends base {
                 required: true,
                 method: 'post'
             },
-            role_id:{
+            role_id: {
                 required: true,
                 method: 'post'
             }
@@ -77,7 +77,7 @@ export default class extends base {
                 required: true,
                 method: 'post'
             },
-            role_id:{
+            role_id: {
                 required: true,
                 method: 'post'
             }

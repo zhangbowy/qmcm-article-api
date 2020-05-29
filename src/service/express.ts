@@ -2,29 +2,29 @@ const rp = require('request-promise');
 const _ = require('lodash');
 import { think } from 'thinkjs';
 
-interface queryParams  {
-  shipperCode: string,
-  logisticCode: string,
-  orderCode: string
+interface QueryParams  {
+  shipperCode: string;
+  logisticCode: string;
+  orderCode: string;
 }
 
-interface expressInfo {
-  traces?: any[],
-  success: boolean,
-  shipperCode: string,
-  shipperName: string,
-  logisticCode: string,
-  isFinish: number,
-  state?: any,
-  _state?: any
+interface ExpressInfo {
+  traces?: any[];
+  success: boolean;
+  shipperCode: string;
+  shipperName: string;
+  logisticCode: string;
+  isFinish: number;
+  state?: any;
+  _state?: any;
 }
 module.exports = class extends think.Service {
   async queryExpress<queryParams>(shipperCode: string, logisticCode: string, orderCode = '') {
-    let expressInfo: expressInfo = {
+    let expressInfo: ExpressInfo = {
       success: false,
-      shipperCode: shipperCode,
+      shipperCode,
       shipperName: '',
-      logisticCode: logisticCode,
+      logisticCode,
       isFinish: 0,
       traces: [],
       state: 0,
@@ -63,15 +63,15 @@ module.exports = class extends think.Service {
   }
 
   parseExpressResult(requestResult: any) {
-    const expressInfo:expressInfo = {
+    const expressInfo: ExpressInfo = {
       success: false,
       shipperCode: '',
       shipperName: '',
       logisticCode: '',
       isFinish: 0,
       traces: [],
-      state:0,
-      _state:'暂无轨迹信息'
+      state: 0,
+      _state: '暂无轨迹信息'
     };
 
     if (think.isEmpty(requestResult)) {
@@ -91,22 +91,22 @@ module.exports = class extends think.Service {
       return expressInfo;
     }
 
-    if (Number.parseInt(requestResult.State) === 3) {
+    if (parseInt(requestResult.State, 10) === 3) {
       expressInfo.isFinish = 1;
       expressInfo.state = 3;
       expressInfo._state = '已签收!';
     }
-    if (Number.parseInt(requestResult.State) === 4) {
-      expressInfo.state =4;
+    if (parseInt(requestResult.State, 10) === 4) {
+      expressInfo.state = 4;
       expressInfo._state = '问题件!';
     }
-    if (Number.parseInt(requestResult.State) === 2) {
-      expressInfo.state =2;
+    if (parseInt(requestResult.State, 10) === 2) {
+      expressInfo.state = 2;
       expressInfo._state = '在途中!';
     }
     expressInfo.success = true;
     if (!think.isEmpty(requestResult.Traces) && Array.isArray(requestResult.Traces)) {
-      expressInfo.traces = _.map(requestResult.Traces, (item:any) => {
+      expressInfo.traces = _.map(requestResult.Traces, (item: any) => {
         return { datetime: item.AcceptTime, content: item.AcceptStation };
       });
       _.reverse(expressInfo.traces);
@@ -124,11 +124,11 @@ module.exports = class extends think.Service {
       DataType: '2'
     };
     let str = '';
-    for(let k in fromData) {
-      if((Object.keys(fromData)).indexOf(k) == Object.keys(fromData).length - 1) {
-        str += `${k}=${fromData[k]}`
+    for (const k in fromData) {
+      if ((Object.keys(fromData)).indexOf(k) == Object.keys(fromData).length - 1) {
+        str += `${k}=${fromData[k]}`;
       } else {
-        str += `${k}=${fromData[k]},`
+        str += `${k}=${fromData[k]},`;
       }
     }
     // return str;

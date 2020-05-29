@@ -14,7 +14,7 @@ export default class extends think.Model {
         };
     }
    get pk() {
-        return 'emb_template_id'
+        return 'emb_template_id';
    }
     async getUserById($id: number) {
         return await this.where({id: $id}).find();

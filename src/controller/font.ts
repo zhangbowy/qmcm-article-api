@@ -10,12 +10,12 @@ export default class extends Base {
      */
     async fontListAction() {
         try {
-            let res = await this.model('fonts').select();
-            for (let item of res) {
-                item.font_content = JSON.parse(item.font_content)
+            const res = await this.model('fonts').select();
+            for (const item of res) {
+                item.font_content = JSON.parse(item.font_content);
             }
             return this.success(res, "请求成功!");
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -35,26 +35,26 @@ export default class extends Base {
             if (!file || !file.type) {
                 return this.fail(-1, '导入文件不能为空', []);
             }
-            const filepath = path.join(think.ROOT_PATH,'www/static/demo');
-            if (file && (file.type === 'application/zip' || file.type ==='application/x-zip-compressed')) {
-                let res1: any = await exportFile(file.path);
+            const filepath = path.join(think.ROOT_PATH, 'www/static/demo');
+            if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
+                const res1: any = await exportFile(file.path);
                 if (typeof res1 == 'string') {
-                    deleteFolder(filepath);
+                    this.deleteFolder(filepath);
                     return this.fail(-1, res1);
                 }
                 const oss = await think.service('oss');
                 /**
                  * 上传到腾讯OSS
                  */
-                let res: any = await oss.uploadFiles(res1.fileList);
-                let params = {
+                const res: any = await oss.uploadFiles(res1.fileList);
+                const params = {
                     font_name,
                     max_height,
                     min_height,
-                    font_content:JSON.stringify(res1.fileObj)
+                    font_content: JSON.stringify(res1.fileObj)
                 };
-                let data = await this.model('fonts').add(params);
-                deleteFolder(filepath);
+                const data = await this.model('fonts').add(params);
+                this.deleteFolder(filepath);
                 return this.success([], "导入成功!");
             } else {
                 return this.fail(-1, '导入文件格式必须为zip');
@@ -74,7 +74,7 @@ export default class extends Base {
     async editFontAction() {
         try {
 
-        }catch (e) {
+        } catch (e) {
 
         }
     }
@@ -85,41 +85,41 @@ export default class extends Base {
      */
     async deleteFontAction() {
         try {
-            let font_id = this.post('font_id');
-            let font = await this.model('fonts').where({font_id:font_id}).find();
+            const font_id = this.post('font_id');
+            const font = await this.model('fonts').where({font_id}).find();
 
             if ((Object.keys(font)).length == 0) {
-                return  this.fail(-1, '字体不存在!',[]);
+                return  this.fail(-1, '字体不存在!', []);
             }
-            let arr: any = [];
-            let fontContent = JSON.parse(font.font_content);
-            for (let k in fontContent) {
-                let obj = {
-                    Key:fontContent[k]
+            const arr: any = [];
+            const fontContent = JSON.parse(font.font_content);
+            // tslint:disable-next-line:forin
+            for (const k in fontContent) {
+                const obj = {
+                    Key: fontContent[k]
                 };
                 arr.push(obj);
             }
             console.log(arr);
-            let data =  await this.model('fonts').where({font_id}).delete();
+            const data =  await this.model('fonts').where({font_id}).delete();
             // @ts-ignore
-            if(data) {
+            if (data) {
                 const  oss  = think.service('oss');
-                let del = await oss.deleteFile(arr);
-                if(del.statusCode && del.statusCode == 200)
-                {
-                    return this.success({del,data}, '删除成功!');
+                const del = await oss.deleteFile(arr);
+                if (del.statusCode && del.statusCode == 200) {
+                    return this.success({del, data}, '删除成功!');
                 }
-                return this.fail(-1, '删除失败!',del);
+                return this.fail(-1, '删除失败!', del);
             }
-        }catch (e) {
+        } catch (e) {
            this.dealErr(e);
         }
     }
 }
 
-function exportFile($file: any,$filePath?: any) {
+function exportFile($file: any, $filePath?: any) {
 
-    let obj = [
+    const obj = [
         "0.PNG",
         "1.PNG",
         "2.PNG",
@@ -183,63 +183,46 @@ function exportFile($file: any,$filePath?: any) {
         "z-1.PNG",
         "Z.PNG"
     ];
-    return new Promise((resolve,reject) => {
-        var zip = new AdmZip($file);
-        let aaa = zip.getEntries();
-        const filepath = path.join(think.ROOT_PATH,'www/static/demo/');
-        let path1 = path.dirname(filepath);
+    return new Promise((resolve, reject) => {
+        const zip = new AdmZip($file);
+        const aaa = zip.getEntries();
+        const filepath = path.join(think.ROOT_PATH, 'www/static/demo/');
+        const path1 = path.dirname(filepath);
         think.mkdir(path1);
         zip.extractAllTo(filepath, true);
-        if(fs.existsSync(filepath)) {
+        if (fs.existsSync(filepath)) {
             const files = fs.readdirSync(filepath);
-            let fileList = [];
-            let fileObj = {};
-            let str = '';
-            let day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
-            let ossPath = `/font/${day}/`;
+            const fileList = [];
+            const fileObj = {};
+            const str = '';
+            const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+            const ossPath = `/font/${day}/`;
           // @ts-ignore
-            for (let item of obj) {
+            for (const item of obj) {
               if (!files.includes(item)) {
                   // str+=item+','
                   resolve(`文件${item}不存在!`);
               } else {
                   let k;
-                  if (item.indexOf('-')> -1) {
+                  if (item.indexOf('-') > -1) {
                       k = item.split('-')[0];
                   } else {
                       k = item.split('.')[0];
                   }
-                  let obj = {
+                  const objItem = {
                       Bucket: 'cos-cx-n1-1257124629', /* 桶 */
                       Region: 'ap-guangzhou',
                       Key: ossPath + item,
-                      FilePath: filepath+item,
+                      FilePath: filepath + item,
                   };
-                  fileList.push(obj);
-                  fileObj[k] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                  fileList.push(objItem);
+                  fileObj[k] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + item;
               }
           }
-            resolve({fileObj,fileList});
-        }else
-        {
-            console.log('无文件')
+            resolve({fileObj, fileList});
+        } else {
+            console.log('无文件');
         }
-    })
+    });
 
-}
-
-function deleteFolder(path: any) {
-    let files = [];
-    if (fs.existsSync(path)) {
-        files = fs.readdirSync(path);
-        files.forEach(function (file:any, index: any) {
-            let curPath = path + "/" + file;
-            if (fs.statSync(curPath).isDirectory()) {
-                deleteFolder(curPath);
-            } else {
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
 }

@@ -10,7 +10,7 @@ export default class extends Base {
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
         const redirectUrl = "http://cxapi.tecqm.club/wx/user/auth";
-        let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
+        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
         return this.success(url);
     }
 
@@ -21,81 +21,81 @@ export default class extends Base {
      */
     async authAction() {
         try {
-            let code:string = this.get('code');
-            if(!code) {
-                return this.fail(-1., 'code不能为空')
-            };
+            const code: string = this.get('code');
+            if (!code) {
+                return this.fail(-1., 'code不能为空');
+            }
             const appid = this.config('wx').appid;
             const secret = this.config('wx').appSecret;
             /**
              * 通过code换取 access_token
              */
-            let url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
+            const url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
 
-            const res = await this.fetch(url).then(res => res.json());
+            const res = await this.fetch(url).then(($res) => $res.json());
             if (res && res.errcode) {
-                return this.success(res)
+                return this.success(res);
             }
-            let openId = res.openid;
+            const openId = res.openid;
             /**
              * 判断是否新用户
              */
-            let info = await this.model('user').where({openid:openId}).find();
+            const info = await this.model('user').where({openid: openId}).find();
             let userInfo;
             /**
              * 老用户
              */
             if (Object.keys(info).length > 0) {
-                let params: object = {
-                    nickname:info.nickname,
-                    sex:info.sex,
-                    province:info.province,
-                    city:info.city,
-                    country:info.country,
-                    headimgurl:info.headimgurl,
-                    openid:info.openid,
-                    id:info.id
+                const params: object = {
+                    nickname: info.nickname,
+                    sex: info.sex,
+                    province: info.province,
+                    city: info.city,
+                    country: info.country,
+                    headimgurl: info.headimgurl,
+                    openid: info.openid,
+                    id: info.id
                 };
-                userInfo = params
+                userInfo = params;
             } else {
                 /**
                  * 新用户 拉取用户信息
                  */
-                let access_token = res.access_token;
-                let getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
-                userInfo = await this.fetch(getInfoUrl).then(res => res.json());
-                let shop_id = this.ctx.state.shop_id;
-                let params: object = {
-                    nickname:userInfo.nickname,
-                    sex:userInfo.sex,
-                    province:userInfo.province,
-                    city:userInfo.city,
-                    country:userInfo.country,
-                    headimgurl:userInfo.headimgurl,
-                    openid:userInfo.openid,
+                const access_token = res.access_token;
+                const getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
+                userInfo = await this.fetch(getInfoUrl).then(($res) => $res.json());
+                const shop_id = this.ctx.state.shop_id;
+                const params: object = {
+                    nickname: userInfo.nickname,
+                    sex: userInfo.sex,
+                    province: userInfo.province,
+                    city: userInfo.city,
+                    country: userInfo.country,
+                    headimgurl: userInfo.headimgurl,
+                    openid: userInfo.openid,
                     shop_id
-                }
-                let id = await this.model('user').add(params);
+                };
+                const id = await this.model('user').add(params);
                 userInfo.id = id;
                 console.log(userInfo);
             }
-            let tokenFuc =  think.service('wx/token');
+            const tokenFuc =  think.service('wx/token');
             /**
              * 生成token
              */
-            let token = await tokenFuc.create1(userInfo);
+            const token = await tokenFuc.create1(userInfo);
             /**
              * 下发到cookies
              */
-            await this.cookie('user_sign', token,{
-                maxAge:1000*1000*1000*1000,
-                expires:new Date().getTime() + 1000*1000*1000*1000
+            await this.cookie('user_sign', token, {
+                maxAge: 1000 * 1000 * 1000 * 1000,
+                expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000
             });
             /**
              * 重定向到首页
              */
             this.redirect('http://cxgh.tecqm.club');
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -108,13 +108,13 @@ export default class extends Base {
         try {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
-            let info = await this.model('user').where({openid: openid}).find();
-            if(think.isEmpty(info)) {
+            const info = await this.model('user').where({openid}).find();
+            if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
-                return this.fail(402,'未登录');
+                return this.fail(402, '未登录');
             }
-            return this.success(this.ctx.state.userInfo,'请求成功!')
-        }catch (e) {
+            return this.success(this.ctx.state.userInfo, '请求成功!');
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -126,13 +126,13 @@ export default class extends Base {
         try {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
-            let info = await this.model('user').where({openid: openid}).find();
-            if(think.isEmpty(info)) {
+            const info = await this.model('user').where({openid}).find();
+            if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
-                return this.fail(402,'未登录');
+                return this.fail(402, '未登录');
             }
-            return this.success([],'已登录')
-        }catch (e) {
+            return this.success([], '已登录');
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -141,30 +141,30 @@ export default class extends Base {
      * 开发的Dev
      */
     async loginDevAction() {
-        const res = await this.model('user').where({id:92}).find();
-        let params: object = {
-            nickname:res.nickname,
-            sex:res.sex,
-            province:res.province,
-            city:res.city,
-            country:res.country,
-            headimgurl:res.headimgurl,
-            openid:res.openid,
-            id:res.id
+        const res = await this.model('user').where({id: 92}).find();
+        const params: object = {
+            nickname: res.nickname,
+            sex: res.sex,
+            province: res.province,
+            city: res.city,
+            country: res.country,
+            headimgurl: res.headimgurl,
+            openid: res.openid,
+            id: res.id
         };
-        let tokenFuc =  think.service('wx/token');
+        const tokenFuc =  think.service('wx/token');
         /**
          * 生成token
          */
-        let token = await tokenFuc.create1(params);
-        let Origin =this.ctx.req.headers.origin || this.ctx.req.headers.host;
-        await this.cookie('user_sign', token,{
-            maxAge:1000*1000*1000*1000,
-            expires:new Date().getTime() + 1000*1000*1000*1000,
+        const token = await tokenFuc.create1(params);
+        const Origin = this.ctx.req.headers.origin || this.ctx.req.headers.host;
+        await this.cookie('user_sign', token, {
+            maxAge: 1000 * 1000 * 1000 * 1000,
+            expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000,
             // HttpOnly:false,
             // domain:'192.168.31.181'
         });
-        return this.success('登录成功!')
+        return this.success('登录成功!');
     }
 
     /**
@@ -176,14 +176,14 @@ export default class extends Base {
             /**
              * 店铺ID
              */
-            let shop_id = this.ctx.state.shop_id;
+            const shop_id = this.ctx.state.shop_id;
             /**
              * 用户id
              */
-            let id = this.ctx.state.userInfo.id;
-            let res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id,shop_id,del:0}).select();
+            const id = this.ctx.state.userInfo.id;
+            const res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id, shop_id, del: 0}).select();
             return this.success(res, '请求成功!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -206,8 +206,8 @@ export default class extends Base {
      */
     async addAddressAction() {
         try {
-            let shop_id = this.ctx.state.shop_id;
-            let user_id = this.ctx.state.userInfo.id;
+            const shop_id = this.ctx.state.shop_id;
+            const user_id = this.ctx.state.userInfo.id;
             const name = this.post('name');
             const phone = this.post('phone');
             const province = this.post('province');
@@ -219,7 +219,7 @@ export default class extends Base {
             const address = this.post('address');
             const is_default = this.post('is_default') || 0;
             const post_code = this.post('post_code');
-            let params: object = {
+            const params: object = {
                 shop_id,
                 user_id,
                 name,
@@ -235,14 +235,14 @@ export default class extends Base {
                 post_code
             };
             if (is_default) {
-                await this.model('address').where({shop_id, user_id,is_default:1}).update({is_default:0})
+                await this.model('address').where({shop_id, user_id, is_default: 1}).update({is_default: 0});
             }
-            let res = await this.model('address').add(params);
+            const res = await this.model('address').add(params);
             if (res) {
                return this.success(res, '添加成功!');
             }
             return this.fail(-1, '添加失败!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -264,9 +264,9 @@ export default class extends Base {
      */
     async editAddressAction() {
         try {
-            let shop_id = this.ctx.state.shop_id;
-            let user_id = this.ctx.state.userInfo.id;
-            let address_id = this.post('address_id');
+            const shop_id = this.ctx.state.shop_id;
+            const user_id = this.ctx.state.userInfo.id;
+            const address_id = this.post('address_id');
             const name = this.post('name');
             const phone = this.post('phone');
             const province = this.post('province');
@@ -278,7 +278,7 @@ export default class extends Base {
             const address = this.post('address');
             const is_default = this.post('is_default') || 0;
             const post_code = this.post('post_code');
-            let params: object = {
+            const params: object = {
                 name,
                 phone,
                 province,
@@ -295,14 +295,14 @@ export default class extends Base {
              * 如果默认先把全部是1的 置为0
              */
             if (is_default) {
-                await this.model('address').where({shop_id, user_id,is_default:1}).update({is_default:0})
+                await this.model('address').where({shop_id, user_id, is_default: 1}).update({is_default: 0});
             }
-            let res: any = await this.model('address').where({ shop_id, user_id, address_id}).update(params);
+            const res: any = await this.model('address').where({ shop_id, user_id, address_id}).update(params);
             if (res) {
                return this.success(res, '编辑成功!');
             }
             return this.fail(-1, '编辑失败');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }
@@ -319,12 +319,12 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.shop_id;
             const user_id: number = this.ctx.state.userInfo.id;
             const address_id: number = this.post('address_id');
-            const res: any = await this.model('address').where({shop_id, user_id, address_id,del: 0}).update({del:1});
+            const res: any = await this.model('address').where({shop_id, user_id, address_id, del: 0}).update({del: 1});
             if (res) {
                 return this.success(res, '删除成功!');
             }
             return this.fail(-1, '该地址不存在!');
-        }catch ($err) {
+        } catch ($err) {
             this.dealErr($err);
         }
     }

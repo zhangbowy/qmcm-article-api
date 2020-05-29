@@ -27,7 +27,7 @@ export default class extends Base {
             shop_name,
             logo,
             system_end_time
-        }
+        };
         const model = this.model('shops') as ShopsModel;
         const adminModel =  this.model('admin') as AdminModel;
         const isHaveName = await model.getShopByName(shop_name);
@@ -46,7 +46,7 @@ export default class extends Base {
             pwd,
             role_type: 2,
             shop_id: shopInfo.shop_id
-        }
+        };
         const res = await  adminModel.addAdmin(adminParams);
         return this.success([], '添加成功!');
     }
@@ -64,7 +64,7 @@ export default class extends Base {
         const adminParams: any =  {
             name,
             phone,
-        }
+        };
         if (this.post('password')) {
             pwd = new Buffer(this.post('password'), 'utf-8' );
             adminParams.pwd = pwd;
@@ -73,7 +73,7 @@ export default class extends Base {
             shop_name,
             logo,
             system_end_time
-        }
+        };
 
         const model = this.model('shops') as ShopsModel;
         const adminModel =  this.model('admin') as AdminModel;

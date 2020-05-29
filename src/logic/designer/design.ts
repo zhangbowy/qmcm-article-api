@@ -4,6 +4,42 @@ export default class extends base {
     designerListAction() {
 
     }
+    editDesignAction() {
+        const rules = {
+            design_id: {
+                required: true,
+                method: 'post'
+            },
+            dst_path: {
+                string: true,
+                required: true,
+                method: 'post'
+            },
+            emb_path: {
+                string: true,
+                required: true,
+                method: 'post'
+            },
+            prev_png_path: {
+                string: true,
+                required: true,
+                method: 'post'
+            },
+            txt_png_path: {
+                string: true,
+                required: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
     addDesignerAction() {
         const rules = {
             designer_name: {

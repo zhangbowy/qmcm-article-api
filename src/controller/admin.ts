@@ -13,9 +13,9 @@ export default class extends Base {
             if (think.isEmpty(Code)) {
                 return  this.fail(-1, "验证码不能为空!");
             }
-            let code = Code.toLowerCase();
-            let code_cookie = (await this.session('captcha') || '').toLowerCase();
-            if(code != code_cookie) {
+            const code = Code.toLowerCase();
+            const code_cookie = (await this.session('captcha') || '').toLowerCase();
+            if (code != code_cookie) {
                 return  this.fail(-1, "验证码错误!");
             }
             const phone = this.post('phone');
@@ -27,15 +27,15 @@ export default class extends Base {
             if (!think.isEmpty(res)) {
                 const bufferPwd = new Buffer(res.pwd, 'binary' ).toString('utf-8');
                 if (pwd === bufferPwd) {
-                    let tokenFuc =  think.service('token');
+                    const tokenFuc =  think.service('token');
                     /**
                      * 生成token
                      */
-                    let info = {
+                    const info = {
                         // exp: Math.floor(Date.now() / 1000) + (60 * 60),
-                        admin_id:res.id,
+                        admin_id: res.id,
                     };
-                    let token = await tokenFuc.create1(info);
+                    const token = await tokenFuc.create1(info);
                     await this.cache(`admin-${res.id}`, res, {
                         type: 'redis',
                         redis: {
@@ -50,12 +50,12 @@ export default class extends Base {
                             timeout:  60 * 60 * 1000 * 6
                         }
                     });
-                    return this.success({token,adminId:res.id}, "登录成功!");
+                    return this.success({token, adminId: res.id}, "登录成功!");
                 }
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
             return  this.fail(-1, "用户名或密码错误!", []);
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -68,27 +68,27 @@ export default class extends Base {
             const admin_info = this.ctx.state.admin_info;
             const shop_id = admin_info.shop_id;
             const admin_role_id = admin_info.role_id;
-            let where = {};
+            const where = {};
             let authority_list;
             if (admin_info.role_type == 2) {
-                authority_list = await this.model('authority').where({only_role_type:['in',[2,3]],is_show: 1,del: 0}).getField('id');
+                authority_list = await this.model('authority').where({only_role_type: ['in', [2, 3]], is_show: 1, del: 0}).getField('id');
             } else if (admin_info.role_type == 3) {
-                authority_list = await this.model('auth_give').where({shop_id, admin_role_id: admin_role_id,del: 0}).getField('auth_id');
+                authority_list = await this.model('auth_give').where({shop_id, admin_role_id, del: 0}).getField('auth_id');
             } else if (admin_info.role_type == 1) {
-                authority_list = await this.model('authority').where({only_role_type:['in',[1]],is_show: 1,del: 0}).getField('id');
+                authority_list = await this.model('authority').where({only_role_type: ['in', [1]], is_show: 1, del: 0}).getField('id');
             }
             const result = {
-                admin_info:{
-                    id:admin_info.id,
-                    shop_id:admin_info.shop_id,
-                    role_type:admin_info.role_type,
-                    name:admin_info.name,
-                    phone:admin_info.phone
+                admin_info: {
+                    id: admin_info.id,
+                    shop_id: admin_info.shop_id,
+                    role_type: admin_info.role_type,
+                    name: admin_info.name,
+                    phone: admin_info.phone
                 },
                 authority_list
             };
-            return this.success(result, '请求成功!')
-        }catch (e) {
+            return this.success(result, '请求成功!');
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -102,7 +102,7 @@ export default class extends Base {
             // @ts-ignore
             // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");
-        }catch (e) {
+        } catch (e) {
             this.dealErr(e);
         }
     }
@@ -132,10 +132,10 @@ export default class extends Base {
             fontSize: 65, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
         };
-        let captcha = new ThinkSvgCaptcha(defaultOptions);
-        let c= captcha.create();
-        await this.session('captcha',c.text);
+        const captcha = new ThinkSvgCaptcha(defaultOptions);
+        const c = captcha.create();
+        await this.session('captcha', c.text);
         this.ctx.type = 'image/svg+xml';
-        return this.ctx.body = c.data
+        return this.ctx.body = c.data;
     }
 }

@@ -9,7 +9,7 @@ interface UploadRes {
     Location: string;
     statusCode: number;
     headers?: any;
-    ETag: string
+    ETag: string;
 }
 
 const rename = think.promisify(fs.rename, fs);
@@ -25,9 +25,9 @@ export default class extends Base {
             const designer_id: number = designer_info.designer_id;
             const designer_team_id: number = designer_info.designer_team_id;
 
-            let where: any = {shop_id, designer_team_id};
+            const where: any = {shop_id, designer_team_id};
             if (!designer_info.is_leader) {
-                where.designer_id = designer_team_id
+                where.designer_id = designer_team_id;
             }
 
             const res = await this.model('design').where(where).countSelect();
