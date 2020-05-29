@@ -50,7 +50,7 @@ export default class extends think.Controller {
                     fs.unlinkSync(curPath);
                 }
             });
-            fs.rmdirSync(path);
+            // fs.rmdirSync(path);
         }
     }
 

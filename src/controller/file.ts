@@ -92,7 +92,7 @@ export default class extends Base {
             } else {
                 filepath = path.join('/root/release/design');
             }
-            deleteFolder(filepath);
+            this.deleteFolder(filepath);
             const zip = new AdmZip(file.path);
             console.log(filepath, 'filepath');
             const path1 = path.dirname(filepath);
