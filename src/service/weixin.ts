@@ -155,6 +155,7 @@ module.exports = class extends think.Service {
    * @returns {{}}
    */
   payNotify(notifyData: any) {
+    console.log(notifyData,'notifyData');
     if (think.isEmpty(notifyData)) {
       return false;
     }
