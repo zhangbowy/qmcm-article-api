@@ -17,7 +17,7 @@ export default class extends Base {
         }
         const redirectUrl = "http://cxmob.tecqm.club/api/wx/user/notify";
         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${JSON.stringify(params)}#wechat_redirect`;
-        return this.redirect(url);
+        return this.success(url);
     }
 
     async notifyAction() {
