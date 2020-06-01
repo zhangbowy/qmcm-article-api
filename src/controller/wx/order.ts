@@ -162,7 +162,8 @@ export default class extends Base {
                 const payParams: any = await this.getWxPay(order_no, pay_amount * 100);
                 const key = payParams.package.split('=')[0];
                 const val = payParams.package.split('=')[1];
-                await this.model('order').where({order_no}).update({key: val});
+                const udp = {prepay_id: val};
+                await this.model('order').where({order_no}).update(udp);
                 return this.success(payParams);
             } else {
                 return this.fail(-1, "创建订单失败!");
@@ -200,7 +201,6 @@ export default class extends Base {
 
     }
 
-
     async notifyAction() {
         const WeixinSerivce = think.service('weixin');
         const result = WeixinSerivce.payNotify(this.post('xml'));
@@ -222,7 +222,6 @@ export default class extends Base {
 
         return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
     }
-
 
     /**
      * 生成订单的编号order_no
