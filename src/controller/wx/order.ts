@@ -58,7 +58,7 @@ export default class extends Base {
      * @return order_no
      */
     // async calculation() {
-    async payAction() {
+    async createAction() {
         try {
             const shop_id = this.ctx.state.shop_id;
             const address_id: any = this.post('address_id');
@@ -159,12 +159,11 @@ export default class extends Base {
                     await this.model('order_item').add(item_v);
                     // await this.model('order_item').addMany(item_list);
                 }
-                const payParams: any = await this.getWxPay(order_no, pay_amount * 100);
-                const key = payParams.package.split('=')[0];
-                const val = payParams.package.split('=')[1];
-                const udp = {prepay_id: val};
-                await this.model('order').where({order_no}).update(udp);
-                return this.success(payParams);
+                return this.success({
+                    order_id,
+                    order_no,
+                    pay_amount
+                });
             } else {
                 return this.fail(-1, "创建订单失败!");
             }
@@ -172,7 +171,24 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+    async payAction() {
+        try {
+            const order_no = this.post('order_no');
+            const orderInfo = await this.model('order').where({order_no}).find();
+            if (think.isEmpty(orderInfo)) {
+                return this.fail(-1, "該訂單不存在!");
+            }
+            const payParams: any = await this.getWxPay(order_no, orderInfo.pay_amount * 100);
+            const key = payParams.package.split('=')[0];
+            const val = payParams.package.split('=')[1];
+            const udp = {prepay_id: val};
+            await this.model('order').where({order_no}).update(udp);
+            return this.success(payParams);
+        } catch (e) {
+            this.dealErr(e);
+        }
 
+    }
     async getWxPay($order_no: number, $pay_fee: number) {
         const shopConfig = this.config('shopConfig');
         const wxpay = WXPay({
