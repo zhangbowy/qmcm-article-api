@@ -24,7 +24,7 @@ export default class extends Base {
     async notifyAction() {
         const code: string = this.get('code');
         const state1: any = this.get('state');
-        this.redirect(`${state1}?code=${code}&state=${state1}`);
+        this.redirect(`http://${state1}?code=${code}&state=${state1}`);
     }
     /**
      * 登录授权回调接口
