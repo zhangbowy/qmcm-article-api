@@ -10,25 +10,32 @@ export default class extends restController {
       this.ctx.state.token = this.cookie('user_sign') || '';
       const tokenSerivce = think.service('wx/token');
       this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
-      if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
-        if (this.ctx.state.userInfo == null) {
-          return this.fail(402, '未登录');
-        }
-        const host = this.ctx.req.headers.host;
+
+      const host = this.ctx.req.headers.host;
+      if (host != 'cxmob.tecqm.club') {
         if (!host) {
           return this.fail(1001, '域名未配置!');
         }
+
         const res: any = await this.model('shops').where({domain: host}).find();
         if (Object.keys(res).length == 0) {
           return this.fail(1001, '店铺不存在!');
         }
-        this.ctx.state.shop_id = 15;
-      } else {
-        console.log(this.ctx.state.userInfo);
-        // if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
-        // {
-        //   return this.success('','已登录')
-        // }
+        this.ctx.state.shop_id = res.shop_id;
+        this.ctx.state.shop_info = res;
+
+        if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
+          if (this.ctx.state.userInfo == null) {
+            return this.fail(402, '未登录');
+          }
+
+        } else {
+          console.log(this.ctx.state.userInfo);
+          // if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
+          // {
+          //   return this.success('','已登录')
+          // }
+        }
       }
     } catch (e) {
      return  this.fail(1001, e);

@@ -17,6 +17,8 @@ export = {
   wx: { // 微信公众号的appid和密钥
     appid: 'wx8d8e2dd3ce250894',
     appSecret: '767be27192a424108a8c6907bdaf1549',
+    payId: 1591304471,
+
   },
   express: { // 快递鸟
     appid: '1365636', // 对应快递鸟用户后台 用户ID EBusinessID

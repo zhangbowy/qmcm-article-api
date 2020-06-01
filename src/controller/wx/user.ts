@@ -9,11 +9,22 @@ export default class extends Base {
      */
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
-        const redirectUrl = "http://cxgh.tecqm.club/api/wx/user/auth";
-        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
+        const returnUrl: any = this.ctx.req.headers.host;
+        const returnApi = returnUrl + '/wx/user/auth';
+        const params: any = {
+            returnUrl,
+            returnApi
+        }
+        const redirectUrl = "http://cxmob.tecqm.club/api/wx/user/notify";
+        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${JSON.stringify(params)}#wechat_redirect`;
         return this.redirect(url);
     }
 
+    async notifyAction() {
+        const code: string = this.get('code');
+        const state: any = JSON.parse(this.get('state'));
+        this.redirect(`${state.returnApi}?code=${code}&state=${this.get('state')}`);
+    }
     /**
      * 登录授权回调接口
      * @tip 当用户确认授权后 微信带着code回调的接口
@@ -22,6 +33,7 @@ export default class extends Base {
     async authAction() {
         try {
             const code: string = this.get('code');
+            const state: any = JSON.parse(this.get('state'));
             if (!code) {
                 return this.fail(-1., 'code不能为空');
             }
@@ -91,9 +103,12 @@ export default class extends Base {
                 maxAge: 1000 * 1000 * 1000 * 1000,
                 expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000
             });
+
+            const returnUrl = state.returnUrl;
             /**
              * 重定向到首页
              */
+
             this.redirect('http://cxgh.tecqm.club');
         } catch (e) {
             this.dealErr(e);
