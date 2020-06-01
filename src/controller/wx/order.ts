@@ -191,7 +191,7 @@ export default class extends Base {
             if (think.isEmpty(orderInfo)) {
                 return this.fail(-1, "該訂單不存在!");
             }
-            const payParams: any = await this.getWxPay(order_no, orderInfo.pay_amount * 100);
+            const payParams: any = await this.getWxPay(orderInfo.order_no, orderInfo.pay_amount * 100);
             const key = payParams.package.split('=')[0];
             const val = payParams.package.split('=')[1];
             await this.model('order').where({order_no}).update({prepay_id: val});
@@ -467,7 +467,8 @@ export default class extends Base {
                                     }
                                     express_amount.push(Number(price));
                                 }
-                                const sku_name = item.name;
+                                // const sku_name = item.name;
+                                const sku_name = "";
 
                                 /**
                                  * order_type为1 默认普通商品 的商品数据 baseData 只要里面的商品都会有的

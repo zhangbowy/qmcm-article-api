@@ -76,8 +76,7 @@ export default class extends Base {
     /**
      * 编辑刺绣模板价格
      * @params {id} 价格id
-     * @params {template_id} 模板id
-     * @params {name} 价格名称
+     * @params {emb_template_id} 模板id
      * @params {price} 价格
      * @params {width} 宽度mm
      * @params {height} 高度mm
@@ -87,13 +86,11 @@ export default class extends Base {
             const id = this.post('id');
             const emb_template_id = this.post('emb_template_id');
             // let template_type = this.post('template_type');
-            const name = this.post('name');
+            // const name = this.post('name');
             const price = this.post('price');
             const width = this.post('width');
             const height = this.post('height');
             const params = {
-                id,
-                name,
                 price,
                 width,
                 height
