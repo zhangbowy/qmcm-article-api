@@ -1,3 +1,5 @@
+import {ancestorWhere} from "tslint";
+
 const crypto = require('crypto');
 const md5 = require('md5');
 const rp = require('request-promise');
@@ -172,10 +174,10 @@ module.exports = class extends think.Service {
     if (notifyObj.return_code !== 'SUCCESS' || notifyObj.result_code !== 'SUCCESS') {
       return false;
     }
-    const signString = this.signQuery(this.buildQuery(notifyObj));
-    if (think.isEmpty(sign) || signString !== sign) {
-      return false;
-    }
+    // const signString = this.signQuery(this.buildQuery(notifyObj));
+    // if (think.isEmpty(sign) || signString !== sign) {
+    //   return false;
+    // }
     return notifyObj;
   }
 };

@@ -172,7 +172,6 @@ export default class extends Base {
         }
     }
 
-
     async payAction() {
         try {
             const order_no = this.post('order_no');
@@ -210,8 +209,6 @@ export default class extends Base {
             //         clearInterval(see);
             //     }
             // },2000)
-
-
 
             return this.success(payParams);
         } catch (e) {
@@ -254,7 +251,7 @@ export default class extends Base {
             partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
             // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
         });
-        wxpay.queryOrder({ out_trade_no: $order_no }, function(err, order){
+        wxpay.queryOrder({ out_trade_no: $order_no }, function(err, order) {
             console.log(order);
             if (order.trade_state) {
 
@@ -274,13 +271,13 @@ export default class extends Base {
         if (think.isEmpty(orderInfo)) {
             return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
         }
-        const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2});
+        const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
         if (order) {
 
         } else {
             return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
         }
-        console.log(order)
+        console.log(order);
         return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
     }
 
