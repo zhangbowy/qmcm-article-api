@@ -34,7 +34,6 @@ export default class extends Base {
     async authAction() {
         try {
             const code: string = this.get('code');
-            const state: any = JSON.parse(this.get('state'));
             if (!code) {
                 return this.fail(-1., 'code不能为空');
             }
@@ -105,12 +104,12 @@ export default class extends Base {
                 expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000
             });
 
-            const returnUrl = state.returnUrl;
+            const urls = `http://${this.ctx.req.headers.host}`;
             /**
              * 重定向到首页
              */
 
-            this.redirect('http://cxgh.tecqm.club');
+            this.redirect(urls);
         } catch (e) {
             this.dealErr(e);
         }
