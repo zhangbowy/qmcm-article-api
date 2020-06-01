@@ -10,4 +10,5 @@ export default class extends base {
     infoAction() {
 
     }
+
 }
