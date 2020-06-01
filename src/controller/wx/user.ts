@@ -10,12 +10,12 @@ export default class extends Base {
     async loginAction(): Promise<void> {
         const appid = this.config('wx').appid;
         const returnUrl: any = this.ctx.req.headers.host;
-        const returnApi = returnUrl + '/wx/user/auth';
+        const returnApi = returnUrl + '/api/wx/user/auth';
         const params: any = {
             returnUrl,
             returnApi
         }
-        const str = `returnUrl=${returnUrl}&returnApi=${returnApi}`
+        const str = `returnUrl=${returnUrl}&returnApi=${returnApi}`;
         const redirectUrl = "http://cxmob.tecqm.club/api/wx/user/notify";
         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${returnApi}#wechat_redirect`;
         return this.success(url);
