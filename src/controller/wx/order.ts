@@ -264,6 +264,7 @@ export default class extends Base {
     async notifyAction() {
         const WeixinSerivce = think.service('weixin');
         const result = WeixinSerivce.payNotify(this.post('xml'));
+        console.log(result);
         if (!result) {
             return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[支付失败]]></return_msg></xml>`;
         }
@@ -279,7 +280,7 @@ export default class extends Base {
         } else {
             return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
         }
-
+        console.log(order)
         return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
     }
 
