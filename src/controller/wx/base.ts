@@ -21,6 +21,11 @@ export default class extends restController {
         if (Object.keys(res).length == 0) {
           return this.fail(1001, '店铺不存在!');
         }
+        const config = await think.model('shop_setting').where({shop_id: res.shop_id}).find();
+        if (think.isEmpty(config)) {
+          return this.fail(-1, '店铺信息未配置!');
+        }
+        await think.config('shopConfig', config);
         this.ctx.state.shop_id = res.shop_id;
         this.ctx.state.shop_info = res;
 

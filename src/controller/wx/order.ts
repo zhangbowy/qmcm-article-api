@@ -4,6 +4,7 @@ import {think} from "thinkjs";
 const path = require('path');
 const sharp = require('sharp');
 const _ = require('lodash');
+const WXPay = require('weixin-pay');
 
 export default class extends Base {
 
@@ -158,15 +159,42 @@ export default class extends Base {
                     await this.model('order_item').add(item_v);
                     // await this.model('order_item').addMany(item_list);
                 }
-                return this.success({
-                    order_no
-                });
+                const payParams = await this.getWxPay(order_no, pay_amount * 100);
+                return this.success(payParams);
             } else {
                 return this.fail(-1, "创建订单失败!");
             }
         } catch ($err) {
             this.dealErr($err);
         }
+    }
+
+    async getWxPay($order_no: number, $pay_fee: number) {
+        const shopConfig = this.config('shopConfig');
+        const wxpay = WXPay({
+            appid: shopConfig.appid,
+            mch_id: shopConfig.mch_id,
+            partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
+            // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
+        });
+        const openid =   this.ctx.state.userInfo.openid;
+        const order = Date.now();
+        return new Promise((resoled, reject) => {
+            wxpay.getBrandWCPayRequestParams({
+                openid,
+                body: order + '公众号支付测试',
+                detail: '公众号支付测试',
+                out_trade_no: $order_no,
+                total_fee: $pay_fee,
+                spbill_create_ip: this.ctx.ip,
+                notify_url: 'http://wxpay_notify_url'
+                // tslint:disable-next-line:only-arrow-functions
+            }, function(err: any, result: any) {
+                // in express
+                resoled(result || err);
+            });
+        });
+
     }
 
     /**

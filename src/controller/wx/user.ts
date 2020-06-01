@@ -8,7 +8,7 @@ export default class extends Base {
      * @return {authUrl}
      */
     async loginAction(): Promise<void> {
-        const appid = this.config('wx').appid;
+        const appid = this.config('shopConfig').appid;
         const returnUrl: any = this.ctx.req.headers.host;
         const returnApi = returnUrl + '/api/wx/user/auth';
         const params: any = {
@@ -26,6 +26,7 @@ export default class extends Base {
         const state1: any = this.get('state');
         this.redirect(`http://${state1}?code=${code}&state=${state1}`);
     }
+
     /**
      * 登录授权回调接口
      * @tip 当用户确认授权后 微信带着code回调的接口
@@ -37,8 +38,8 @@ export default class extends Base {
             if (!code) {
                 return this.fail(-1., 'code不能为空');
             }
-            const appid = this.config('wx').appid;
-            const secret = this.config('wx').appSecret;
+            const appid = this.config('shopConfig').appid;
+            const secret = this.config('shopConfig').appsecret;
             /**
              * 通过code换取 access_token
              */
