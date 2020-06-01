@@ -15,15 +15,16 @@ export default class extends Base {
             returnUrl,
             returnApi
         }
+        const str = `returnUrl=${returnUrl}&returnApi=${returnApi}`
         const redirectUrl = "http://cxmob.tecqm.club/api/wx/user/notify";
-        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${JSON.stringify(params)}#wechat_redirect`;
+        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${returnApi}#wechat_redirect`;
         return this.success(url);
     }
 
     async notifyAction() {
         const code: string = this.get('code');
-        const state: any = JSON.parse(this.get('state'));
-        this.redirect(`${state.returnApi}?code=${code}&state=${this.get('state')}`);
+        const state1: any = this.get('state');
+        this.redirect(`${state1}?code=${code}&state=${state1}`);
     }
     /**
      * 登录授权回调接口
