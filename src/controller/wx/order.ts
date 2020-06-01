@@ -159,7 +159,10 @@ export default class extends Base {
                     await this.model('order_item').add(item_v);
                     // await this.model('order_item').addMany(item_list);
                 }
-                const payParams = await this.getWxPay(order_no, pay_amount * 100);
+                const payParams: any = await this.getWxPay(order_no, pay_amount * 100);
+                const key = payParams.package.split('=')[0];
+                const val = payParams.package.split('=')[1];
+                await this.model('order').where({order_no}).update({key: val});
                 return this.success(payParams);
             } else {
                 return this.fail(-1, "创建订单失败!");
@@ -187,7 +190,7 @@ export default class extends Base {
                 out_trade_no: $order_no,
                 total_fee: $pay_fee,
                 spbill_create_ip: this.ctx.ip,
-                notify_url: 'http://wxpay_notify_url'
+                notify_url: 'http://cxgh.tecqm.club/wx/order/notify'
                 // tslint:disable-next-line:only-arrow-functions
             }, function(err: any, result: any) {
                 // in express
@@ -196,6 +199,30 @@ export default class extends Base {
         });
 
     }
+
+
+    async notifyAction() {
+        const WeixinSerivce = think.service('weixin');
+        const result = WeixinSerivce.payNotify(this.post('xml'));
+        if (!result) {
+            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[支付失败]]></return_msg></xml>`;
+        }
+
+        const orderModel = this.model('order');
+        const orderInfo = await orderModel.where({order_no: result.out_trade_no}).find();
+        if (think.isEmpty(orderInfo)) {
+            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+        }
+        const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2});
+        if (order) {
+
+        } else {
+            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+        }
+
+        return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
+    }
+
 
     /**
      * 生成订单的编号order_no
