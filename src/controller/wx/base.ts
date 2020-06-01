@@ -14,15 +14,14 @@ export default class extends restController {
         if (this.ctx.state.userInfo == null) {
           return this.fail(402, '未登录');
         }
-        // let Origin = this.ctx.req.headers.origin;
-        // if(!Origin) {
-        //   return this.fail(1001,'域名未配置!')
-        // }
-        // let res: any = await this.model('shops').where({domain:Origin}).find();
-        // if (Object.keys(res).length == 0)
-        // {
-        //   return this.fail(1001,'店铺不存在!')
-        // }
+        const host = this.ctx.req.headers.host;
+        if (!host) {
+          return this.fail(1001, '域名未配置!');
+        }
+        const res: any = await this.model('shops').where({domain: host}).find();
+        if (Object.keys(res).length == 0) {
+          return this.fail(1001, '店铺不存在!');
+        }
         this.ctx.state.shop_id = 15;
       } else {
         console.log(this.ctx.state.userInfo);
@@ -31,7 +30,6 @@ export default class extends restController {
         //   return this.success('','已登录')
         // }
       }
-      this.ctx.state.shop_id = 15;
     } catch (e) {
      return  this.fail(1001, e);
     }
