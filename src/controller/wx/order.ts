@@ -237,7 +237,7 @@ export default class extends Base {
                 out_trade_no: $order_no,
                 total_fee: $pay_fee,
                 spbill_create_ip: this.ctx.ip,
-                notify_url: 'http://cxgh.tecqm.club/wx/order/notify'
+                notify_url: 'http://cxgh.tecqm.club/api/wx/order/notify'
                 // tslint:disable-next-line:only-arrow-functions
             }, function(err: any, result: any) {
                 // in express

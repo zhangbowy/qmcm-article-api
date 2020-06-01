@@ -55,6 +55,9 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
+    notifyAction() {
+
+    }
     createAction() {
         const rules = {
             cart_list: {
