@@ -82,7 +82,7 @@ module.exports = class extends think.Service {
    * @param payInfo
    * @returns {Promise}
    */
-  createUnifiedOrder(payInfo) {
+  createUnifiedOrder(payInfo: any) {
     const WeiXinPay = require('weixinpay');
     const weixinpay = new WeiXinPay({
       appid: think.config('weixin.appid'), // 微信小程序appid
@@ -98,14 +98,14 @@ module.exports = class extends think.Service {
         spbill_create_ip: payInfo.spbill_create_ip,
         notify_url: think.config('weixin.notify_url'),
         trade_type: 'JSAPI'
-      }, (res) => {
+      }, (res: any) => {
         if (res.return_code === 'SUCCESS' && res.result_code === 'SUCCESS') {
-          const returnParams = {
-            'appid': res.appid,
-            'timeStamp': parseInt(Date.now() / 1000) + '',
-            'nonceStr': res.nonce_str,
-            'package': 'prepay_id=' + res.prepay_id,
-            'signType': 'MD5'
+          const returnParams: any = {
+            appid: res.appid,
+            timeStamp: parseInt(String(Date.now() / 1000), 10) + '',
+            nonceStr: res.nonce_str,
+            package: 'prepay_id=' + res.prepay_id,
+            signType: 'MD5'
           };
           const paramStr = `appId=${returnParams.appid}&nonceStr=${returnParams.nonceStr}&package=${returnParams.package}&signType=${returnParams.signType}&timeStamp=${returnParams.timeStamp}&key=` + think.config('weixin.partner_key');
           returnParams.paySign = md5(paramStr).toUpperCase();
@@ -123,7 +123,7 @@ module.exports = class extends think.Service {
    * @param queryObj
    * @returns {Promise.<string>}
    */
-  buildQuery(queryObj) {
+  buildQuery(queryObj: any) {
     const sortPayOptions = {};
     for (const key of Object.keys(queryObj).sort()) {
       sortPayOptions[key] = queryObj[key];
@@ -141,9 +141,10 @@ module.exports = class extends think.Service {
    * @param queryStr
    * @returns {Promise.<string>}
    */
-  signQuery(queryStr) {
+  signQuery(queryStr: any) {
     queryStr = queryStr + '&key=' + think.config('weixin.partner_key');
-    const md5 = require('md5');
+    // tslint:disable-next-line:no-shadowed-variable
+    const md5: any = require('md5');
     const md5Sign = md5(queryStr);
     return md5Sign.toUpperCase();
   }
@@ -153,12 +154,12 @@ module.exports = class extends think.Service {
    * @param notifyData
    * @returns {{}}
    */
-  payNotify(notifyData) {
+  payNotify(notifyData: any) {
     if (think.isEmpty(notifyData)) {
       return false;
     }
 
-    const notifyObj = {};
+    const notifyObj: any = {};
     let sign = '';
     for (const key of Object.keys(notifyData)) {
       if (key !== 'sign') {

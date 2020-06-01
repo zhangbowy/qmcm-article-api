@@ -171,18 +171,48 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+
+
     async payAction() {
         try {
             const order_no = this.post('order_no');
             const orderInfo = await this.model('order').where({order_no}).find();
+            if (orderInfo.status != 1 && orderInfo.status != 6) {
+                let msg: string = '该订单已支付!';
+                switch (orderInfo.status) {
+                    case -2:
+                        msg = '该订单已关闭';
+                        break;
+                    case 5:
+                        msg = '该订单询价中';
+                        break;
+                }
+                return this.fail(-1, msg);
+            }
             if (think.isEmpty(orderInfo)) {
                 return this.fail(-1, "該訂單不存在!");
             }
             const payParams: any = await this.getWxPay(order_no, orderInfo.pay_amount * 100);
             const key = payParams.package.split('=')[0];
             const val = payParams.package.split('=')[1];
-            const udp = {prepay_id: val};
-            await this.model('order').where({order_no}).update(udp);
+            await this.model('order').where({order_no}).update({prepay_id: val});
+
+            // let _this = this;
+            // let ints = 0;
+            // let see = setInterval( async function() {
+            //     let bool = await _this.isPay(order_no);
+            //     ints += 1
+            //     if(bool){
+            //         console.log('2222222222222222');
+            //         clearInterval(see);
+            //     }
+            //     if(ints == 30*15){
+            //         clearInterval(see);
+            //     }
+            // },2000)
+
+
+
             return this.success(payParams);
         } catch (e) {
             this.dealErr(e);
@@ -216,7 +246,21 @@ export default class extends Base {
         });
 
     }
+    async isPay($order_no: number) {
+        const shopConfig = this.config('shopConfig');
+        const wxpay = WXPay({
+            appid: shopConfig.appid,
+            mch_id: shopConfig.mch_id,
+            partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
+            // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
+        });
+        wxpay.queryOrder({ out_trade_no: $order_no }, function(err, order){
+            console.log(order);
+            if (order.trade_state) {
 
+            }
+        });
+    }
     async notifyAction() {
         const WeixinSerivce = think.service('weixin');
         const result = WeixinSerivce.payNotify(this.post('xml'));
