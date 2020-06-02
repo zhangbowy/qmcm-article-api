@@ -175,7 +175,8 @@ export default class extends Base {
     async payAction() {
         try {
             const order_no = this.post('order_no');
-            const orderInfo = await this.model('order').where({order_no}).find();
+
+            const orderInfo: any = await this.model('order').where({order_no}).find();
             if (orderInfo.status != 1 && orderInfo.status != 6) {
                 let msg: string = '该订单已支付!';
                 switch (orderInfo.status) {
@@ -191,7 +192,13 @@ export default class extends Base {
             if (think.isEmpty(orderInfo)) {
                 return this.fail(-1, "該訂單不存在!");
             }
-            const payParams: any = await this.getWxPay(orderInfo.order_no, orderInfo.pay_amount * 100);
+            const wxOrder = await this.findOrder(order_no, orderInfo.prepay_id);
+            if (!think.isEmpty(wxOrder)) {
+                return this.json(wxOrder);
+            }
+            // tslint:disable-next-line:one-variable-per-declaration
+            const pay_fee = Number(orderInfo.pay_amount) * 10 * 10;
+            const payParams: any = await this.getWxPay(orderInfo.order_no, pay_fee);
             const key = payParams.package.split('=')[0];
             const val = payParams.package.split('=')[1];
             await this.model('order').where({order_no}).update({prepay_id: val});
@@ -227,6 +234,17 @@ export default class extends Base {
         const openid =   this.ctx.state.userInfo.openid;
         const order = Date.now();
         return new Promise((resoled, reject) => {
+            // wxpay.createUnifiedOrder({
+            //     body:order + '公众号支付测试',
+            //     out_trade_no: '20140703'+Math.random().toString().substr(2, 10),
+            //     total_fee: 1,
+            //     spbill_create_ip: '192.168.2.210',
+            //     notify_url: 'http://wxpay_notify_url',
+            //     trade_type: 'NATIVE',
+            //     product_id: '1234567890'
+            // }, function(err, result){
+            //     console.log(result);
+            // });
             wxpay.getBrandWCPayRequestParams({
                 openid,
                 body: order + '公众号支付测试',
@@ -243,7 +261,7 @@ export default class extends Base {
         });
 
     }
-    async isPay($order_no: number) {
+    async findOrder($order_no: number, $prepay_id: any) {
         const shopConfig = this.config('shopConfig');
         const wxpay = WXPay({
             appid: shopConfig.appid,
@@ -251,12 +269,42 @@ export default class extends Base {
             partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
             // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
         });
-        wxpay.queryOrder({ out_trade_no: $order_no }, function(err, order) {
-            console.log(order);
-            if (order.trade_state) {
+        return  new Promise((resolve, reject) => {
+            // tslint:disable-next-line:only-arrow-functions
+            wxpay.queryOrder({ out_trade_no: $order_no }, function(err: any, order: any) {
+                console.log(order);
+                let result: any;
+                if (order.return_code) {
+                    if (order.result_code == 'FAIL') {
+                        result = {};
+                    } else {
+                        if (order.trade_state && order.trade_state == 'NOTPAY') {
+                            const  reqparam: any = {
+                                appId: shopConfig.appid,
+                                timeStamp: Math.floor(Date.now() / 1000) + "",
+                                nonceStr: order.nonce_str,
+                                package: "prepay_id=" + $prepay_id,
+                                signType: "MD5"
+                            };
+                            reqparam.paySign = wxpay.sign(reqparam);
+                            resolve(reqparam);
+                        } else if (order.trade_state == 'SUCCESS') {
+                            // tslint:disable-next-line:no-unused-expression
+                            result = {code: -1, msg: "该订单已支付", data: ""};
+                        } else if (order.trade_state == 'CLOSED') {
+                            result =  {code: -1, msg: "该订单已关闭", data: ""};
+                        } else if (order.trade_state == 'REFUND') {
+                            result =  {code: -1, msg: "该订单转入退款", data: ""};
+                        } else if (order.trade_state == 'PAYERROR') {
+                            result =  {code: -1, msg: "支付失败,未知错误", data: ""};
+                        }
 
-            }
+                    }
+                }
+                resolve(result);
+            });
         });
+
     }
     async notifyAction() {
         const WeixinSerivce = think.service('weixin');
@@ -797,6 +845,7 @@ export default class extends Base {
                                                 if (cart_v.design_info) {
                                                     if (cart_v.design_info.design_id) {
                                                         item_info.design_id = cart_v.design_info.design_id;
+                                                        // tslint:disable-next-line:no-shadowed-variable
                                                         const shop_id = this.ctx.state.shop_id;
                                                         const design = await this.model('design').where({shop_id, design_id: item_info.design_id, del: 0, status: 3}).find();
                                                         if (think.isEmpty(design)) {
