@@ -287,7 +287,7 @@ export default class extends Base {
                                 signType: "MD5"
                             };
                             reqparam.paySign = wxpay.sign(reqparam);
-                            resolve(reqparam);
+                            result =  {code: 0, msg: '微信支付参数', data: reqparam};;
                         } else if (order.trade_state == 'SUCCESS') {
                             // tslint:disable-next-line:no-unused-expression
                             result = {code: -1, msg: "该订单已支付", data: ""};
