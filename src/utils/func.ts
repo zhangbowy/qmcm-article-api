@@ -10,8 +10,8 @@ export default  {
         const re = /png" filecontents="(.*)" filecontentmode/;
         const arr = re.exec(str);
         if (Array.isArray(arr) && arr.length > 1) {
-            return arr[1]
+            return arr[1];
         }
-        return arr
+        return arr;
     }
-}
+};

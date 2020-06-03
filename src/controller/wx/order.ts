@@ -192,39 +192,172 @@ export default class extends Base {
             if (think.isEmpty(orderInfo)) {
                 return this.fail(-1, "該訂單不存在!");
             }
-            const wxOrder = await this.findOrder(order_no, orderInfo.prepay_id);
+
+            /**
+             * 轮询每隔两秒查询是否支付主动更新订单状态
+             */
+            const _this = this;
+            let ints = 0;
+            // tslint:disable-next-line:only-arrow-functions
+            const see = setInterval( async function() {
+                const bool = await _this.isPay(orderInfo);
+                ints += 1;
+                if (bool) {
+                    console.log('已支付');
+                    clearInterval(see);
+                }
+                if (ints == 30 * 15) {
+                    clearInterval(see);
+                }
+            }, 2000);
+
+            const wxOrder = await this.findOrder(orderInfo, orderInfo.prepay_id);
             if (!think.isEmpty(wxOrder)) {
                 return this.json(wxOrder);
             }
-            // tslint:disable-next-line:one-variable-per-declaration
-            const pay_fee = Number(orderInfo.pay_amount) * 10 * 10;
-            const payParams: any = await this.getWxPay(orderInfo.order_no, pay_fee);
-            const key = payParams.package.split('=')[0];
-            const val = payParams.package.split('=')[1];
-            await this.model('order').where({order_no}).update({prepay_id: val});
+            const pay_fee = this.accMul(orderInfo.pay_amount, 100);
+            const res: any = await this.getWxPay(orderInfo, pay_fee);
+            if (!think.isObject(res)) {
+                return this.fail(-1, res);
+            }
+            // const key = payParams.package.split('=')[0];
+            // const val = payParams.package.split('=')[1];
+            await this.model('order').where({order_no}).update({prepay_id: res.result.prepay_id});
 
-            // let _this = this;
-            // let ints = 0;
-            // let see = setInterval( async function() {
-            //     let bool = await _this.isPay(order_no);
-            //     ints += 1
-            //     if(bool){
-            //         console.log('2222222222222222');
-            //         clearInterval(see);
-            //     }
-            //     if(ints == 30*15){
-            //         clearInterval(see);
-            //     }
-            // },2000)
-
-            return this.success(payParams);
+            return this.success(res.payParams);
         } catch (e) {
             this.dealErr(e);
         }
 
     }
-    async getWxPay($order_no: number, $pay_fee: number) {
-        const shopConfig = this.config('shopConfig');
+
+    /**
+     * 判断是否支付
+     */
+   async isPay($order: any) {
+        const wxOrder: any = await this.findOrder($order);
+        if (wxOrder.msg == '该订单已支付') {
+            await this.updateOrder($order);
+           // await think.model('order').where({order_no: order.order_no}).update({status: 2, _status: "待发货"});
+            return  true;
+       } else {
+            return false;
+       }
+    }
+
+    /**
+     * 定时任务
+     */
+    async crontabAction() {
+        console.log('定时任务');
+        const orderList = await think.model('order').where({status: 1}).select();
+        const today = new Date().getTime();
+        const now = today;
+        // let oneDay =think.ms('1 days');
+        // let oneDay = 1000*60*60*8 + 1000*60;
+        const half_hour = 1000 * 60 * 30;
+        const list: any = [];
+        for (const order of orderList) {
+            const wxOrder: any = await this.findOrder(order);
+            const created_time = new Date(order.created_at).getTime();
+            if (now - created_time > half_hour) {
+                list.push(order);
+                console.log(created_time);
+                await think.model('order').where({id: order.id}).update({
+                    _status: "超时未支付,已取消",
+                    status: -2
+                });
+                await this.cancelWxOrder(order);
+                await think.model('order_item').where({order_id: order.id}).update({
+                    item_status: -2
+                });
+            } else {
+                if (wxOrder.msg == '该订单已支付') {
+                    // await think.model('order').where({order_no: order.order_no}).update({status: 2, _status: "待发货"});
+                    await this.updateOrder(order);
+                }
+            }
+        }
+    }
+
+    /**
+     * 取消订单
+     * @param $order
+     */
+    async cancelWxOrder($order: any) {
+        const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
+        const wxpay = WXPay({
+            appid: shopConfig.appid,
+            mch_id: shopConfig.mch_id,
+            partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
+            // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
+        });
+        return new Promise((resolve, reject) => {
+            // @ts-ignore
+            // tslint:disable-next-line:only-arrow-functions
+            wxpay.closeOrder({ out_trade_no: $order.order_no}, function(err, result) {
+                resolve(result);
+            });
+        });
+
+    }
+
+    /**
+     * 待支付的订单更新订单状态
+     * @param $order
+     */
+    async updateOrder($order: any) {
+        const orderInfo: any = await this.model('order').where( {order_no: $order.order_no}).find();
+        if (orderInfo.status != 1 || orderInfo.status != 6) {
+            return this.fail(-1, '失败');
+        }
+        let _status = "待发货";
+        const pay_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
+
+        let udpOption: any;
+        if (orderInfo.order_type == 1) {
+            udpOption = {pay_time, _status, status: 2};
+        }
+        if (orderInfo.order_type == 2) {
+
+            if (orderInfo.designer_id && orderInfo.custom_template_id != 2) {
+                /**
+                 * 有花样的订单 并且有文字 直接推给设计师
+                 */
+                _status = "设计师处理中";
+                const _designer_status = '设计师处理中';
+                udpOption = { _designer_status, designer_status: 3, pay_time, _status, status: 9 };
+            } else if (orderInfo.designer_id && orderInfo.custom_template_id == 2) {
+                /**
+                 * 有花样的订单 并且无文字只有一个花样 直接送去打印
+                 */
+                _status = "待打印";
+                udpOption = {pay_time, _status, status: 10};
+            } else {
+                /**
+                 * 其余自己上传的图各种组合 去到待派单
+                 */
+                _status = "待派单";
+                udpOption = {pay_time, _status, status: 7};
+            }
+        }
+        if (orderInfo.order_type == 4) {
+            _status = "待派单";
+            // res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status: 7});
+            udpOption = {pay_time, _status, status: 7};
+        }
+        const res: any = await this.model('order').where({order_no: $order.order_no}).update(udpOption);
+        // await think.model('order').where({order_no: $order_no}).update({status: 2, _status: "待发货"});
+    }
+
+    /**
+     * 统一下单
+     * @param $order
+     * @param $pay_fee
+     */
+    async getWxPay($order: any, $pay_fee: number) {
+        const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
+        // const shopConfig = this.config('shopConfig');
         const wxpay = WXPay({
             appid: shopConfig.appid,
             mch_id: shopConfig.mch_id,
@@ -233,36 +366,56 @@ export default class extends Base {
         });
         const openid =   this.ctx.state.userInfo.openid;
         const order = Date.now();
-        return new Promise((resoled, reject) => {
-            // wxpay.createUnifiedOrder({
-            //     body:order + '公众号支付测试',
-            //     out_trade_no: '20140703'+Math.random().toString().substr(2, 10),
-            //     total_fee: 1,
-            //     spbill_create_ip: '192.168.2.210',
-            //     notify_url: 'http://wxpay_notify_url',
-            //     trade_type: 'NATIVE',
-            //     product_id: '1234567890'
-            // }, function(err, result){
-            //     console.log(result);
-            // });
-            wxpay.getBrandWCPayRequestParams({
+        return new Promise((resolve, reject) => {
+            wxpay.createUnifiedOrder({
+                trade_type: 'JSAPI',
                 openid,
                 body: order + '公众号支付测试',
                 detail: '公众号支付测试',
-                out_trade_no: $order_no,
+                out_trade_no: $order.order_no,
                 total_fee: $pay_fee,
                 spbill_create_ip: this.ctx.ip,
                 notify_url: 'http://cxgh.tecqm.club/api/wx/order/notify'
                 // tslint:disable-next-line:only-arrow-functions
             }, function(err: any, result: any) {
-                // in express
-                resoled(result || err);
+                if (result.return_code == 'SUCCESS') {
+                    const  payParams: any = {
+                        appId: shopConfig.appid,
+                        timeStamp: Math.floor(Date.now() / 1000) + "",
+                        nonceStr: result.nonce_str,
+                        package: "prepay_id=" + result.prepay_id,
+                        signType: "MD5"
+                    };
+                    payParams.paySign = wxpay.sign(payParams);
+                    resolve({payParams, result});
+                } else {
+                    resolve(result.return_msg);
+                }
             });
+            // wxpay.getBrandWCPayRequestParams({
+            //     openid,
+            //     body: order + '公众号支付测试',
+            //     detail: '公众号支付测试',
+            //     out_trade_no: $order.order_no,
+            //     total_fee: $pay_fee,
+            //     spbill_create_ip: this.ctx.ip,
+            //     notify_url: 'http://cxgh.tecqm.club/api/wx/order/notify'
+            //     // tslint:disable-next-line:only-arrow-functions
+            // }, function(err: any, result: any) {
+            //     // in express
+            //     resoled(result || err);
+            // });
         });
-
     }
-    async findOrder($order_no: number, $prepay_id: any) {
-        const shopConfig = this.config('shopConfig');
+
+    /**
+     * 查询订单
+     * @param $order
+     * @param $prepay_id
+     */
+    async findOrder($order: any, $prepay_id?: any) {
+        const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
+        // const shopConfig = this.config('shopConfig');
         const wxpay = WXPay({
             appid: shopConfig.appid,
             mch_id: shopConfig.mch_id,
@@ -271,8 +424,8 @@ export default class extends Base {
         });
         return  new Promise((resolve, reject) => {
             // tslint:disable-next-line:only-arrow-functions
-            wxpay.queryOrder({ out_trade_no: $order_no }, function(err: any, order: any) {
-                console.log(order);
+            wxpay.queryOrder({ out_trade_no: $order.order_no }, function(err: any, order: any) {
+                // console.log(order);
                 let result: any;
                 if (order.return_code) {
                     if (order.result_code == 'FAIL') {
@@ -287,7 +440,7 @@ export default class extends Base {
                                 signType: "MD5"
                             };
                             reqparam.paySign = wxpay.sign(reqparam);
-                            result =  {code: 0, msg: '微信支付参数', data: reqparam};;
+                            result =  {code: 0, msg: '微信支付参数', data: reqparam};
                         } else if (order.trade_state == 'SUCCESS') {
                             // tslint:disable-next-line:no-unused-expression
                             result = {code: -1, msg: "该订单已支付", data: ""};
@@ -306,27 +459,36 @@ export default class extends Base {
         });
 
     }
+
+    /**
+     * 微信支付回调接口
+     */
     async notifyAction() {
-        const WeixinSerivce = think.service('weixin');
-        const result = WeixinSerivce.payNotify(this.post('xml'));
-        console.log(result);
-        if (!result) {
-            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[支付失败]]></return_msg></xml>`;
-        }
+        try {
+            const WeixinSerivce = think.service('weixin');
+            const result = WeixinSerivce.payNotify(this.post('xml'));
+            console.log(result);
+            if (!result) {
+                return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[支付失败]]></return_msg></xml>`;
+            }
 
-        const orderModel = this.model('order');
-        const orderInfo = await orderModel.where({order_no: result.out_trade_no}).find();
-        if (think.isEmpty(orderInfo)) {
-            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
-        }
-        const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
-        if (order) {
+            const orderModel = this.model('order');
+            const orderInfo = await orderModel.where({order_no: result.out_trade_no}).find();
+            if (think.isEmpty(orderInfo)) {
+                return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+            }
+            const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
+            await this.updateOrder(orderInfo);
+            if (order) {
 
-        } else {
-            return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+            } else {
+                return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+            }
+            console.log(order);
+            return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
+        } catch (e) {
+           this.dealErr(e);
         }
-        console.log(order);
-        return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
     }
 
     /**
@@ -1069,17 +1231,17 @@ export default class extends Base {
     async cancelAction() {
         try {
             const order_no = this.post('order_no');
-            const res1: any = await this.model('order').where({order_no}).find();  // -2为已取消
+            const orderInfo: any = await this.model('order').where({order_no}).find();  // -2为已取消
             // @ts-ignore
-            if (think.isEmpty(res1)) {
+            if (think.isEmpty(orderInfo)) {
                 return this.fail(-1, '订单不存在');
             }
-            if (res1.status == -2) {
+            if (orderInfo.status == -2) {
                 return this.fail(-1, '该订单已取消, 请勿重复操作!');
             }
             const res: any = await this.model('order').where({order_no}).update({status: -2, _status: "已取消"});  // -2为已取消
-
-            for (const item_v of res1.order_item) {
+            const closeInfo = await this.cancelWxOrder(orderInfo);
+            for (const item_v of orderInfo.order_item) {
                 /**
                  * 加存方法 现在sku是一个串  待优化
                  */
@@ -1089,7 +1251,7 @@ export default class extends Base {
                  */
                 await this.model("item").where({id: item_v.item_id}).decrement('sale_num', item_v.buy_num);
             }
-            return this.success(res, '取消订单成功');
+            return this.success({orderInfo, closeInfo}, '取消订单成功');
         } catch ($err) {
             this.dealErr($err);
         }

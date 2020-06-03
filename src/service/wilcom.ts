@@ -9,7 +9,6 @@ const appKey =  think.config('wilcom').appKey;
 module.exports = class extends think.Service {
     constructor() {
         super();
-
     }
     /**
      * 根据图片获取刺绣预览图
@@ -64,7 +63,7 @@ module.exports = class extends think.Service {
         if (!embData) {
             throw new Error('获取design错误');
         }
-        return embData;
+        return pngData;
         // req.embDataBuffer = embData;//存储生成的 emb data
         // req.pngData = pngData; //存储生成的 png data
         // console.log('图片--》design api返回成功')

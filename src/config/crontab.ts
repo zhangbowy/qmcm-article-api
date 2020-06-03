@@ -1,10 +1,17 @@
 import {think} from "thinkjs";
-module.exports = [{
+module.exports = [
+    // {
+    //     interval: '10s',
+    //     immediate: true,
+    //     enable: true,
+    //     // handle: 'wx/order/crontab'
+    // },
+    {
     interval: '30s',
     immediate: true,
     enable: true,
     handle: async () => {
-        console.log('定时任务');
+        // console.log('定时任务');
         const orderList = await think.model('order').where({status: 1}).select();
         const today = new Date().getTime();
         const now = today;

@@ -13,7 +13,14 @@ export default class extends Base {
     async embTemplateAction(): Promise<void> {
         try {
             const template_type = this.post('template_type');
-            const res = await this.model('emb_template').where({template_type}).select();
+            const shop_id: any = this.ctx.state.admin_info.shop_id;
+            const where = {shop_id};
+            /**
+             * setRelation('emb_template_price', {where})
+             * 动态设置 where 查询条件
+             */
+            // @ts-ignore
+            const res = await this.model('emb_template').setRelation('emb_template_price', {where}).where({template_type}).select();
             return this.success(res, '请求成功!');
         } catch (e) {
             this.dealErr(e);
@@ -23,6 +30,7 @@ export default class extends Base {
 
     /**
      * 編輯刺綉模板
+     * @param {cover_image}
      */
     async editEmbTemplateAction(): Promise<void> {
         try {
@@ -49,10 +57,11 @@ export default class extends Base {
     async addEmbPriceAction(): Promise<void> {
         try {
             const emb_template_id = this.post('emb_template_id');
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             /**
              * type 1 有價格 2 沒有 只有基础价
              */
-            const template_type = 1;
+            // const template_type = 1;
             // let template_type = this.post('template_type');
             const name = this.post('name');
             const price = this.post('price');
@@ -60,11 +69,12 @@ export default class extends Base {
             const height = this.post('height');
             const params = {
                 emb_template_id,
-                template_type,
+                // template_type,
                 name,
                 price,
                 width,
-                height
+                height,
+                shop_id
             };
             const res = await this.model('emb_template_price').add(params);
             return this.success(res, '请求成功!');
@@ -84,6 +94,7 @@ export default class extends Base {
     async editEmbPriceAction(): Promise<void> {
         try {
             const id = this.post('id');
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const emb_template_id = this.post('emb_template_id');
             // let template_type = this.post('template_type');
             // const name = this.post('name');
@@ -95,7 +106,7 @@ export default class extends Base {
                 width,
                 height
             };
-            const res: any = await this.model('emb_template_price').where({emb_template_id, id}).update(params);
+            const res: any = await this.model('emb_template_price').where({shop_id, emb_template_id, id}).update(params);
             if (res) {
                 return this.success(res, '编辑成功!');
             }
@@ -113,9 +124,10 @@ export default class extends Base {
     async delEmbPriceAction(): Promise<void> {
         try {
             const id = this.post('id');
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const emb_template_id = this.post('template_id');
             // @ts-ignore
-            const res: object = await this.model('emb_template_price').where({id, emb_template_id}).delete();
+            const res: object = await this.model('emb_template_price').where({shop_id, id, emb_template_id}).delete();
             if (res) {
                 return this.success(res, '删除成功!');
             }
@@ -133,9 +145,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('slider').order('sort ASC').where({shop_id}).select();
-            if (res) {
-                return this.success(res, '请求成功!');
-            }
+            return this.success(res, '请求成功!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -836,6 +846,49 @@ export default class extends Base {
                 return this.fail([], `${key} 不存在!`);
             }
             return this.success([], '设置成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 获取微信设置
+     */
+    async getWxConfigAction() {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const config = await this.model('shop_setting').fieldReverse('id').where({shop_id}).find();
+            if (think.isEmpty(config)) {
+                await this.model('shop_setting').add({shop_id});
+            }
+            const result = await this.model('shop_setting').fieldReverse('id').where({shop_id}).find();
+            return this.success(result, '店铺设置');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 保存微信设置
+     */
+    async saveWxConfigAction() {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const mch_id: number = this.post('mch_id');
+            const wxpay_key: number = this.post('wxpay_key');
+            const appid: number = this.post('appid');
+            const appsecret: number = this.post('appsecret');
+            const wxpay_cert_p12: number = this.post('wxpay_cert_p12');
+            const domain: number = this.post('domain');
+            const config = await this.model('shop_setting').where({shop_id}).update({
+                mch_id,
+                wxpay_key,
+                appid,
+                appsecret,
+                domain,
+                wxpay_cert_p12
+            });
+            return this.success([], '保存成功!');
         } catch (e) {
             this.dealErr(e);
         }

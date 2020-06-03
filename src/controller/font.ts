@@ -31,6 +31,7 @@ export default class extends Base {
             const font_name = this.post('font_name');
             const min_height = this.post('min_height');
             const max_height = this.post('max_height');
+            const preview_image = this.post('preview_image');
 
             if (!file || !file.type) {
                 return this.fail(-1, '导入文件不能为空', []);
@@ -51,6 +52,7 @@ export default class extends Base {
                     font_name,
                     max_height,
                     min_height,
+                    preview_image,
                     font_content: JSON.stringify(res1.fileObj)
                 };
                 const data = await this.model('fonts').add(params);
@@ -70,12 +72,28 @@ export default class extends Base {
      * @params { max_height } 最大高
      * @params { min_height } 最小高
      * @params { font_name } 最小高
+     * @params { preview_image } 预览图
      */
     async editFontAction() {
         try {
-
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const font_id: number = this.post('font_id');
+            const font_name: number = this.post('font_name');
+            const min_height: number = this.post('min_height');
+            const max_height: number = this.post('max_height');
+            const preview_image: number = this.post('preview_image');
+            const res = await this.model('fonts').where({font_id}).update({
+                preview_image,
+                max_height,
+                min_height,
+                font_name,
+            });
+            if (!res) {
+                return this.fail(-1, '该字体不存在');
+            }
+            return this.success([], '编辑成功!');
         } catch (e) {
-
+            this.dealErr(e);
         }
     }
 

@@ -12,20 +12,20 @@ export default class extends restController {
       this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
 
       const host = this.ctx.req.headers.host;
-      if (host != 'cxmob.tecqm.club' && this.ctx.path.indexOf('wx/order/notify') === -1) {
+      if (host != 'cxmob.tecqm.club' && this.ctx.path.indexOf('wx/order/notify') === -1 && this.ctx.path.indexOf('wx/order/crontab') === -1) {
         if (!host) {
           return this.fail(1001, '域名未配置!');
         }
 
-        const res: any = await this.model('shops').where({domain: host}).find();
+        const res: any = await this.model('shop_setting').where({domain: host}).find();
         if (Object.keys(res).length == 0) {
-          return this.fail(1001, '店铺不存在!');
+          return this.fail(1001, '店铺不存在或域名未配置!');
         }
-        const config = await think.model('shop_setting').where({shop_id: res.shop_id}).find();
-        if (think.isEmpty(config)) {
-          return this.fail(-1, '店铺信息未配置!');
-        }
-        await think.config('shopConfig', config);
+        // const config = await think.model('shop_setting').where({shop_id: res.shop_id}).find();
+        // if (think.isEmpty(config)) {
+        //   return this.fail(-1, '店铺信息未配置!');
+        // }
+        // await think.config('shopConfig', config);
         this.ctx.state.shop_id = res.shop_id;
         this.ctx.state.shop_info = res;
 

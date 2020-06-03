@@ -42,7 +42,7 @@ export default class extends think.Controller {
         if (fs.existsSync(path)) {
             files = fs.readdirSync(path);
             // tslint:disable-next-line:only-arrow-functions
-            let _this = this
+            const _this = this;
             files.forEach(function(file: any, index: any) {
                 const curPath = path + "/" + file;
                 if (fs.statSync(curPath).isDirectory()) {
@@ -55,6 +55,14 @@ export default class extends think.Controller {
         }
     }
 
+     accMul(arg1: any, arg2: any) {
+         // tslint:disable-next-line:prefer-const one-variable-per-declaration
+        let m = 0, s1 = arg1.toString(), s2 = arg2.toString();
+        try {m += s1.split(".")[1].length; } catch (e) {}
+        try {m += s2.split(".")[1].length; } catch (e) {}
+        console.log((Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m)).toFixed(2));
+        return (Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m))
+    }
     /**
      * 递归分类列表
      */

@@ -111,12 +111,27 @@ export default class extends Base {
             this.fail(-1, '请上传正确的zip格式文件', []);
         }
     }
-    /**
-     * 上传oss
-     * @params dst file
-     */
-    async uploadOssAction() {
 
+    /**
+     * 上传证书
+     */
+    async uploadCertAction() {
+        const file = this.file('cert');
+        const fileName = think.uuid('v4');
+        if (!file || !file.type) {
+            return  this.fail(-1, '文件不能为空', []);
+        }
+
+        const gs = file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length);
+        const typeList = ['pem', 'p12'];
+        if (!typeList.includes(gs)) {
+            return  this.fail(-1, '文件格式仅支持.pem,.p12', []);
+        }
+        const shop_id = this.ctx.state.admin_info.shop_id;
+        const filepath = path.join(think.ROOT_PATH, 'runtime/cert/' + shop_id + '.' + gs);
+        think.mkdir(path.dirname(filepath));
+        await rename(file.path, filepath);
+        return this.success({url: 'runtime/cert/' + shop_id + '.' + gs});
     }
 }
 function deleteFolder($path: any) {

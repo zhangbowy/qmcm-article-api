@@ -37,7 +37,9 @@ export default class extends restController {
         // if (!await this.session('token')) {
         //   return this.fail(402, '未登录!', []);
         // }
-
+        /**
+         * 判断角色权限
+         */
         const isAuth = await this.checkAuth(admin_info);
         if (isAuth) {
           /**
@@ -48,7 +50,7 @@ export default class extends restController {
           // return this.fail(401,'您无权访问');
           return this.fail(401, '您没有此项权限!');
         }
-        console.log(this.session('token'));
+        // console.log(this.session('token'));
       }
     } catch (e) {
       this.dealErr(e);
@@ -103,6 +105,11 @@ export default class extends restController {
     return res;
   }
 
+  /**
+   * 系统日志留用
+   * @param $log
+   * @param $content
+   */
   async saveSystemLog($log: any, $content: any) {
     const admin_info = this.ctx.state.admin_info;
     const admin_phone = this.ctx.state.admin_info.phone;

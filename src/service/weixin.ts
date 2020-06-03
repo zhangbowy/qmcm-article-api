@@ -1,11 +1,13 @@
 import {ancestorWhere} from "tslint";
+import {think} from "thinkjs";
 
 const crypto = require('crypto');
 const md5 = require('md5');
 const rp = require('request-promise');
 
 module.exports = class extends think.Service {
-  async login(code, fullUserInfo) {
+  // @ts-ignore
+  async login(code, fullUserInfo: { rawData: { toString: () => string | number; }; signature: any; encryptedData: any; iv: any; }) {
     try {
       // 获取 session
       const options = {
@@ -22,6 +24,7 @@ module.exports = class extends think.Service {
       let sessionData = await rp(options);
       sessionData = JSON.parse(sessionData);
       if (!sessionData.openid) {
+        // @ts-ignore
         return { errno: sessionData.errcode, errmsg: sessionData.errmsg, data: null };
       }
 
@@ -46,7 +49,7 @@ module.exports = class extends think.Service {
    * @param iv
    * @returns {Promise.<string>}
    */
-  async decryptUserInfoData(sessionKey, encryptedData, iv) {
+  async decryptUserInfoData(sessionKey: any, encryptedData: any, iv: any) {
     let decoded = '';
     try {
       const _sessionKey = Buffer.from(sessionKey, 'base64');
@@ -157,7 +160,7 @@ module.exports = class extends think.Service {
    * @returns {{}}
    */
   payNotify(notifyData: any) {
-    console.log(notifyData,'notifyData');
+    console.log(notifyData, 'notifyData');
     if (think.isEmpty(notifyData)) {
       return false;
     }

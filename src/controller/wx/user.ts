@@ -109,7 +109,6 @@ export default class extends Base {
             /**
              * 重定向到首页
              */
-
             this.redirect(urls);
         } catch (e) {
             this.dealErr(e);

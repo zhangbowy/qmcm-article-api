@@ -240,8 +240,8 @@ export default class extends Base {
             const area_top = Math.floor(design_top * scale);
             const area_width = Math.floor(design_width * scale);
             const area_height = Math.floor(design_height * scale);
-            const area_width_mm = area_width / 270 * 25.4;
-            const area_height_mm = area_height / 270 * 25.4;
+            const area_width_mm =  Math.floor(area_width / 270 * 25.4);
+            const area_height_mm = Math.floor(area_height / 270 * 25.4);
 
             let composite: any = [];
             /**
@@ -336,7 +336,8 @@ export default class extends Base {
                 } else {
                     drawBuffer = Buffer.from(baseData, 'base64');
                 }
-                const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).webp().toBuffer() ;
+                // const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).webp().toBuffer() ;
+                const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).toBuffer() ;
                 const drawAreaBuffer_meta  = await sharp(drawAreaBuffer).metadata();
                 const drawAreaBuffer_width = drawAreaBuffer_meta.width;
                 const drawAreaBuffer_height = drawAreaBuffer_meta.height;
