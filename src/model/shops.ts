@@ -24,7 +24,7 @@ export default class extends think.Model {
                 field: 'shop_id,phone,name',
                 where: {role_type: ['NOTIN', '1'], del: 0},
             },
-            shop_setting:{
+            shop_setting: {
                 type: think.Model.HAS_ONE,
                 Model: 'shops',
                 fKey: 'shop_id',
