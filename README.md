@@ -1,6 +1,7 @@
 # yuncixiu-api-v3.0
 
-api with think js 
+云刺绣 api with Thinkjs  
+
 ## Install dependencies
 
 ```

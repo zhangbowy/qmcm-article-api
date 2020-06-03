@@ -880,6 +880,10 @@ export default class extends Base {
             const appsecret: number = this.post('appsecret');
             const wxpay_cert_p12: number = this.post('wxpay_cert_p12');
             const domain: number = this.post('domain');
+            const isHaveDomain = await this.model('shop_setting').where({shop_id: ['NOTIN', shop_id], domain}).find();
+            if (!think.isEmpty(isHaveDomain)) {
+                return this.fail(-1, '域名已被使用!');
+            }
             const config = await this.model('shop_setting').where({shop_id}).update({
                 mch_id,
                 wxpay_key,

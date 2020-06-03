@@ -554,6 +554,7 @@ export default class extends Base {
      */
     async setStatusAction(): Promise<any>  {
         try {
+            return false
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
             const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;

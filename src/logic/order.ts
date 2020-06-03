@@ -167,4 +167,7 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
+  exportExcelAction() {
+
+  }
 }

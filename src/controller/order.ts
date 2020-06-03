@@ -2,8 +2,66 @@ import Base from './base.js';
 import ItemModel from "../model/item";
 import {think} from "thinkjs";
 const path = require('path');
+const fs = require("fs");
+const nodeXlsx = require('node-xlsx');
 export default class extends Base {
 
+  async getList() {
+    try {
+      // @ts-ignore
+      const shop_id = 15;
+      const page: number = this.post('currentPage') || 1;
+      const limit: number = this.post('pageSize') || 10;
+      const status: number = Number(this.post('status') || 0);
+      const order_no: string = this.post('order_no') || '';
+      const order_type: number = Number(this.post('order_type') || 0);
+      const start_time: number = this.post('start_time');
+      const end_time: number = this.post('end_time');
+      const start_pay_time: number = this.post('start_pay_time');
+      const end_pay_time: number = this.post('end_pay_time');
+      const receiver_phone: number = this.post('receiver_phone');
+      const express_number: number = this.post('express_number');
+      const where: any = {};
+      where.order_no = ['like', `%${order_no}%`];
+      where.shop_id = shop_id;
+      if (status) {
+        where.status = status;
+      }
+      if (start_time && end_time) {
+        where.created_at = {'>=': start_time, '<=': end_time};
+      }
+      if (start_pay_time && end_pay_time) {
+        where.pay_time = {'>=': start_pay_time, '<=': end_pay_time};
+      }
+      if (receiver_phone) {
+        where.receiver_phone = receiver_phone;
+      }
+      if (order_type) {
+        where.order_type = order_type;
+      }
+      let orderIdList;
+      let result;
+      if (express_number) {
+        orderIdList =  await this.model('order_item').where({express_number}).getField('order_id');
+        // @ts-ignore
+        if (orderIdList.length > 0) {
+          where.id = ['IN', orderIdList];
+        } else {
+          where.id = 0;
+        }
+        // result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
+      } else {
+        // result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
+      }
+      result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
+      if (this.ctx.state.isExcel) {
+        // @ts-ignore
+      }
+      return result;
+    } catch (e) {
+      this.dealErr(e);
+    }
+  }
   /**
    * 订单列表
    * @param {currentPage}
@@ -11,32 +69,17 @@ export default class extends Base {
    * @param {status} 订单状态 状态 -2、已关闭/取消订单 0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9、已接单(designer_status 1、待接单 2、待指派设计师 3、设计师处理中 4、处理完成) 10、待打印
    * @param {order_no} 订单编号
    * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
+   * @param {start_time} 开始时间
+   * @param {end_time} 结束时间
+   * @param {start_pay_time} 支付起
+   * @param {end_pay_time} 支付止
+   * @param {receiver_phone} 收货人手机号
+   * @param {express_number} 快递单号
    * @return order_list
    */
   async orderListAction() {
-    try {
-      // @ts-ignore
-      const shop_id = this.ctx.state.admin_info.shop_id;
-      const page: number = this.post('currentPage') || 1;
-      const limit: number = this.post('pageSize') || 10;
-      const status: number = Number(this.post('status') || 0);
-      const order_no: string = this.post('order_no') || '';
-      const order_type: number = Number(this.post('order_type') || 0);
-      const where: any = {};
-      where.order_no = ['like', `%${order_no}%`];
-      where.shop_id = shop_id;
-      if (status) {
-        where.status = status;
-      }
-      if (order_type) {
-        where.order_type = order_type;
-      }
-      const res = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
-      // let res = await this.model('order').group('status').where(where).countSelect();
-      return this.success(res, '请求成功!');
-    } catch (e) {
-      this.dealErr(e);
-    }
+    const res = await this.getList();
+    return this.success(res);
   }
 
   /**
@@ -54,12 +97,27 @@ export default class extends Base {
       // const status: number = this.post('status') || 0;
       const order_no: string = this.post('order_no') || '';
       const order_type: string = this.post('order_type') || 0;
+      const start_time: number = this.post('start_time');
+      const end_time: number = this.post('end_time');
+      const start_pay_time: number = this.post('start_pay_time');
+      const end_pay_time: number = this.post('end_pay_time');
+      const receiver_phone: number = this.post('receiver_phone');
+      const express_number: number = this.post('express_number');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
       where.shop_id = shop_id;
       // if (status) {
       //   // where.status = status
       // }
+      if (start_time && end_time) {
+        where.created_at = {'>=': start_time, '<=': end_time};
+      }
+      if (start_pay_time && end_pay_time) {
+        where.pay_time = {'>=': start_pay_time, '<=': end_pay_time};
+      }
+      if (receiver_phone) {
+        where.receiver_phone = receiver_phone;
+      }
       if (order_type) {
         where.order_type = order_type;
       }
@@ -131,15 +189,43 @@ export default class extends Base {
           count: 0
         }
       ];
-      const res: any = await this.model('order').order('order_no DESC').where(where).count('status');
-
-      for (const item of statusListn) {
-        where.status = item.status;
-        const count =  await this.model('order').where(where).order('created_at DESC').count('status');
-        const index = statusListn.indexOf(item);
-        statusListn[index].count = count;
+      let orderIdList;
+      let result;
+      if (express_number) {
+        orderIdList =  await this.model('order_item').where({ express_number}).getField('order_id');
+        // @ts-ignore
+        if (orderIdList.length > 0) {
+          // orderList = await this.model('order').where({id: ['IN', 350]}).group('status').select();
+          where.id = ['IN', orderIdList];
+        }
+      } else {
+        // const res: any = await this.model('order').order('order_no DESC').where(where).count('status');
+        // // result = await this.model('order').getCount(orderIds);
+        // for (const item of statusListn) {
+        //   where.status = item.status;
+        //   const count =  await this.model('order').where(where).order('created_at DESC').count('status');
+        //   const index = statusListn.indexOf(item);
+        //   statusListn[index].count = count;
+        // }
+        // statusListn[0].count = res;
       }
-      statusListn[0].count = res;
+      const orderIds = await this.model('order').where(where).getField('id');
+      // @ts-ignore
+      if (orderIds.length > 0) {
+        // @ts-ignore
+        result = await this.model('order').getCount(orderIds);
+        // @ts-ignore
+        let total = 0;
+        for (const order_v of result) {
+          for (const status_v of statusListn) {
+            if (status_v.status == order_v.status) {
+              status_v.count = order_v.count;
+              total += order_v.count;
+            }
+          }
+        }
+        statusListn[0].count = total;
+      }
       return this.success(statusListn, '请求成功!');
     } catch (e) {
       this.dealErr(e);
@@ -575,4 +661,112 @@ export default class extends Base {
       }
       this.success([], '操作成功!');
   }
+  async exportExcelAction() {
+    // tslint:disable-next-line:jsdoc-format
+    this.ctx.state.isExcel = true;
+    const orderList: any
+        =  await this.getList();
+    // 导出excel表样式
+    const sheetStyle = {'!cols': [{wch: 18}, {wch: 10}, {wch: 10}, {wch: 10}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}]}; // 表样式
+    // 导出目录
+    const excelDir = path.join(__dirname, '../', '/public/exportExcel/');
+    // 导出文件名
+    const fileName = `导出${orderList.data.length}条于${getFullTime()}.xlsx`;
+    // 导出完整路径
+    const filePath = excelDir + fileName;
+    // 清理导出目录下所有文件
+    // clearPath(excelDir);
+    // 生成excel
+    this.ctx.set({
+      // 'Content-Type': 'multipart/form-data',
+      // 'Content-Length': isHaveFile.size,
+      // "Content-Disposition": "attachment; filename=" + `${fileName}`,
+
+    });
+    const excel = await getExcelByData(orderList.data, sheetStyle, filePath, fileName);
+    this.ctx.attachment(fileName);
+    this.ctx.body = excel;
+  }
+
+}
+
+// /**
+//  * 清理指定路径下的内容
+//  * @param $path 路径
+//  * @tip 如果指定路径不存在则生成
+//  */
+// function clearPath($path: any) {
+//   let exceFiles = [];
+//   if (fs.existsSync($path)) {
+//     exceFiles = fs.readdirSync($path); // 拿到指定目录下全部内容
+//     exceFiles.forEach((file, index) => {
+//       const curPath = $path + "/" + file;
+//       if (fs.statSync(curPath).isDirectory()) {
+//         delDir(curPath); // 删除文件夹
+//       } else {
+//         fs.unlinkSync(curPath); // 删除文件
+//       }
+//     });
+//   } else {
+//     fs.mkdirSync($path); // 可能是第一次进入-创建
+//   }
+// }
+
+/**
+  获取完整日期
+ *
+ */
+function getFullTime() {
+  const date = new Date();
+  const year1 = date.getFullYear();
+  const month1 = date.getMonth() + 1;
+  const day1 = date.getDate();
+  const hour1 = date.getHours();
+  const minute1 = date.getMinutes();
+  const second1 = date.getSeconds();
+  const timers1 = `${year1}年${month1}月${day1}日${hour1}时-${minute1}分-${second1}秒`;
+  return timers1;
+}
+
+/**
+ * 用数据生成导出EXCEL
+ * @param $data 要导出的数据
+ * @param $sheetStyle 要导出的样式
+ * @param $outPath 要导出的文件路径
+ * @param $fileName 要导出的文件名
+ * @success 返回导出excel的url
+ * @failed 返回错误信息
+ */
+function getExcelByData($data: any, $sheetStyle: { '!cols': Array<{ wch: number; }>; }, $outPath: string, $fileName: string) {
+  return new Promise((resolve, reject) => {
+    // const data = JSON.parse(JSON.stringify($data)); // 复制
+    const rowData: any[] = []; // 表数据
+    // @ts-ignore
+    const hcol: any[] = []; // 表头
+    // tslint:disable-next-line:forin
+    for (const col in $data[0]) {
+      hcol.push(col);
+    }
+    rowData.push(hcol); // 将表头放入表数据第一行
+    // @ts-ignore
+    $data.forEach((rowV, rowK) => {
+      const rows: any[] = [];
+      hcol.forEach((colV, colK) => {
+        rows[colK] = rowV[colV];  // 外围数据循环一次,这里在循环表头,将data[k]的每一行key对应数据拿出来到需要的格式
+      });
+      rowData.push(rows); // 用表头取到的数据push进表数据
+    });
+    const resultExcel2 = nodeXlsx.build([{name: "sheet1", data: rowData}], $sheetStyle); // node-xlsx模式
+    resolve(resultExcel2);
+    // tslint:disable-next-line:only-arrow-functions
+    // tslint:disable-next-line:only-arrow-functions
+    // fs.writeFile($outPath, resultExcel2, 'binary', function(err: any) {
+    //   if (err) {
+    //     reject(err);
+    //   } else {
+    //     const excelcUrl = `http://localhost:8089/public/exportExcel/${$fileName}`;
+    //     resolve(excelcUrl);
+    //   }
+    // });
+  });
 }

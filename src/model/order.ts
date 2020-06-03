@@ -150,9 +150,13 @@ export default class extends think.Model {
         };
         return result;
     }
-    async getWeek() {
-        const sql = 'select created_at from `order` where to_days(now()) - to_days(created_at) <= 3';
+    async getCount($ids: any) {
+        const str = $ids.join(',');
+        const sql = 'select  count(*) as count,status from `order` where `id` IN (' + str + ') group by status';
         const a = await this.query(sql);
         return  a;
+    }
+    getPayAmount() {
+        'select created_at from `order` where to_days(now()) - to_days(created_at) <= 3'
     }
 }
