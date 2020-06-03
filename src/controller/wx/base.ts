@@ -17,16 +17,16 @@ export default class extends restController {
           return this.fail(1001, '域名未配置!');
         }
 
-        const res: any = await this.model('shop_setting').where({domain: host}).find();
-        if (Object.keys(res).length == 0) {
+        const config: any = await this.model('shop_setting').where({domain: host}).find();
+        if (Object.keys(config).length == 0) {
           return this.fail(1001, '店铺不存在或域名未配置!');
         }
-        // const config = await think.model('shop_setting').where({shop_id: res.shop_id}).find();
-        // if (think.isEmpty(config)) {
-        //   return this.fail(-1, '店铺信息未配置!');
-        // }
-        // await think.config('shopConfig', config);
-        this.ctx.state.shop_id = res.shop_id;
+        const res = await think.model('shops').where({shop_id: config.shop_id}).find();
+        if (Object.keys(config).length == 0) {
+          return this.fail(res, '店铺不存在');
+        }
+        await think.config('shopConfig', config);
+        this.ctx.state.shop_id = config.shop_id;
         this.ctx.state.shop_info = res;
 
         if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
