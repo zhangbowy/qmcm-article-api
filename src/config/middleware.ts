@@ -10,8 +10,10 @@ export = [
   {
     handle: 'meta',
     options: {
-      logRequest: isDev,
-      sendResponseTime: isDev
+      logRequest: true,
+      // logRequest: isDev,
+      sendResponseTime: true
+      // sendResponseTime: isDev
     }
   },
   {
