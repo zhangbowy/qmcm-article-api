@@ -264,7 +264,7 @@ export default class extends Base {
             appid: shopConfig.appid,
             mch_id: shopConfig.mch_id,
             partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
-            pfx: data, //微信商户平台证书
+            pfx: data, // 微信商户平台证书
             // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
         });
         const params = {
@@ -566,7 +566,7 @@ export default class extends Base {
             // item_info.custom_image = cart_v.design_info.custom_image;
             // item_info.preview_image = cart_v.design_info.preview_image
             const cart_list: any = this.post('cart_list');
-
+            const logistics_type: any = this.post('logistics_type');
             if (cart_list.length == 0) {
                 return  '商品不能为空!';
             }
@@ -606,7 +606,16 @@ export default class extends Base {
              *  购物类型 / 订单类型
              */
             const order_type = cart_list[0].shopping_type;
+            // const logistics_type = cart_list[0].logistics_type || 1;
+            const _logistics_type = '快递发货';
             for (const cart_v of cart_list) {
+                if (logistics_type && logistics_type == 2) {
+                    if (cart_v.shopping_type != 2 || cart_v.design_info.is_choose_design == 0 || cart_v.design_info.custom_template_id != 2) {
+                        return  '只有单个花样定制支持门店自提';
+                    } else {
+
+                    }
+                }
                 if (order_type != cart_v.shopping_type) {
                     const _shopping_type = getOrderType(cart_v.shopping_type);
                     const _order_type = getOrderType(order_type);
@@ -648,76 +657,80 @@ export default class extends Base {
                                     return  item.name + '购买数量超出库存' + item.sum_stock;
                                     break;
                                 }
-                                if (item.express_type == 0) {
+                                if (logistics_type == 1) {
+                                    if (item.express_type == 0) {
+                                        express_amount.push(0);
+                                    }
+                                    // pay_amount += item.current_price * cart_v.buy_num;
+                                    // let sku_name = item.name;
+                                    //
+                                    // let item_info = {
+                                    //     item_id:item.id,
+                                    //     name:item.name,
+                                    //     weight:item.weight,
+                                    //     image:item.thumb_image_path,
+                                    //     sku_name,
+                                    //     sku_id:cart_v.sku_id || 0,
+                                    //     buy_num:cart_v.buy_num,
+                                    //     current_price:item.current_price,
+                                    //     category_id:item.category_id
+                                    // };
+                                    // item_list.push(item_info);
+                                    /**
+                                     * 统一运费
+                                     */
+                                    if (item.express_type == 1) {
+                                        express_amount.push(Number(item.express_fee));
+                                    }
+                                    /**
+                                     * 物流模板计费
+                                     */
+                                    if (item.express_type == 2 && item.express_template_id && address.user_id) {
+                                        /**
+                                         * 有区域规则
+                                         */
+                                        let price;
+                                        if (express_rule.region_rules && express_rule.region_rules.length > 0) {
+                                            /**
+                                             * type 1 重量 2 件数
+                                             */
+                                            express_rule.region_rules = JSON.parse(express_rule.region_rules);
+                                            if (express_rule.express_template_type == 1) {
+                                                const priceList = [];
+                                                for (const region_v of express_rule.region_rules) {
+                                                    if (region_v.region.includes(address.city_code)) {
+                                                        const coutinue = item.weight - Number(region_v.first_number) > 0 ? Math.ceil(item.weight - Number(region_v.first_number)) : 0;
+                                                        price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                        priceList.push(price);
+                                                    }
+                                                }
+                                                express_amount.push(maxPrice(priceList));
+                                            } else {
+                                                const priceList = [];
+                                                for (const region_v of express_rule.region_rules) {
+                                                    if (region_v.region.includes(address.city_code)) {
+                                                        const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
+                                                        price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                        priceList.push(price);
+                                                    }
+                                                }
+                                                express_amount.push(maxPrice(priceList));
+                                            }
+                                        } else {
+                                            if (express_rule.express_template_type == 1) {
+                                                const coutinue = item.weight - express_rule.first_number > 0 ? Math.ceil(item.weight - express_rule.first_number) : 0;
+                                                price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
+                                            } else {
+                                                const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
+                                                price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
+                                            }
+                                        }
+                                        express_amount.push(Number(price));
+                                    }
+                                    // const sku_name = item.name;
+                                } else {
                                     express_amount.push(0);
                                 }
-                                // pay_amount += item.current_price * cart_v.buy_num;
-                                // let sku_name = item.name;
-                                //
-                                // let item_info = {
-                                //     item_id:item.id,
-                                //     name:item.name,
-                                //     weight:item.weight,
-                                //     image:item.thumb_image_path,
-                                //     sku_name,
-                                //     sku_id:cart_v.sku_id || 0,
-                                //     buy_num:cart_v.buy_num,
-                                //     current_price:item.current_price,
-                                //     category_id:item.category_id
-                                // };
-                                // item_list.push(item_info);
-                                /**
-                                 * 统一运费
-                                 */
-                                if (item.express_type == 1) {
-                                    express_amount.push(Number(item.express_fee));
-                                }
-                                /**
-                                 * 物流模板计费
-                                 */
-                                if (item.express_type == 2 && item.express_template_id && address.user_id) {
-                                    /**
-                                     * 有区域规则
-                                     */
-                                    let price;
-                                    if (express_rule.region_rules && express_rule.region_rules.length > 0) {
-                                        /**
-                                         * type 1 重量 2 件数
-                                         */
-                                        express_rule.region_rules = JSON.parse(express_rule.region_rules);
-                                        if (express_rule.express_template_type == 1) {
-                                            const priceList = [];
-                                            for (const region_v of express_rule.region_rules) {
-                                                if (region_v.region.includes(address.city_code)) {
-                                                    const coutinue = item.weight - Number(region_v.first_number) > 0 ? Math.ceil(item.weight - Number(region_v.first_number)) : 0;
-                                                    price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
-                                                    priceList.push(price);
-                                                }
-                                            }
-                                            express_amount.push(maxPrice(priceList));
-                                        } else {
-                                            const priceList = [];
-                                            for (const region_v of express_rule.region_rules) {
-                                                if (region_v.region.includes(address.city_code)) {
-                                                    const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
-                                                    price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
-                                                    priceList.push(price);
-                                                }
-                                            }
-                                            express_amount.push(maxPrice(priceList));
-                                        }
-                                    } else {
-                                        if (express_rule.express_template_type == 1) {
-                                            const coutinue = item.weight - express_rule.first_number > 0 ? Math.ceil(item.weight - express_rule.first_number) : 0;
-                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
-                                        } else {
-                                            const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
-                                            price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
-                                        }
-                                    }
-                                    express_amount.push(Number(price));
-                                }
-                                // const sku_name = item.name;
                                 const sku_name = "";
 
                                 /**
@@ -830,6 +843,9 @@ export default class extends Base {
                                             }
                                             // item_info.custom_image = cart_v.design_info.custom_image;
                                         } else {
+                                            if (item_info.custom_template_id == 2) {
+                                                item_info._logistics_type = '门店自提';
+                                            }
                                             item_info.custom_image = cart_v.design_info.custom_image;
                                         }
 
@@ -946,56 +962,61 @@ export default class extends Base {
                                         if (item.express_type == 0) {
                                             express_amount.push(0);
                                         }
-                                        /**
-                                         * 统一运费
-                                         */
-                                        if (item.express_type == 1) {
-                                            express_amount.push(Number(item.express_fee));
-                                        }
-                                        /**
-                                         * 物流模板计费
-                                         */
-                                        if (item.express_type == 2 && item.express_template_id && address.user_id) {
+
+                                        if (logistics_type == 1)  {
                                             /**
-                                             * 有区域规则
+                                             * 统一运费
                                              */
-                                            let price;
-                                            if (express_rule.region_rules && express_rule.region_rules.length > 0) {
-                                                /**
-                                                 * type 1 重量 2 件数
-                                                 */
-                                                express_rule.region_rules = JSON.parse(express_rule.region_rules);
-                                                if (express_rule.express_template_type == 1) {
-                                                    const priceList = [];
-                                                    for (const region_v of express_rule.region_rules) {
-                                                        if (region_v.region.includes(address.city_code)) {
-                                                            const coutinue = sku_v.weight - Number(region_v.first_number) > 0 ? Math.ceil(sku_v.weight - Number(region_v.first_number)) : 0;
-                                                            price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
-                                                            priceList.push(price);
-                                                        }
-                                                    }
-                                                    express_amount.push(maxPrice(priceList));
-                                                } else {
-                                                    const priceList = [];
-                                                    for (const region_v of express_rule.region_rules) {
-                                                        if (region_v.region.includes(address.city_code)) {
-                                                            const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
-                                                            price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
-                                                            priceList.push(price);
-                                                        }
-                                                    }
-                                                    express_amount.push(maxPrice(priceList));
-                                                }
-                                            } else {
-                                                if (express_rule.express_template_type == 1) {
-                                                    const coutinue = sku_v.weight - express_rule.first_number > 0 ? Math.ceil(sku_v.weight - express_rule.first_number) : 0;
-                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
-                                                } else {
-                                                    const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
-                                                    price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
-                                                }
+                                            if (item.express_type == 1) {
+                                                express_amount.push(Number(item.express_fee));
                                             }
-                                            express_amount.push(Number(price));
+                                            /**
+                                             * 物流模板计费
+                                             */
+                                            if (item.express_type == 2 && item.express_template_id && address.user_id) {
+                                                /**
+                                                 * 有区域规则
+                                                 */
+                                                let price;
+                                                if (express_rule.region_rules && express_rule.region_rules.length > 0) {
+                                                    /**
+                                                     * type 1 重量 2 件数
+                                                     */
+                                                    express_rule.region_rules = JSON.parse(express_rule.region_rules);
+                                                    if (express_rule.express_template_type == 1) {
+                                                        const priceList = [];
+                                                        for (const region_v of express_rule.region_rules) {
+                                                            if (region_v.region.includes(address.city_code)) {
+                                                                const coutinue = sku_v.weight - Number(region_v.first_number) > 0 ? Math.ceil(sku_v.weight - Number(region_v.first_number)) : 0;
+                                                                price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                                priceList.push(price);
+                                                            }
+                                                        }
+                                                        express_amount.push(maxPrice(priceList));
+                                                    } else {
+                                                        const priceList = [];
+                                                        for (const region_v of express_rule.region_rules) {
+                                                            if (region_v.region.includes(address.city_code)) {
+                                                                const coutinue = cart_v.buy_num - Number(region_v.first_number) > 0 ? Math.ceil(cart_v.buy_num - Number(region_v.first_number)) : 0;
+                                                                price =  Number(region_v.first_amount) + (coutinue / region_v.continue_number) * Number(region_v.continue_amount);
+                                                                priceList.push(price);
+                                                            }
+                                                        }
+                                                        express_amount.push(maxPrice(priceList));
+                                                    }
+                                                } else {
+                                                    if (express_rule.express_template_type == 1) {
+                                                        const coutinue = sku_v.weight - express_rule.first_number > 0 ? Math.ceil(sku_v.weight - express_rule.first_number) : 0;
+                                                        price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
+                                                    } else {
+                                                        const coutinue = cart_v.buy_num - express_rule.first_number > 0 ? Math.ceil(cart_v.buy_num - express_rule.first_number) : 0;
+                                                        price = Number(express_rule.first_amount) + (coutinue / express_rule.continue_number) * Number(express_rule.continue_amount);
+                                                    }
+                                                }
+                                                express_amount.push(Number(price));
+                                            }
+                                        } else {
+                                            express_amount.push(0);
                                         }
                                         let sku_name = '';
                                         for (const skus_v of sku_v.skus) {
@@ -1118,6 +1139,9 @@ export default class extends Base {
                                                         }
                                                         // item_info.custom_image = cart_v.design_info.custom_image;
                                                     } else {
+                                                        if (item_info.custom_template_id == 2) {
+                                                            item_info._logistics_type = '门店自提';
+                                                        }
                                                         item_info.custom_image = cart_v.design_info.custom_image;
                                                     }
 
@@ -1237,7 +1261,9 @@ export default class extends Base {
                 item_price: pay_amount.toFixed(2),
                 express_amount: express_amount.toFixed(2),
                 total_price: total_price.toFixed(2),
-                order_type
+                order_type,
+                logistics_type,
+                _logistics_type
             };
             return result;
         } catch ($err) {

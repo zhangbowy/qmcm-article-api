@@ -1,5 +1,5 @@
 import { think } from 'thinkjs';
-import base from './base'
+import base from './base';
 export default class extends base {
     loginAction() {
 
@@ -10,5 +10,7 @@ export default class extends base {
     infoAction() {
 
     }
-
+    sendSmsAction() {
+        this.allowMethods = 'POST';
+    }
 }

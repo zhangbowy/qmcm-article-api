@@ -1,7 +1,7 @@
 import {ancestorWhere} from "tslint";
 
 const secret = 'SLDLKKDS323ssdd@#@@gf';
-const crypto = require('crypto')
+const crypto = require('crypto');
 import { think } from 'thinkjs';
 import * as url from "url";
 module.exports = class extends think.Service {
@@ -48,7 +48,7 @@ module.exports = class extends think.Service {
            const appid = $config.appid;
            const secret1 = $config.appsecret;
            // tslint:disable-next-line:no-shadowed-variable
-           const url = ` https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${token}&type=jsapi`;
+           const url = `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${token}&type=jsapi`;
            const res  = await this.fetch(url).then(($res) => $res.json());
            if (res.errcode == 0 && res.ticket) {
                await think.cache(`${$config.appid}-ticket`, res.ticket, {
@@ -77,7 +77,7 @@ module.exports = class extends think.Service {
              appid = $config.appid,
              appsecret = $config.appsecret,
              timestamp = Math.floor(Date.now() / 1000);
-       const signature = await this.getSha1('jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + $url +'/');
+       const signature = await this.getSha1('jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + $url + '/');
        return {
            code: 0,
            msg: 'jssdk签名',

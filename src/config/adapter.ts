@@ -54,9 +54,9 @@ exports.session = {
   type: 'cookie',
   common: {
     // maxAge: 1000 * 60 * 60 * 24, // 1 day
-    maxAge: 1000 * 60 * 60 , // 1 min
+    maxAge: 1000 * 60 * 60, // 1 min
     cookie: {
-      name: 'token',
+      // name: 'token',
       keys: ['thinkjs'],
       signed: true
     }

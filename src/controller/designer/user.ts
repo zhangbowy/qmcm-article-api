@@ -120,4 +120,28 @@ export default class extends Base {
     async editUserInfoAction() {
 
     }
+    async sendSmsAction() {
+        const sms = think.service('sms');
+        const phone = this.post('phone');
+        const code = await getCode();
+        const phone_code  = await this.session('phone_code');
+        const res = await sms.sendMessage(phone, code);
+        await this.session('phone_code', code);
+        return this.success(res);
+    }
+}
+async function getCode() {
+    const charactors = "1234567890";
+
+    // tslint:disable-next-line:one-variable-per-declaration
+    let value = '', i;
+
+    for (let j = 1; j <= 4; j++) {
+
+        i = parseInt(String(10 * Math.random()), 10);
+
+        value = value + charactors.charAt(i);
+
+    }
+    return value;
 }

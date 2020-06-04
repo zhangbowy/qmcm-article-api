@@ -282,7 +282,6 @@ export default class extends Base {
     });
   }
 
-
   /**
    * 确认支付
    * @param {order_id} 订单id
