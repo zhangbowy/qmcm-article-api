@@ -77,7 +77,7 @@ module.exports = class extends think.Service {
              appid = $config.appid,
              appsecret = $config.appsecret,
              timestamp = Math.floor(Date.now() / 1000);
-       const signature = await this.getSha1('jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + $url);
+       const signature = await this.getSha1('jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + $url +'/');
        return {
            code: 0,
            msg: 'jssdk签名',
