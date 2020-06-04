@@ -3,13 +3,14 @@ import ItemModel from "../model/item";
 import {think} from "thinkjs";
 const path = require('path');
 const fs = require("fs");
+const WXPay = require('weixin-pay');
 const nodeXlsx = require('node-xlsx');
 export default class extends Base {
 
   async getList() {
     try {
       // @ts-ignore
-      const shop_id = 15;
+      const shop_id = this.ctx.state.admin_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       const status: number = Number(this.post('status') || 0);
@@ -250,6 +251,37 @@ export default class extends Base {
       this.dealErr(e);
     }
   }
+
+  async refund($order: any) {
+    const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
+    const path1 = path.join(think.RUNTIME_PATH, '/cert/15.p12');
+    const data = await fs.readFileSync(path1);
+    const wxpay = WXPay({
+      appid: shopConfig.appid,
+      mch_id: shopConfig.mch_id,
+      partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
+      pfx: data, //微信商户平台证书
+      // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
+    });
+    const params = {
+      appid: shopConfig.appid,
+      mch_id:  shopConfig.mch_id,
+      op_user_id: '用户',
+      out_refund_no: '20140703' + Math.random().toString().substr(2, 10),
+      total_fee: '1', // 原支付金额
+      refund_fee: '1', // 退款金额
+      // transaction_id: '微信订单号'
+      out_trade_no: $order.order_no
+    };
+    return  new Promise((resolve, reject) => {
+      // @ts-ignore
+      wxpay.refund(params, (err, result) => {
+        console.log('refund', arguments);
+        resolve(err || result);
+      });
+    });
+  }
+
 
   /**
    * 确认支付
@@ -664,8 +696,7 @@ export default class extends Base {
   async exportExcelAction() {
     // tslint:disable-next-line:jsdoc-format
     this.ctx.state.isExcel = true;
-    const orderList: any
-        =  await this.getList();
+    const orderList: any =  await this.getList();
     // 导出excel表样式
     const sheetStyle = {'!cols': [{wch: 18}, {wch: 10}, {wch: 10}, {wch: 10}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 20}]}; // 表样式
     // 导出目录

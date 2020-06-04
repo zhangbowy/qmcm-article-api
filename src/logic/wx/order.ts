@@ -292,4 +292,7 @@ export default class extends base {
     crontabAction() {
 
     }
+    refundAction() {
+
+    }
 }

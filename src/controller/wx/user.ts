@@ -343,4 +343,13 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+
+    async getJsConfigAction() {
+        const shop_id: number = this.ctx.state.shop_id;
+        const shopConfig = await think.model('shop_setting').where({shop_id}).find();
+        const url = this.post('url') || 'http://cxgh.tecqm.club';
+        const jsTicket =  think.service('wx/jsTicket');
+        const res = await jsTicket.getJsSign(url, shopConfig);
+        return this.json(res);
+    }
 }

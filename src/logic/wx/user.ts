@@ -151,4 +151,7 @@ export default class extends base {
     notifyAction() {
 
     }
+    getJsConfigAction() {
+
+    }
 }

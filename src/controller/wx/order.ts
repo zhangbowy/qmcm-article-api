@@ -2,6 +2,7 @@ import Base from './base.js';
 import express_template from "../../model/express_template";
 import {think} from "thinkjs";
 const path = require('path');
+const fs = require('fs');
 const sharp = require('sharp');
 const _ = require('lodash');
 const WXPay = require('weixin-pay');
@@ -245,6 +246,45 @@ export default class extends Base {
        }
     }
 
+    async refundAction() {
+       try {
+           const order = {order_no: '20200604102223970394437', shop_id: 15};
+           // const orderInfo = await this.model('order').where({order_no}).find();
+           const res = await this.refund(order);
+           return this.success(res);
+       } catch (e) {
+
+       }
+    }
+    async refund($order: any) {
+        const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
+        const path1 = path.join(think.RUNTIME_PATH, '/cert/15.p12');
+        const data = await fs.readFileSync(path1);
+        const wxpay = WXPay({
+            appid: shopConfig.appid,
+            mch_id: shopConfig.mch_id,
+            partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
+            pfx: data, //微信商户平台证书
+            // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
+        });
+        const params = {
+            appid: shopConfig.appid,
+            mch_id:  shopConfig.mch_id,
+            op_user_id: '用户',
+            out_refund_no: '20140703' + Math.random().toString().substr(2, 10),
+            total_fee: '1', // 原支付金额
+            refund_fee: '1', // 退款金额
+            // transaction_id: '微信订单号'
+            out_trade_no: $order.order_no
+        };
+        return  new Promise((resolve, reject) => {
+            // @ts-ignore
+            wxpay.refund(params, (err, result) => {
+                console.log('refund', arguments);
+                resolve(err || result);
+            });
+        });
+    }
     /**
      * 定时任务
      */
