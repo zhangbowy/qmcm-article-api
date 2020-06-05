@@ -134,6 +134,8 @@ export default class extends Base {
             }
             if (status) {
                 where.status = status;
+            } else {
+                where.status = ['IN', '2,3'];
             }
             // tslint:disable-next-line:max-line-length
             const res = await this.model('design').where(where).order('created_at DESC').page(page, limit).countSelect();

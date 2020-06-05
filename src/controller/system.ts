@@ -3,6 +3,7 @@ import Base from './base.js';
 import UserModel from  './../model/user';
 import ExpressTemp from './../model/express_template';
 import {forEachComment} from "tslint";
+import {think} from "thinkjs";
 const fs = require('fs');
 const sharp = require('sharp');
 export default class extends Base {
@@ -857,12 +858,12 @@ export default class extends Base {
     async getWxConfigAction() {
         try {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
-            const config = await this.model('shop_setting').fieldReverse('id').where({shop_id}).find();
+            const config = await this.model('shop_setting').fieldReverse('about_us,notice,id').where({shop_id}).find();
             if (think.isEmpty(config)) {
                 await this.model('shop_setting').add({shop_id});
             }
-            const result = await this.model('shop_setting').fieldReverse('id').where({shop_id}).find();
-            return this.success(result, '店铺设置');
+            const result = await this.model('shop_setting').fieldReverse('about_us,notice,id').where({shop_id}).find();
+            return this.success(result, '店铺微信设置');
         } catch (e) {
             this.dealErr(e);
         }
@@ -884,6 +885,18 @@ export default class extends Base {
             if (!think.isEmpty(isHaveDomain)) {
                 return this.fail(-1, '域名已被使用!');
             }
+            const jsTicket =  think.service('wx/jsTicket');
+            // tslint:disable-next-line:one-variable-per-declaration
+            const res = await jsTicket.getJsSign(`http：//${domain}/`, {appid, appsecret}, true);
+            if (res.code != 0) {
+                if (res.code == 40125) {
+                    res.msg = '无效的appscret';
+                }
+                if (res.code == 40013) {
+                    res.msg = '无效的appid';
+                }
+                return  this.json(res);
+            }
             const config = await this.model('shop_setting').where({shop_id}).update({
                 mch_id,
                 wxpay_key,
@@ -891,6 +904,39 @@ export default class extends Base {
                 appsecret,
                 domain,
                 wxpay_cert_p12
+            });
+            return this.success([], '保存成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    async getTxtConfigAction() {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const config = await this.model('shop_setting').field('about_us,notice').where({shop_id}).find();
+            if (think.isEmpty(config)) {
+                await this.model('shop_setting').add({shop_id});
+            }
+            const result = await this.model('shop_setting').field('about_us,notice').where({shop_id}).find();
+            return this.success(result, '文本设置');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+
+    /**
+     * 保存微信设置
+     */
+    async saveTxtConfigAction() {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const about_us: number = this.post('about_us');
+            const notice: number = this.post('notice');
+            const config = await this.model('shop_setting').where({shop_id}).update({
+                about_us,
+                notice
             });
             return this.success([], '保存成功!');
         } catch (e) {

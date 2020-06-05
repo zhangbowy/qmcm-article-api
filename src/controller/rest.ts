@@ -55,7 +55,7 @@ export default class extends think.Controller {
         }
     }
     async getLocation($ip: any) {
-        const ip1 = think.env == 'development' ? '220.184.204.246' : $ip.replace(/::ffff:/g, '')
+        const ip1 = think.env == 'development' ? '220.184.204.246' : $ip.replace(/::ffff:/g, '');
 
         const options = {
             method: 'GET',
@@ -68,7 +68,7 @@ export default class extends think.Controller {
         const $data = JSON.parse(await rp(options));
         let ipInfo;
         if (typeof $data.province == 'string') {
-            ipInfo = `(${$data.province}-${$data.city})`
+            ipInfo = `(${$data.province}-${$data.city})`;
         } else {
             ipInfo = $ip;
         }

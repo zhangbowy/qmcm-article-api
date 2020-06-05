@@ -128,7 +128,9 @@ export default class extends Base {
                 _order_type,
                 designer_id: item_info.item_list[0].designer_id,
                 designer_team_id: item_info.item_list[0].designer_team_id,
-                custom_template_id: item_info.item_list[0].custom_template_id
+                custom_template_id: item_info.item_list[0].custom_template_id,
+                logistics_type: item_info.logistics_type,
+                _logistics_type: item_info._logistics_type
 
             });
             if (order_id) {
@@ -607,7 +609,7 @@ export default class extends Base {
              */
             const order_type = cart_list[0].shopping_type;
             // const logistics_type = cart_list[0].logistics_type || 1;
-            const _logistics_type = '快递发货';
+            let _logistics_type = '快递发货';
             for (const cart_v of cart_list) {
                 if (logistics_type && logistics_type == 2) {
                     if (cart_v.shopping_type != 2 || cart_v.design_info.is_choose_design == 0 || cart_v.design_info.custom_template_id != 2) {
@@ -1140,6 +1142,7 @@ export default class extends Base {
                                                         // item_info.custom_image = cart_v.design_info.custom_image;
                                                     } else {
                                                         if (item_info.custom_template_id == 2) {
+                                                            _logistics_type  = '门店自提';
                                                             item_info._logistics_type = '门店自提';
                                                         }
                                                         item_info.custom_image = cart_v.design_info.custom_image;

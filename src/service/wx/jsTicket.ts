@@ -9,10 +9,10 @@ module.exports = class extends think.Service {
        super();
    }
 
-   async getAccessToken($config: any) {
+   async getAccessToken($config: any, $noCache: boolean) {
         // @ts-ignore
        const token = await think.cache(`${$config.appid}-accessToken`, undefined, 'redis');
-       if (!think.isEmpty(token)) {
+       if (!think.isEmpty(token) && !$noCache) {
             return  token;
         } else {
             const appid = $config.appid;
@@ -35,13 +35,13 @@ module.exports = class extends think.Service {
         }
    }
 
-   async getTicket($config: any) {
+   async getTicket($config: any, $noCache: boolean) {
        // @ts-ignore
        const ticket = await think.cache(`${$config.appid}-ticket`,undefined, 'redis');
-       if (!think.isEmpty(ticket)) {
+       if (!think.isEmpty(ticket) && !$noCache) {
            return  ticket;
        } else {
-           const token = await this.getAccessToken($config);
+           const token = await this.getAccessToken($config, $noCache);
            if (think.isObject(token)) {
                return token;
            }
@@ -65,10 +65,10 @@ module.exports = class extends think.Service {
        }
    }
 
-   async getJsSign($url: string, $config: any) {
+   async getJsSign($url: string, $config: any, $noCache: boolean) {
        // tslint:disable-next-line:one-variable-per-declaration
-       const ticket = await this.getTicket($config);
-       if (think.isObject(ticket)) {
+       const ticket = await this.getTicket($config, $noCache);
+       if (think.isObject(ticket) ) {
            // @ts-ignore
            return {code: ticket.errcode, msg: ticket.errmsg, data: []};
        }

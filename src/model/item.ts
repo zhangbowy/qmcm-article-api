@@ -39,12 +39,12 @@ export default class extends think.Model {
         if ($data.status == -1) {
 
             // @ts-ignore
-            return this.setRelation(false).field('sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
+            return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
         } else {
             where.status = $data.status;
             // @ts-ignore
             // ,sku_list,sku_show,detail
-            return this.setRelation(false).field('sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
+            return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
         }
         // return this.order({created_at: 'DESC'}).where({del: 0}).field('shop_id,shop_name,logo,system_end_time,created_at').page(page, limit).countSelect();
     }
