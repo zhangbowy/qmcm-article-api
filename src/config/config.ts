@@ -1,7 +1,7 @@
 // default config
 import { think } from "thinkjs";
 export = {
-  workers: 4,
+  workers: 1,
   port: 8001,
   errnoField: 'code',
   errmsgField: 'msg',
@@ -18,11 +18,10 @@ export = {
     appid: 'wx8d8e2dd3ce250894',
     appSecret: '767be27192a424108a8c6907bdaf1549',
     payId: 1591304471,
-
   },
   express: { // 快递鸟
-    appid: '1365636', // 对应快递鸟用户后台 用户ID EBusinessID
-    appkey: 'f4292d9e-5328-42c5-8395-517a9f9f32e8', // AppKey
+    appid: '1647388', // 对应快递鸟用户后台 用户ID EBusinessID
+    appkey: '32729fb8-d85d-4619-b83d-fce7e6baf634', // AppKey
     request_url: 'http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx' // 快递鸟实时物流接口
   },
   wilcom: { // 澳洲接口账号密钥

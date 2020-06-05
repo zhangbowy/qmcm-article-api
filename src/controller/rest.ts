@@ -1,5 +1,5 @@
 import {think} from 'thinkjs';
-
+const rp = require('request-promise')
 const fs = require("fs");
 export default class extends think.Controller {
 
@@ -54,7 +54,27 @@ export default class extends think.Controller {
             // fs.rmdirSync(path);
         }
     }
+    async getLocation($ip: any) {
+        const ip1 = think.env == 'development' ? '220.184.204.246' : $ip.replace(/::ffff:/g, '')
 
+        const options = {
+            method: 'GET',
+            url: 'https://restapi.amap.com/v3/ip',
+            qs: {
+                key: '310d88b1f76599ee6a4b0bd50ba6bbd8',
+                ip: ip1,
+            }
+        };
+        const $data = JSON.parse(await rp(options));
+        let ipInfo;
+        if (typeof $data.province == 'string') {
+            ipInfo = `(${$data.province}-${$data.city})`
+        } else {
+            ipInfo = $ip;
+        }
+
+        return ipInfo;
+    }
      accMul(arg1: any, arg2: any) {
          // tslint:disable-next-line:prefer-const one-variable-per-declaration
         let m = 0, s1 = arg1.toString(), s2 = arg2.toString();

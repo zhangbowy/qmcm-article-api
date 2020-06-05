@@ -34,6 +34,7 @@ export default class extends Base {
                     const info = {
                         // exp: Math.floor(Date.now() / 1000) + (60 * 60),
                         admin_id: res.id,
+                        loginTime: think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss')
                     };
                     const token = await tokenFuc.create1(info);
                     await this.cache(`admin-${res.id}`, res, {

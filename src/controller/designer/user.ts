@@ -22,39 +22,71 @@ export default class extends Base {
             // }
             const designer_phone = this.post('phone');
             let designer_password = this.post('password');
+            const phone_code = this.post('phone_captcha');
             if (!designer_phone || !designer_phone) {
                 return  this.fail(-1, "用户名或密码不能为空!", []);
             }
             designer_password = think.md5(designer_password);
-            const res = await this.model('designer').where({designer_phone, designer_password}).find();
+            const res = await this.model('designer').where({designer_phone}).find();
             if (!think.isEmpty(res)) {
-                    if (res.status == 0) {
-                        return  this.fail(-1, "该账号已禁用,请联系管理员!", []);
-                    }
-                    const tokenFuc =  think.service('token');
-                    /**
-                     * 生成token
-                     */
-                    const info = {
-                        // exp: Math.floor(Date.now() / 1000) + (60 * 60),
-                        designer_id: res.designer_id,
-                    };
-                    const token = await tokenFuc.create1(info);
-                    await this.cache(`design-${res.designer_id}`, res, {
-                        type: 'redis',
-                        redis: {
-                            // timeout: 24 * 60 * 60 * 1000
-                            timeout:  60 * 60 * 1000 * 6
+                if ( res.designer_password == designer_password) {
+                    if (res.is_active) {
+                        if (res.status == 0) {
+                            return  this.fail(-1, "该账号已禁用,请联系管理员!", []);
                         }
-                    });
-                    // await this.cache(`design-sign-${res.designer_id}`, token, {
-                    //     type: 'redis',
-                    //     redis: {
-                    //         // timeout: 24 * 60 * 60 * 1000
-                    //         timeout:  60 * 60 * 1000
-                    //     }
-                    // });
-                    return this.success({design_sign: token, designer_id: res.designer_id}, "登录成功!");
+                        const tokenFuc =  think.service('token');
+                        const info = {
+                            // exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                            designer_id: res.designer_id,
+                            loginTime: think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss')
+
+                        };
+                        const token = await tokenFuc.create1(info);
+                        await this.cache(`design-${res.designer_id}`, res, {
+                            type: 'redis',
+                            redis: {
+                                // timeout: 24 * 60 * 60 * 1000
+                                timeout:  60 * 60 * 1000 * 6
+                            }
+                        });
+                        await this.cache(`design-sign-${res.designer_id}`, token, {
+                            type: 'redis',
+                            redis: {
+                                // timeout: 24 * 60 * 60 * 1000
+                                timeout:  60 * 60 * 1000 * 6
+                            }
+                        });
+                        await this.session('phone_captcha', '');
+                        return this.success({design_sign: token, designer_id: res.designer_id}, "登录成功!");
+                    } else {
+                        if (think.isEmpty(phone_code)) {
+                            return this.fail(10001, '账号未激活'); // code:10001 账号未激活
+                        }
+                        const captcha  = await this.session('phone_captcha');
+                        if (phone_code == captcha) {
+                            await this.model('designer').where({designer_phone}).update({is_active: 1});
+                            await this.session('phone_captcha', '');
+                            const tokenFuc =  think.service('token');
+                            const info = {
+                                // exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                                designer_id: res.designer_id,
+                            };
+                            const token = await tokenFuc.create1(info);
+                            await this.cache(`design-${res.designer_id}`, res, {
+                                type: 'redis',
+                                redis: {
+                                    // timeout: 24 * 60 * 60 * 1000
+                                    timeout:  60 * 60 * 1000 * 6
+                                }
+                            });
+                            return this.success({design_sign: token, designer_id: res.designer_id}, "登录成功!");
+                        } else {
+                            return this.fail(-1, '手机验证码错误');
+                        }
+                    }
+                } else {
+                    return  this.fail(-1, "用户名或密码错误!", []);
+                }
             } else {
                 return  this.fail(-1, "用户名或密码错误!", []);
             }
@@ -67,7 +99,7 @@ export default class extends Base {
             const designer_info = this.ctx.state.designer_info;
             const shop_id = designer_info.shop_id;
             const designer_id = designer_info.designer_id;
-            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del: 0}).find();
+            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del: 0}).find();
             return this.success(res, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -123,10 +155,16 @@ export default class extends Base {
     async sendSmsAction() {
         const sms = think.service('sms');
         const phone = this.post('phone');
+        // @ts-ignore
+        const phoneCaptchaTime = await this.cache(`design-${phone}-captcha-time`, undefined, 'redis');
+        if (phoneCaptchaTime) {
+            // return this.fail(-1, '一分钟之内不可再次发送');
+            return this.fail(-1, '请稍后再试!');
+        }
         const code = await getCode();
-        const phone_code  = await this.session('phone_code');
+        const phone_code  = await this.session('phone_captcha');
         const res = await sms.sendMessage(phone, code);
-        await this.session('phone_code', code);
+        await this.session('phone_captcha', code);
         return this.success(res);
     }
 }

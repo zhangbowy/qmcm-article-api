@@ -26,9 +26,10 @@ export default class extends restController {
         if (think.isEmpty(admin_redis_sign)) {
           return this.fail(402, '未登录3!', []);
         }
-        // if(admin_data.iat < admin_redis_sign.iat) {
-        //   return this.fail(402, '当前账号已在其他浏览器登录!', []);
-        // }
+        if (admin_data.iat < admin_redis_sign.iat) {
+          const location =  await this.getLocation(this.ip);
+          return this.fail(402, `当前账号已于${admin_redis_sign.loginTime}在${location}登录!`, [admin_redis_sign]);
+        }
         // @ts-ignore
         const admin_info = await this.cache(`admin-${admin_id}`, undefined, 'redis');
         if (think.isEmpty(admin_info)) {

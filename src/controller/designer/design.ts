@@ -22,7 +22,7 @@ export default class extends Base {
 
             const shop_id: boolean = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
-            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_leader,default_password,status,created_at,updated_at').where({designer_id: ['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
+            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,status,created_at,updated_at').where({designer_id: ['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
             return this.success(res, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -45,7 +45,7 @@ export default class extends Base {
             const designer_name = this.post('designer_name');
             const designer_phone = this.post('designer_phone');
             const avatar_url = this.post('avatar_url');
-            const user = await this.model('designer').where({designer_phone}).find();
+            const user = await this.model('designer').where({del: 0, designer_phone}).find();
             if (!think.isEmpty(user)) {
                 return  this.fail(-1, '手机号已被使用!');
             }

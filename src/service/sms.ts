@@ -88,7 +88,7 @@ module.exports = class extends think.Service {
         return  new Promise((resolve, reject) => {
             // tslint:disable-next-line:only-arrow-functions
             // @ts-ignore
-            client.SendSms(req, function(err, response) {
+            client.SendSms(req, async function(err, response) {
                 // 请求异常返回，打印异常信息
                 if (err) {
                     console.log(err);
@@ -97,8 +97,15 @@ module.exports = class extends think.Service {
                 // 请求正常返回，打印 response 对象
                 console.log(response.to_json_string());
                 if (response.SendStatusSet[0].Code == 'ok') {
-                   resolve(response.SendStatusSet);
-                   resolve({code: 0, msg: "send success", data: response.SendStatusSet});
+                    await this.cache(`design-${$phone}-captcha-time`, $phone, {
+                        type: 'redis',
+                        redis: {
+                            // timeout: 24 * 60 * 60 * 1000
+                            timeout: 61 * 1000 * 2
+                        }
+                    });
+                    resolve(response.SendStatusSet);
+                    resolve({code: 0, msg: "send success", data: []});
                } else {
                    resolve({code: -1, msg: response.SendStatusSet[0].Message, data: response.SendStatusSet});
                }
