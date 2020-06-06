@@ -1,20 +1,19 @@
 import { think } from 'thinkjs';
 import base from './base';
 export default class extends base {
-    loginAction() {
+    getCommissionAction() {
 
     }
-    logoutAction() {
+    getCashListAction() {
 
     }
     infoAction() {
 
     }
-    sendSmsAction() {
+    withdrawalAction() {
         this.allowMethods = 'POST';
         const rules = {
-            phone: {
-                mobile: 'zh-CN',
+            cash_amount: {
                 required: true,
                 method: 'post'
             },

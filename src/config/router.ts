@@ -1,4 +1,4 @@
 export = [
  // ['/wx/order/orderTrace', '/order/orderTrace']
-    [/\/api\/(\w+)/, 'user?name=:1']
+    ['/wx/aboutUs', '/wx/index/aboutUs']
 ];

@@ -198,6 +198,8 @@ export default class extends Base {
         if (orderIdList.length > 0) {
           // orderList = await this.model('order').where({id: ['IN', 350]}).group('status').select();
           where.id = ['IN', orderIdList];
+        } else {
+          where.id = 0;
         }
       } else {
         // const res: any = await this.model('order').order('order_no DESC').where(where).count('status');
@@ -322,20 +324,20 @@ export default class extends Base {
         udpOption = {pay_time, _status, status: 2};
       }
       if (orderInfo.order_type == 2) {
-
+        const order_item = await this.model('order_item').where({order_id: orderInfo.id}).find();
         if (orderInfo.designer_id && orderInfo.custom_template_id != 2) {
           /**
            * 有花样的订单 并且有文字 直接推给设计师
            */
           _status = "设计师处理中";
           const _designer_status = '设计师处理中';
-          udpOption = { _designer_status, designer_status: 3, pay_time, _status, status: 9 };
+          udpOption = {is_choose_design: 1, design_price: order_item.design_price, designer_price: order_item.design_price, _designer_status, designer_status: 3, pay_time, _status, status: 9 };
         } else if (orderInfo.designer_id && orderInfo.custom_template_id == 2) {
           /**
            * 有花样的订单 并且无文字只有一个花样 直接送去打印
            */
           _status = "待打印";
-          udpOption = {pay_time, _status, status: 10};
+          udpOption = {is_choose_design: 1, design_price: order_item.design_price, designer_price: order_item.design_price, pay_time, designer_status: 4, _status, status: 10};
         } else {
           /**
            * 其余自己上传的图各种组合 去到待派单

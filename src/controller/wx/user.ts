@@ -14,7 +14,7 @@ export default class extends Base {
         const params: any = {
             returnUrl,
             returnApi
-        }
+        };
         const str = `returnUrl=${returnUrl}&returnApi=${returnApi}`;
         const redirectUrl = "http://cxmob.tecqm.club/api/wx/user/notify";
         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=${returnApi}#wechat_redirect`;
@@ -344,12 +344,22 @@ export default class extends Base {
         }
     }
 
+    /**
+     * 删除收货地址
+     * @return boolean
+     */
     async getJsConfigAction() {
-        const shop_id: number = this.ctx.state.shop_id;
-        const shopConfig = await think.model('shop_setting').where({shop_id}).find();
-        const url = this.post('url') || 'http://cxgh.tecqm.club';
-        const jsTicket =  think.service('wx/jsTicket');
-        const res = await jsTicket.getJsSign(url, shopConfig);
-        return this.json(res);
+        try {
+            const shop_id: number = this.ctx.state.shop_id;
+            const shopConfig = await think.model('shop_setting').where({shop_id}).find();
+            const url = this.post('url') || 'http://cxgh.tecqm.club';
+            const jsTicket =  think.service('wx/jsTicket');
+            const res = await jsTicket.getJsSign(url, shopConfig);
+            return this.json(res);
+        } catch (e) {
+            this.dealErr(e);
+        }
     }
+
+
 }

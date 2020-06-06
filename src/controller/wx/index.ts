@@ -37,4 +37,17 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+    /**
+     * 获取店铺设置
+     */
+    async aboutUsAction() {
+        try {
+            const shop_id: number = this.ctx.state.shop_id;
+            const config_key = this.get('');
+            const res: object = await this.model('shop_setting').field('about_us').where({shop_id}).find();
+            this.success(res, '关于我们');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
 }

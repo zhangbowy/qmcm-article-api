@@ -701,44 +701,64 @@ export default class extends base {
         }
     }
 
-  getWxConfigAction() {
+    getWxConfigAction() {
 
     }
-  saveWxConfigAction() {
-    const rules = {
-      mch_id: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
-      wxpay_key: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
-      appid: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
-      appsecret: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
-      wxpay_cert_p12: {
-        required: true,
-        trim: true,
-        method: 'post'
-      },
-    };
-    const msgs: object = {
-      required: '{name}不能为空'
-    };
-    if (!this.validate(rules, msgs)) { // 校验不通过
-      const keys: string[] = Object.keys(this.validateErrors);
-      const msg: string = this.validateErrors[keys[0]];
-      return this.fail(-1, msg);
+
+    saveWxConfigAction() {
+        const rules = {
+            mch_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            wxpay_key: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            appid: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            appsecret: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            wxpay_cert_p12: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
     }
-  }
+    getShopConfigAction() {}
+    saveShopConfigAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            notice: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
 }

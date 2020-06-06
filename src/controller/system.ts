@@ -911,7 +911,11 @@ export default class extends Base {
         }
     }
 
-    async getTxtConfigAction() {
+    /**
+     * 获取店铺设置
+     * @tip 为什么分一个出来 因为 面的wxconfig信息比较重要
+     */
+    async getShopConfigAction() {
         try {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const config = await this.model('shop_setting').field('about_us,notice').where({shop_id}).find();
@@ -919,7 +923,7 @@ export default class extends Base {
                 await this.model('shop_setting').add({shop_id});
             }
             const result = await this.model('shop_setting').field('about_us,notice').where({shop_id}).find();
-            return this.success(result, '文本设置');
+            return this.success(result, '店铺设置');
         } catch (e) {
             this.dealErr(e);
         }
@@ -927,9 +931,10 @@ export default class extends Base {
 
 
     /**
-     * 保存微信设置
+     * 保存店铺设置
+     *
      */
-    async saveTxtConfigAction() {
+    async saveShopConfigAction() {
         try {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const about_us: number = this.post('about_us');
