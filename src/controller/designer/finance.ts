@@ -71,7 +71,7 @@ export default class extends Base {
             const finished_commission = await this.model('order').where({designer_team_id, designer_status: ['IN' ,  '4']}).sum('designer_price');
             const Withdrawals_commission = await this.model('cash').where({status: ['IN', '1,3']}).sum('cash_amount');
             if (finished_commission - Withdrawals_commission < Number(cash_amount)) {
-                return this.fail([], '可提现金额不足!');
+                return this.fail(-1, '可提现金额不足!');
             }
             const design_team = await this.model('designer_team').where({shop_id, designer_team_id}).find();
             const designer_team_name = design_team.designer_team_name;
