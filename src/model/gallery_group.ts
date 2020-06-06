@@ -6,7 +6,7 @@ interface AddGruopParams {
     group_name: string;
     parent_id: number;
     level: number;
-    shop_id?: number;
+    shop_id?: number
 }
 interface GoodsListParams {
     // page?: number;
@@ -22,52 +22,53 @@ export default class extends think.Model {
         return await this.add($data);
     }
     async deleteGroup($id: number) {
-        return this.where({id: ['in', $id]}).delete();
+        return this.where({id: ['in',$id]}).delete();
     }
-    async editGroup($id: number, $data: any) {
+    async editGroup($id: number,$data: any) {
         return this.where({id: $id}).update($data);
     }
-    async getNeedsTree($group_id: number) {
-        if ($group_id == 0) {
-            return  [0];
+    async getNeedsTree($group_id: number){
+        if($group_id == 0)
+        {
+            return  [0]
         }
-        const res = await this.select();
-        const hash = {};
-        for (const item of res) {
-            hash[item.id] = item.parent_id;
+        let res = await this.select();
+        let hash = {};
+        for(let item of res)
+        {
+            hash[item.id] = item.parent_id
         }
-        const bmid = $group_id;
+        var bmid = $group_id;
         // console.log(hash,'hash');
-        const pids = new Set([bmid]);
-        const len = pids.size;
-        // @ts-ignore
+        var pids = new Set([bmid]);
         do {
+            var len = pids.size;
 
-            for (const id in hash) {
+            for(var id in hash) {
                 if (pids.has(hash[id])) {
                     pids.add(Number(id));
                     delete hash[id];
                 }
             }
-        } while (pids.size > len);
+        } while (pids.size>len);
         return Array.from(pids);
 
-        let rootNeeds = await this.where({id: $group_id}).select();
+        let rootNeeds = await this.where({id:$group_id}).select();
         rootNeeds = await this.getChildNeeds(rootNeeds);
         return rootNeeds;
     }
-    async getChildNeeds(rootNeeds: any) {
-        const expendPromise: any = [];
+    async getChildNeeds(rootNeeds:any){
+        let expendPromise:any = [];
         // @ts-ignore
-        rootNeeds.forEach((item) => {
-            expendPromise.push(this.where({parent_id: item.id}).select());
-        });
-        const child = await Promise.all(expendPromise);
+        rootNeeds.forEach(item => {
+            expendPromise.push(this.where({parent_id:item.id}).select());
+        })
+        let child = await Promise.all(expendPromise);
         console.log(child);
-        for (let [idx , item] of child.entries()) {
+        for(let [idx , item] of child.entries()){
             // @ts-ignore
             // @ts-ignore
-            if (item.length > 0) {
+            if(item.length > 0){
                 item = await this.getChildNeeds(item);
             }
             rootNeeds[idx].child = item;
