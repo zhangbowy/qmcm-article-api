@@ -1,9 +1,6 @@
 import {ancestorWhere} from "tslint";
-
-const secret = 'SLDLKKDS323ssdd@#@@gf';
 const crypto = require('crypto');
 import { think } from 'thinkjs';
-import * as url from "url";
 module.exports = class extends think.Service {
    constructor() {
        super();

@@ -123,7 +123,8 @@ export default class extends Base {
         try {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
-            const info = await this.model('user').where({openid}).find();
+            const id = userInfo.id;
+            const info = await this.model('user').where({openid, id}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
@@ -141,7 +142,8 @@ export default class extends Base {
         try {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
-            const info = await this.model('user').where({openid}).find();
+            const id = userInfo.id;
+            const info = await this.model('user').where({id,openid}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');

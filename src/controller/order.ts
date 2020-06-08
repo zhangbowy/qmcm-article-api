@@ -7,6 +7,21 @@ const WXPay = require('weixin-pay');
 const nodeXlsx = require('node-xlsx');
 export default class extends Base {
 
+  /**
+   * 订单列表
+   * @param {currentPage}
+   * @param {pageSize}
+   * @param {status} 订单状态 状态 -2、已关闭/取消订单 0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9、已接单(designer_status 1、待接单 2、待指派设计师 3、设计师处理中 4、处理完成) 10、待打印
+   * @param {order_no} 订单编号
+   * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
+   * @param {start_time} 开始时间
+   * @param {end_time} 结束时间
+   * @param {start_pay_time} 支付起
+   * @param {end_pay_time} 支付止
+   * @param {receiver_phone} 收货人手机号
+   * @param {express_number} 快递单号
+   * @return order_list
+   */
   async getList() {
     try {
       // @ts-ignore
@@ -63,6 +78,7 @@ export default class extends Base {
       this.dealErr(e);
     }
   }
+
   /**
    * 订单列表
    * @param {currentPage}

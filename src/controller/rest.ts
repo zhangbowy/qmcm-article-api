@@ -122,7 +122,7 @@ export default class extends think.Controller {
 
         const {Writable} = require('stream');
         // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
-        const res = await $this.fetch($filePath);
+        const res = await this.fetch($filePath);
         const chunks: any = [];
         let size = 0;
         return new Promise((resolve, reject) => {
