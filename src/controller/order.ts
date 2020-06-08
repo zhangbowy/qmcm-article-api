@@ -614,6 +614,9 @@ export default class extends Base {
         }
         return this.fail(-1, msg);
       }
+      if (designer_price > order.item_amount) {
+        return this.fail(-1 , `给设计师的价格不能大于定制商品价格【${order.item_amount}】`);
+      }
       const _status = '派单中';
       const _designer_status = '待接单';
       const res = await this.model('order').where({shop_id, id: order_id}).update({designer_price, _designer_status, designer_status: 1, _status, status: 8, designer_team_id});

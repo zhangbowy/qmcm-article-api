@@ -14,6 +14,48 @@ interface UploadRes {
 
 const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
+    /**
+     * 上传图片
+     * @params image file
+     * @params type 上传类型 design
+     * @return IMAGE PATH
+     */
+    async uploadImgAction() {
+        try {
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const file = this.file('image');
+            const type = this.post('type');
+            const fileName = think.uuid('v4');
+            const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+            let filePath;
+            const typeList = ['paymentCert'];
+            /**
+             * 获取文件后缀
+             */
+            const extname = path.extname(file.path);
+            console.log(extname);
+            if (file && file.type  && (file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
+                if (!typeList.includes(type)) {
+                    return  this.fail(-1, '上传类型不存在!');
+                }
+                let secondPath;
+                if (type == 'paymentCert') {
+                    secondPath =  `finance/${type}`;
+                }
+                filePath = `/others/${shop_id}/${secondPath}/${fileName}${extname}`;
+                /**
+                 * 上传到腾讯OSS
+                 */
+                const oss = await think.service('oss');
+                const res: any = await oss.upload(file.path, filePath);
+                return this.success('http://' + res.Location, '上传成功!');
+            } else {
+                this.fail(-1, '请上传png或jpg格式的图片', []);
+            }
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
     private files: FileList;
     /**
      * 上传图片
@@ -21,7 +63,7 @@ export default class extends Base {
      * @params type 上传类型
      * @return IMAGE PATH
      */
-    async uploadImgAction() {
+    async uploadImgAction1() {
 
         const file = this.file('image');
         // tslint:disable-next-line:no-console prefer-const

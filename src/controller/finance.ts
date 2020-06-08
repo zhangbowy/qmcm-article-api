@@ -4,6 +4,22 @@ const path = require('path');
 const fs = require('fs');
 
 export default class extends Base {
+
+    async getDataAction() {
+        const shop_id = this.ctx.state.admin_info.shop_id;
+        const total_pay_amount: any = await this.model('order').where(`shop_id=${shop_id} and ` + '`status` NOT IN (1,-2,5,6)').sum('pay_amount');
+        // const today_pay_amount: any = await this.model('order').where(`shop_id=${shop_id} and ` + '`status` NOT IN (1,-2,5,6)').sum('pay_amount');
+        const total_commission  = await this.model('order').where({designer_status: ['IN' ,  '2,3,4']}).sum('designer_price');
+        const audit_commission = await this.model('cash').where({shop_id, status: ['IN' ,  '1']}).sum('cash_amount') || 0;
+        const withdrawals_commission = await this.model('cash').where({shop_id, status: ['IN' ,  '3']}).sum('cash_amount') || 0;
+
+        return this.success({
+            total_pay_amount,
+            total_commission,
+            audit_commission,
+            withdrawals_commission
+        });
+    }
     /**
      * 提现列表
      * @param {status} 1 提现中 2 已驳回 3 提现成功
@@ -16,7 +32,6 @@ export default class extends Base {
             const status: number = this.get('status') || 0;
             const designer_team_id: number = this.get('designer_team_id') || 0;
             const shop_id = this.ctx.state.admin_info.shop_id;
-
             const where: any = {shop_id};
             if (designer_team_id) {
                 where.designer_team_id = designer_team_id;
@@ -37,8 +52,11 @@ export default class extends Base {
     async cashRefusedAction() {
         try {
             const cash_id = this.post('cash_id');
+            const remark = this.post('remark');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const res = await this.model('cash').where({shop_id, cash_id, status: 1}).update({status: 2});
+            const verify_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
+
+            const res = await this.model('cash').where({shop_id, cash_id, status: 1}).update({verify_time, remark, _status: '已驳回!', status: 2});
             if (!res) {
                 return this.fail(-1, '该提现申请不存在或状态已变更!');
             }
@@ -60,7 +78,8 @@ export default class extends Base {
             const cash_id = this.post('cash_id');
             const remark = this.post('remark');
             const cert = this.post('cert');
-            const res = await this.model('cash').where({shop_id, cash_id}).update({status: 3, remark, cert});
+            const verify_time = think.datetime(  new Date().getTime(), 'YYYY-MM-DD HH:mm:ss');
+            const res = await this.model('cash').where({shop_id, cash_id}).update({verify_time, _status: '提现成功!', status: 3, remark, cert});
             if (!res) {
                 return this.fail(-1, '该提现申请不存在或状态已变更!');
             }

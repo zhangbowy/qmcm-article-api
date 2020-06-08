@@ -250,7 +250,7 @@ export default class extends Base {
 
     async refundAction() {
        try {
-           const order = {order_no: '20200604102223970394437', shop_id: 15};
+           const order = {order_no: '20200608163605881587044', shop_id: 15};
            // const orderInfo = await this.model('order').where({order_no}).find();
            const res = await this.refund(order);
            return this.success(res);
@@ -273,9 +273,9 @@ export default class extends Base {
             appid: shopConfig.appid,
             mch_id:  shopConfig.mch_id,
             op_user_id: '用户',
-            out_refund_no: '20140703' + Math.random().toString().substr(2, 10),
-            total_fee: '1', // 原支付金额
-            refund_fee: '1', // 退款金额
+            out_refund_no: 'zhangbo' + Math.random().toString().substr(2, 10),
+            total_fee: 2500, // 原支付金额
+            refund_fee: 2500, // 退款金额
             // transaction_id: '微信订单号'
             out_trade_no: $order.order_no
         };
@@ -383,7 +383,7 @@ export default class extends Base {
                 udpOption = {pay_time, _status, status: 7};
             }
         }
-        if (orderInfo.order_type == 4) {
+        if (orderInfo.order_type == 4 || orderInfo.order_type == 3) {
             _status = "待派单";
             // res = await this.model('order').where({shop_id, id: order_id}).update({pay_time, _status, status: 7});
             udpOption = {pay_time, _status, status: 7};

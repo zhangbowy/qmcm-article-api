@@ -99,7 +99,7 @@ export default class extends Base {
             const designer_info = this.ctx.state.designer_info;
             const shop_id = designer_info.shop_id;
             const designer_id = designer_info.designer_id;
-            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,created_at,updated_at').where({designer_id, shop_id, del: 0}).find();
+            const res = await this.model("designer").field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,alipay,wechat,bank_card_number,created_at,updated_at').where({designer_id, shop_id, del: 0}).find();
             return this.success(res, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -166,6 +166,29 @@ export default class extends Base {
         const res = await sms.sendMessage(phone, code);
         await this.session('phone_captcha', code);
         return this.success(res);
+    }
+    async saveInfoAction() {
+
+        const designer_info = this.ctx.state.designer_info;
+        const designer_team_id = designer_info.designer_team_id;
+        const designer_id = designer_info.designer_id;
+
+        const alipay = this.post('alipay');
+        const bank_card_number = this.post('bank_card_number');
+        const designer_name = this.post('designer_name');
+        const wechat = this.post('wechat');
+
+
+        const res = await this.model('designer').where({designer_team_id, designer_id}).update({
+            alipay,
+            bank_card_number,
+            designer_name,
+            wechat
+        })
+        if (!res) {
+            return this.fail(-1, '该设计师不存在');
+        }
+        return this.success([], '操作成功!');
     }
 }
 async function getCode() {
