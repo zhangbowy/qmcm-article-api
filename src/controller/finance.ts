@@ -32,14 +32,28 @@ export default class extends Base {
             const status: number = this.get('status') || 0;
             const designer_team_id: number = this.get('designer_team_id') || 0;
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const where: any = {shop_id};
+            const where: any = {'cash.shop_id': shop_id};
             if (designer_team_id) {
-                where.designer_team_id = designer_team_id;
+                where['c.designer_team_id'] = designer_team_id;
             }
             if (status) {
-                where.status = status;
+                where['cash.status' ] = status;
+                // where.status =
             }
-            const res = await this.model('cash').where(where).page(page, limit).countSelect();
+            const res = await this.model('cash').where(where).page(page, limit).join({
+                table: 'designer',
+                join: 'inner', // join 方式，有 left, right, inner 3 种方式
+                as: 'c', // 表别名
+                where: {
+                   is_leader: 1
+                },
+                on: {
+                    designer_id: 'designer_id',
+                }
+            }).field('c.bank_card_number,c.alipay,c.wechat,c.designer_team_id,' +
+                'cash.cash_id,cash.designer_team_name,cash.cash_amount,' +
+                'cash.designer_phone,cash.created_at,cash.verify_time,' +
+                'cash.status,cash._status,cash.remark,cash.shop_id,cash.cert,cash.designer_id').countSelect();
             return this.success(res, '提现记录');
         } catch (e) {
            this.dealErr(e);

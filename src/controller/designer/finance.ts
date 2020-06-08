@@ -81,6 +81,7 @@ export default class extends Base {
                 designer_team_name,
                 cash_amount,
                 shop_id,
+                designer_id,
                 // remark,
                 status: 1,
                 _status: '提现中!'

@@ -285,7 +285,7 @@ export default class extends Base {
    * @param {txt_png} 工艺单图片
    * @return boolean
    */
-  async  uploadDesignAction() {
+  async uploadDesignAction() {
     try {
       const order_id = this.post('order_id');
       const order_emb_path = this.file('emb');
@@ -337,7 +337,12 @@ export default class extends Base {
       if (think.isEmpty(itemCount)) {
         return this.fail(-1, '订单不存在!');
       }
-      await this.model('order').where({id: order_id, shop_id }).update({_status: '待打印', status: 10, designer_status: 4, _designer_status: '设计师制作完成'});
+      await this.model('order').where({id: order_id, shop_id}).update({
+        _status: '待打印',
+        status: 10,
+        designer_status: 4,
+        _designer_status: '设计师制作完成'
+      });
       return this.success([], '操作成功!');
     } catch (e) {
       this.dealErr(e);
