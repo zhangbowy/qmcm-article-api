@@ -240,8 +240,8 @@ export default class extends Base {
             const area_top = Math.floor(design_top * scale);
             const area_width = Math.floor(design_width * scale);
             const area_height = Math.floor(design_height * scale);
-            const area_width_mm =  Math.floor(area_width / 270 * 25.4);
-            const area_height_mm = Math.floor(area_height / 270 * 25.4);
+            const area_width_mm =  Math.floor(area_width / 120 * 25.4);
+            const area_height_mm = Math.floor(area_height / 120 * 25.4);
 
             let composite: any = [];
             /**
@@ -331,7 +331,7 @@ export default class extends Base {
                 const setting = await this.model('setting').where({key: 'is_request_wilcom', value: 1}).find();
                 if (!think.isEmpty(setting)) {
                     const wilcom = think.service('wilcom');
-                    const embPng =  await wilcom.getEmbByImg(baseData, area_width_mm, area_height_mm);
+                    const embPng =  await wilcom.getEmbByImg(baseData, 100, 100);
                     drawBuffer = Buffer.from(embPng, 'base64');
                 } else {
                     drawBuffer = Buffer.from(baseData, 'base64');
