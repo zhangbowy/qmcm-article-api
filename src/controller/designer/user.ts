@@ -112,7 +112,6 @@ export default class extends Base {
     async logoutAction(): Promise<any> {
         try {
             // @ts-ignore
-            // await this.cache(`admin-${admin_info.id}`, null, 'redis');
             return this.success([], "登出成功!");
         } catch ($err) {
             this.dealErr($err);
@@ -152,6 +151,12 @@ export default class extends Base {
     async editUserInfoAction() {
 
     }
+
+    /**
+     * 发送验证码
+     * @param {phone}
+     * @return boolean
+     */
     async sendSmsAction() {
         const sms = think.service('sms');
         const phone = this.post('phone');
@@ -167,36 +172,89 @@ export default class extends Base {
         await this.session('phone_captcha', code);
         return this.success(res);
     }
+
+    /**
+     * 保存用户信息
+     * @param {alipay}
+     * @param {birthday}
+     * @param {sex}
+     * @param {bank_card_number}
+     * @param {designer_name}
+     * @param {avatar_url}
+     * @param {wechat}
+     * @return boolean
+     */
     async saveInfoAction() {
+        try {
+            const designer_info = this.ctx.state.designer_info;
+            const designer_team_id = designer_info.designer_team_id;
+            const designer_id = designer_info.designer_id;
 
-        const designer_info = this.ctx.state.designer_info;
-        const designer_team_id = designer_info.designer_team_id;
-        const designer_id = designer_info.designer_id;
-
-        const alipay = this.post('alipay');
-        const birthday = this.post('birthday');
-        const sex = this.post('sex');
-        const bank_card_number = this.post('bank_card_number');
-        const designer_name = this.post('designer_name');
-        const avatar_url = this.post('avatar_url');
-        const wechat = this.post('wechat');
-        if (think.isEmpty(wechat) && think.isEmpty(bank_card_number) && think.isEmpty(alipay)) {
-            return this.fail(-1, '请至少填写一个收款账号!');
+            const alipay = this.post('alipay');
+            const birthday = this.post('birthday');
+            const sex = this.post('sex');
+            const bank_card_number = this.post('bank_card_number');
+            const designer_name = this.post('designer_name');
+            const avatar_url = this.post('avatar_url');
+            const wechat = this.post('wechat');
+            if (think.isEmpty(wechat) && think.isEmpty(bank_card_number) && think.isEmpty(alipay)) {
+                return this.fail(-1, '请至少填写一个收款账号!');
+            }
+            const res = await this.model('designer').where({designer_team_id, designer_id}).update({
+                alipay,
+                bank_card_number,
+                designer_name,
+                avatar_url,
+                wechat,
+                birthday,
+                sex
+            });
+            if (!res) {
+                return this.fail(-1, '该设计师不存在');
+            }
+            return this.success([], '保存成功!');
+        } catch (e) {
+            this.dealErr(e);
         }
+    }
 
-        const res = await this.model('designer').where({designer_team_id, designer_id}).update({
-            alipay,
-            bank_card_number,
-            designer_name,
-            avatar_url,
-            wechat,
-            birthday,
-            sex
-        });
-        if (!res) {
-            return this.fail(-1, '该设计师不存在');
+    /**
+     * 修改密码
+     * @param {old_password}
+     * @param {new_password}
+     * @return boolean
+     */
+    async  changePsdAction() {
+        try {
+            const designer_info = this.ctx.state.designer_info;
+            const shop_id = designer_info.shop_id;
+            const designer_team_id = designer_info.designer_team_id;
+            const designer_id = designer_info.designer_id;
+            const old_password = this.post('old_password');
+            const new_password = this.post('new_password');
+            const md5_old_psd = think.md5(old_password);
+            const md5_new_psd = think.md5(new_password);
+            const designer = await this.model('designer').where({designer_team_id, designer_id, shop_id}).find();
+            if (think.isEmpty(designer)) {
+                return  this.fail(-1, '该设计师不存在');
+            }
+            if (md5_old_psd != designer.designer_password) {
+                return  this.fail(-1, '旧密码不正确!');
+            }
+
+            if (md5_new_psd == designer.designer_password) {
+                return  this.fail(-1, '旧密码与新密码不能相同!');
+            }
+
+            const res = await this.model('designer').where({designer_team_id, designer_id, shop_id}).update({
+                designer_password: md5_new_psd
+            });
+            // @ts-ignore
+            await this.cache(`design-${designer_info.designer_id}`, null, 'redis');
+            return this.success([], '修改成功!');
+        } catch (e) {
+            this.dealErr(e);
         }
-        return this.success([], '保存成功!');
     }
 }
 async function getCode() {

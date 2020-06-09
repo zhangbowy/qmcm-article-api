@@ -1569,7 +1569,7 @@ export default class extends Base {
 
 function getIndex(arr: any, num: number) {
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i] > num) {
+        if (arr[i] >= num) {
             if (i == 0) {
                 return i;
             }

@@ -67,7 +67,9 @@ export default class extends Base {
             const designer_phone: string = designer_info.designer_phone;
             const cash_amount  = this.post('cash_amount');
             // const remark  = this.post('remark');
-
+            if (cash_amount == 0) {
+                return this.fail(-1, '提现金额不能为0!');
+            }
             const finished_commission = await this.model('order').where({designer_team_id, designer_status: ['IN' ,  '4']}).sum('designer_price');
             const Withdrawals_commission = await this.model('cash').where({status: ['IN', '1,3']}).sum('cash_amount');
             if (finished_commission - Withdrawals_commission < Number(cash_amount)) {
