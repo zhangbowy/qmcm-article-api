@@ -250,7 +250,7 @@ export default class extends Base {
 
     async refundAction() {
        try {
-           const order = {order_no: '20200609170621614365445', shop_id: 15};
+           const order = {order_no: '2020060917244342948457', shop_id: 15};
            // const orderInfo = await this.model('order').where({order_no}).find();
            const res = await this.refund(order);
            return this.success(res);
@@ -269,13 +269,18 @@ export default class extends Base {
             pfx: data, // 微信商户平台证书
             // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
         });
+        // const orderInfo = await this.model('order').where({order_no: $order.order_no}).find();
+        // if (think.isEmpty(orderInfo)) {
+        //     return this.fail(-1, '订单不存在');
+        // }
+        // const fee: number =  this.accMul(orderInfo.pay_amount, 100);
         const params = {
             appid: shopConfig.appid,
             mch_id:  shopConfig.mch_id,
-            op_user_id: '用户',
+            op_user_id: '管理员',
             out_refund_no: 'zhangbo' + Math.random().toString().substr(2, 10),
-            total_fee: 2300, // 原支付金额
-            refund_fee: 2300, // 退款金额
+            total_fee: 1900 , // 原支付金额ge't
+            refund_fee: 1900, // 退款金额
             // transaction_id: '微信订单号'
             out_trade_no: $order.order_no
         };
@@ -390,7 +395,7 @@ export default class extends Base {
         }
         const res: any = await this.model('order').where({order_no: $order.order_no}).update(udpOption);
         // await think.model('order').where({order_no: $order_no}).update({status: 2, _status: "待发货"});
-        return  true
+        return  true;
     }
 
     /**
@@ -413,7 +418,7 @@ export default class extends Base {
             wxpay.createUnifiedOrder({
                 trade_type: 'JSAPI',
                 openid,
-                body: order + '公众号支付测试',
+                body: order + '云易绣商城',
                 detail: '公众号支付测试',
                 out_trade_no: $order.order_no,
                 total_fee: $pay_fee,
