@@ -38,7 +38,8 @@
     "think-websocket-socket.io": "^1.0.11",
     "thinkjs": "^3.2.11",
     "thinkjs3-ts": "^1.0.1",
-    "weixin-pay": "^1.1.7"
+    "weixin-pay": "^1.1.7",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "typescript": "^2.5.3",

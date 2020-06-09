@@ -135,7 +135,7 @@ export default class extends Base {
                 params.custom_category_id = custom_category_id;
             }
             const model = this.model('item') as ItemModel;
-            const res = await model.addGoods(params);
+            const res: any = await model.addGoods(params);
             if (res) {
                 return this.success(res, "添加成功!");
             }

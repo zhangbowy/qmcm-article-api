@@ -2,7 +2,6 @@ import 'thinkjs3-ts';
 import { think } from 'thinkjs';
 import * as path from 'path';
 // @ts-ignore
-import system_log from '../utils/system_log';
 // const cors = require('koa-cors');
 const isDev = think.env === 'development';
 
@@ -52,8 +51,4 @@ export = [
   },
   'logic',
   'controller',
-  {
-    handle: system_log,
-    options: {}
-  }
 ];

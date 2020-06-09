@@ -130,7 +130,7 @@ export default class extends Base {
             width: 150, // width of captcha
             height: 50, // height of captcha
             // fontPath: './fonts/Comismsh.ttf', // your font path
-            fontSize: 65, // captcha text size
+            fontSize: 70, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
         };
         const captcha = new ThinkSvgCaptcha(defaultOptions);

@@ -143,7 +143,7 @@ export default class extends Base {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
             const id = userInfo.id;
-            const info = await this.model('user').where({id,openid}).find();
+            const info = await this.model('user').where({id, openid}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
@@ -254,7 +254,7 @@ export default class extends Base {
             if (is_default) {
                 await this.model('address').where({shop_id, user_id, is_default: 1}).update({is_default: 0});
             }
-            const res = await this.model('address').add(params);
+            const res: any = await this.model('address').add(params);
             if (res) {
                return this.success(res, '添加成功!');
             }
@@ -362,6 +362,4 @@ export default class extends Base {
             this.dealErr(e);
         }
     }
-
-
 }

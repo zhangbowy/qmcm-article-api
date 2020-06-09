@@ -8,6 +8,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "sourceMap": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "outDir": "app",
     "baseUrl": ".",
     "paths": {

@@ -390,6 +390,7 @@ export default class extends Base {
         }
         const res: any = await this.model('order').where({order_no: $order.order_no}).update(udpOption);
         // await think.model('order').where({order_no: $order_no}).update({status: 2, _status: "待发货"});
+        return  true
     }
 
     /**
@@ -519,8 +520,8 @@ export default class extends Base {
             if (think.isEmpty(orderInfo)) {
                 return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
             }
-            const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
-            await this.updateOrder(orderInfo);
+            // const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
+            const order  = await this.updateOrder(orderInfo);
             if (order) {
 
             } else {

@@ -5,6 +5,7 @@ const fs = require('fs');
 const AdmZip = require('adm-zip');
 const pinyin = require("node-pinyin");
 const rename = think.promisify(fs.rename, fs);
+const xml2js = require("xml2js");
 export default class extends Base {
 
     /**
@@ -554,7 +555,7 @@ export default class extends Base {
      */
     async setStatusAction(): Promise<any>  {
         try {
-            return false
+            return false;
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
             const designer_team_id: number = this.ctx.state.designer_info.designer_team_id;
@@ -694,21 +695,53 @@ export default class extends Base {
             const url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-29-12:33:43/�к���.EMB';
             const img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
             const data = fs.readFileSync('1.EMB');
-            const imgBuffer: any  = await this.getBuffer(this, img, true);
-            const imgBase64 = imgBuffer.toString('base64');
+            // const imgBuffer: any  = await this.getBuffer(this, img, true);
+            // const imgBase64 = imgBuffer.toString('base64');
 
-            const embBuffer: any  = await this.getBuffer(this, url, true);
+            // const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');
 
             // const embData = await wilcom.getEmbByImg(imgBase64);
-            const embBase64 = embBuffer.toString('base64');
+            const embBase64 = data.toString('base64');
             const design_info = await wilcom.getDesignInfo(embBase64);
-            return this.success(design_info);
+            const res: any = await this.parseXML(design_info);
+            // @ts-ignore
+            const threadList = res.design_info.colorways.colorway.threads.thread;
+            const stop_recordList = res.design_info.stop_sequence.stop_record;
+            let str = '颜色       针迹         代码         名字               图表\r\n';
+            for (const item of stop_recordList) {
+                // @ts-ignore
+                const index = Number(item.$.color_idx);
+                const color = threadList[index].$;
+                str += `${this.getString(color.color)} ${this.getString(item.$.num_stitches)}  ${this.getString(color.code)}   ${this.getString(color.description, 15)}    ${this.getString(color.brand)}\r\n`;
+            }
+            await fs.writeFileSync('1.txt', str);
+            return this.success({str, threadList, stop_recordList});
         } catch (e) {
             this.dealErr(e);
         }
     }
+    getString($string: string, $len?: number) {
 
+        const len = $string.length;
+        if (len < ($len || 10)) {
+            for (let i = 1; i <= ($len || 10) - len; i++) {
+                $string += ' ';
+            }
+        }
+        return $string;
+    }
+   // @ts-ignore
+    async parseXML(xml) {
+        return new Promise((resolve, reject) => {
+            // tslint:disable-next-line:prefer-const
+            let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
+            // tslint:disable-next-line:only-arrow-functions
+            parser.parseString(xml, function(err: any, result: any) {
+                resolve(result);
+            });
+        });
+    }
     async exportFile($file: any, $filePath?: any) {
 
         const obj = [
