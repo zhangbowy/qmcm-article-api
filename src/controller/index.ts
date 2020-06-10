@@ -92,7 +92,6 @@ export default class extends Base {
     //   const data: string = sid + skey + r_tsp + mid;
     //   const sign: string = crypto.createHash('md5').update(data).digest("hex");
     //   console.log('sign:', sign);
-    //
     //   const uid = this.post("id") || "uid";
     //   if (r_sign == sign) {
           const order_item  = await this.model('order_item').where({item_status: 10}).find();
@@ -104,20 +103,11 @@ export default class extends Base {
           // @ts-ignore
           this.ctx.set({
             // 'Content-Type': 'multipart/form-data',
-            'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + 'AMZ90RFX875LKMFasdf09DDFF3' + '"',
-            'ServiceBusNotification-Format': 'gcm',
+            // 'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + 'AMZ90RFX875LKMFasdf09DDFF3' + '"',
+            // 'ServiceBusNotification-Format': 'gcm',
             'x-ms-version': '2015-04',
             // 'Content-Length': isHaveFile.size,
-            // "Content-Disposition": "attachment; filename=" + `${order_item.order_id}.DST`,
-            "multipart": [{
-              'content-type': 'application/json',
-              "body": {
-                data: {message: "Hello via Direct Batch Send!!!"}
-              }
-            }, {
-              'content-type': 'application/json',
-              "body" : [1, 2, 3] // This is array
-            }]
+            "Content-Disposition": "attachment; filename=" + `${order_item.order_id}.DST`,
           });
           const PassThrough = require('stream').PassThrough;
           // this.ctx.body = await res.body.pipe(this.ctx.body);

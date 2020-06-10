@@ -539,7 +539,7 @@ export default class extends Base {
             if (think.isEmpty(orderInfo)) {
                 return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
             }
-            // const order = await orderModel.where({order_no: result.out_trade_no}).update({status: 2, _status: "待发货"});
+            await this.model('order').where({order_no: result.out_trade_no}).update({transaction_id: result.transaction_id});
             const order  = await this.updateOrder(orderInfo);
             if (order) {
 
@@ -866,7 +866,10 @@ export default class extends Base {
                                             // item_info.custom_image = cart_v.design_info.custom_image;
                                         } else {
                                             if (item_info.custom_template_id == 2) {
-                                                item_info._logistics_type = '门店自提';
+                                                if (logistics_type == 2) {
+                                                    _logistics_type  = '门店自提';
+                                                    item_info._logistics_type = '门店自提';
+                                                }
                                             }
                                             item_info.custom_image = cart_v.design_info.custom_image;
                                         }
@@ -1162,8 +1165,10 @@ export default class extends Base {
                                                         // item_info.custom_image = cart_v.design_info.custom_image;
                                                     } else {
                                                         if (item_info.custom_template_id == 2) {
-                                                            _logistics_type  = '门店自提';
-                                                            item_info._logistics_type = '门店自提';
+                                                            if (logistics_type == 2) {
+                                                                _logistics_type  = '门店自提';
+                                                                item_info._logistics_type = '门店自提';
+                                                            }
                                                         }
                                                         item_info.custom_image = cart_v.design_info.custom_image;
                                                     }
@@ -1537,6 +1542,47 @@ export default class extends Base {
         } catch (e) {
             this.dealErr(e);
         }
+    }
+
+    /**
+     * 扫描机器
+     */
+    async scanMachineAction() {
+       const order_no =  this.post('order_no');
+       const machine_code =  this.post('machine_code');
+
+       const orderInfo = await this.model('order').where({order_no}).find();
+       if (think.isEmpty(orderInfo)) {
+           return this.fail(-1, '该订单不存在!');
+       }
+       if (orderInfo.logistics_type != 2) {
+            return this.fail(-1, '该订单不是门店自提订单');
+       }
+       if (orderInfo.is_scan) {
+           return this.fail(-1, '该订单已扫描过机器!');
+       }
+
+       await this.model('order').where({machine_code}).update({machine_code: 0});
+       await this.model('order').where({order_no}).update({
+           machine_code,
+           is_scan: 1
+       });
+       return this.success([], '就绪,等待机器请求!');
+    }
+
+    async getDstAction() {
+        const machine_code =  this.post('machine_code');
+        const orderInfo = await this.model('order').where({machine_code}).find();
+        if (think.isEmpty(orderInfo)) {
+            return this.fail(-1, '暂无数据!');
+        }
+        const order_id = orderInfo.id;
+        const order_item = await this.model('order_item').where({order_id}).find();
+        await this.model('order').where({machine_code}).update({machine_code: 0});
+        return this.success({
+            dst: order_item.design_dst_path
+        });
+        // await this.model('order').where({})
     }
 
     /**
