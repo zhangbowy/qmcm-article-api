@@ -162,7 +162,7 @@ export default class extends Base {
      * 开发的Dev
      */
     async loginDevAction() {
-        const res = await this.model('user').where({id: 92}).find();
+        const res = await this.model('user').find();
         const params: object = {
             nickname: res.nickname,
             sex: res.sex,
