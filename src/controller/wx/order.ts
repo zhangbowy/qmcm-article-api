@@ -1597,6 +1597,7 @@ export default class extends Base {
                 if (think.isEmpty(orderInfo)) {
                     return this.fail(-1, '暂无数据!');
                 }
+                console.log(mechineId, 'machineId')
                 const order_id = orderInfo.id;
                 const order_item = await this.model('order_item').where({ order_id }).find();
                 const res: any = await this.fetch(order_item.design_dst_path);
