@@ -145,4 +145,48 @@ export default class extends Base {
         this.ctx.type = 'image/svg+xml';
         return this.ctx.body = c.data;
     }
+
+    /**
+     * 修改密码
+     * @param {old_password}
+     * @param {new_password}
+     * @return boolean
+     */
+    async  changePsdAction() {
+        try {
+            const admin_info = this.ctx.state.admin_info;
+            const shop_id = admin_info.shop_id;
+            const phone = admin_info.phone;
+            const id = admin_info.id;
+            const old_password = this.post('old_password');
+            const new_password = this.post('new_password');
+            const md5_old_psd = think.md5(old_password);
+            const md5_new_psd = think.md5(new_password);
+            const admin = await this.model('admin').where({shop_id, phone, id}).find();
+            if (think.isEmpty(admin)) {
+                return  this.fail(-1, '该用户不存在');
+            }
+
+            if (admin.role_type == 3) {
+                return  this.fail(-1, '您没有此项权限!');
+            }
+            const bufferPwd = new Buffer(admin.pwd, 'binary' ).toString('utf-8');
+            if (old_password != bufferPwd) {
+                return  this.fail(-1, '旧密码不正确!');
+            }
+
+            if (new_password == bufferPwd) {
+                return  this.fail(-1, '旧密码与新密码不能相同!');
+            }
+            const pwd = new Buffer(new_password, 'utf-8' );
+            const res = await this.model('admin').where({id, phone, shop_id}).update({
+                pwd
+            });
+            // @ts-ignore
+            await this.cache(`admin-${admin.id}`, null, 'redis');
+            return this.success([], '修改成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
 }

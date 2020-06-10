@@ -122,9 +122,10 @@ export default class extends Base {
     async infoAction() {
         try {
             const userInfo = this.ctx.state.userInfo;
+            const shop_id = this.ctx.state.shop_id;
             const openid = userInfo.openid;
             const id = userInfo.id;
-            const info = await this.model('user').where({openid, id}).find();
+            const info = await this.model('user').where({shop_id, openid, id}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
@@ -142,12 +143,13 @@ export default class extends Base {
         try {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
+            const shop_id = this.ctx.state.shop_id;
             const id = userInfo.id;
             if (think.isEmpty(openid) || think.isEmpty(id)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
             }
-            const info = await this.model('user').where({id, openid}).find();
+            const info = await this.model('user').where({shop_id, id, openid}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
