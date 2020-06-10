@@ -1559,11 +1559,14 @@ export default class extends Base {
            return this.fail(-1, '该订单不存在!');
        }
        if (orderInfo.logistics_type != 2) {
-            return this.fail(-1, '该订单不是门店自提订单');
+           return this.fail(-1, '该订单不是门店自提订单');
        }
-       // if (orderInfo.is_scan) {
-       //     return this.fail(-1, '该订单已扫描过机器!');
-       // }
+       if (orderInfo.status == 1) {
+           return this.fail(-1, '该订单未支付!');
+       }
+       if (orderInfo.status == -2) {
+           return this.fail(-1, '该订单已取消!');
+        }
 
        await this.model('order').where({machine_code}).update({machine_code: 0});
        await this.model('order').where({order_no}).update({
