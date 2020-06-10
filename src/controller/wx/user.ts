@@ -143,6 +143,10 @@ export default class extends Base {
             const userInfo = this.ctx.state.userInfo;
             const openid = userInfo.openid;
             const id = userInfo.id;
+            if (think.isEmpty(openid) || think.isEmpty(id)) {
+                await this.cookie('user_sign', '');
+                return this.fail(402, '未登录');
+            }
             const info = await this.model('user').where({id, openid}).find();
             if (think.isEmpty(info)) {
                 await this.cookie('user_sign', '');
