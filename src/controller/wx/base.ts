@@ -12,7 +12,8 @@ export default class extends restController {
       this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
 
       const host = this.ctx.req.headers.host;
-      if (host != 'cxmob.tecqm.club' && this.ctx.path.indexOf('wx/order/notify') === -1 && this.ctx.path.indexOf('wx/order/crontab') === -1) {
+      const whiteList = ['/wx/order/getDst', '/wx/order/notify', 'wx/order/crontab'];
+      if (host != 'cxmob.tecqm.club' && whiteList.indexOf(this.ctx.path) === -1) {
         if (!host) {
           return this.fail(1001, '域名未配置!');
         }

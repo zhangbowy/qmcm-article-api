@@ -6,6 +6,7 @@ const fs = require('fs');
 const sharp = require('sharp');
 const _ = require('lodash');
 const WXPay = require('weixin-pay');
+const crypto = require('crypto');
 
 export default class extends Base {
 
@@ -1546,6 +1547,8 @@ export default class extends Base {
 
     /**
      * 扫描机器
+     * @param {order_no} 订单号
+     * @param {machine_code} 机器码
      */
     async scanMachineAction() {
        const order_no =  this.post('order_no');
@@ -1558,31 +1561,56 @@ export default class extends Base {
        if (orderInfo.logistics_type != 2) {
             return this.fail(-1, '该订单不是门店自提订单');
        }
-       if (orderInfo.is_scan) {
-           return this.fail(-1, '该订单已扫描过机器!');
-       }
+       // if (orderInfo.is_scan) {
+       //     return this.fail(-1, '该订单已扫描过机器!');
+       // }
 
        await this.model('order').where({machine_code}).update({machine_code: 0});
        await this.model('order').where({order_no}).update({
            machine_code,
            is_scan: 1
        });
+        // await this.model('order').where({order_no}).increment('view_nums', 1); //将阅读数加 1
        return this.success([], '就绪,等待机器请求!');
     }
 
     async getDstAction() {
-        const machine_code =  this.post('machine_code');
-        const orderInfo = await this.model('order').where({machine_code}).find();
-        if (think.isEmpty(orderInfo)) {
-            return this.fail(-1, '暂无数据!');
+        if (this.header("ops")) {
+            // @ts-ignore
+            const received: string = this.header("ops");
+            const arr_rec: any[] = received.split("@@");
+            const r_tsp: string = arr_rec[2];
+            const r_sign: string = arr_rec[3];
+
+            const mechineId = arr_rec[1] || 1;
+            const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
+            const data: string = sid + skey + r_tsp + mid;
+            const sign: string = crypto.createHash('md5').update(data).digest("hex");
+            console.log('sign:', sign);
+            const uid = this.post("id") || "uid";
+            if (r_sign == sign) {
+                // const machine_code = this.post('machine_code');
+                const orderInfo = await this.model('order').where({machine_code: mechineId}).find();
+                if (think.isEmpty(orderInfo)) {
+                    return this.fail(-1, '暂无数据!');
+                }
+                const order_id = orderInfo.id;
+                const order_item = await this.model('order_item').where({ order_id }).find();
+                const res: any = await this.fetch(order_item.design_dst_path);
+                this.ctx.set({
+                    // 'Content-Length': isHaveFile.size,
+                    "Content-Disposition": "attachment; filename=" + `${order_item.order_id}.DST`,
+                });
+                const PassThrough = require('stream').PassThrough;
+                await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
+                this.ctx.body = res.body;
+                // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+            } else {
+                return this.fail(-1, '签名错误!');
+            }
+        } else {
+            return this.fail(-1, '无效请求!');
         }
-        const order_id = orderInfo.id;
-        const order_item = await this.model('order_item').where({order_id}).find();
-        await this.model('order').where({machine_code}).update({machine_code: 0});
-        return this.success({
-            dst: order_item.design_dst_path
-        });
-        // await this.model('order').where({})
     }
 
     /**
