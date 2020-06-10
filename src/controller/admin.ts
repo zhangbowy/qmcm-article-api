@@ -72,22 +72,28 @@ export default class extends Base {
             const where = {};
             let authority_list;
             if (admin_info.role_type == 2) {
-                authority_list = await this.model('authority').where({only_role_type: ['in', [2, 3]], is_show: 1, del: 0}).getField('id');
+                authority_list = await this.model('authority').where({only_role_type: ['in', [2, 3, 0]], is_show: 1, del: 0}).getField('id');
             } else if (admin_info.role_type == 3) {
                 authority_list = await this.model('auth_give').where({shop_id, admin_role_id, del: 0}).getField('auth_id');
             } else if (admin_info.role_type == 1) {
-                authority_list = await this.model('authority').where({only_role_type: ['in', [1]], is_show: 1, del: 0}).getField('id');
+                authority_list = await this.model('authority').where({only_role_type: ['in', [1, 0]], is_show: 1, del: 0}).getField('id');
             }
+
+            const shop_info = await this.model('shops').setRelation(false).where({shop_id: admin_info.shop_id}).fieldReverse('domain,shop_setting,del,id').find()
+
             const result = {
                 admin_info: {
                     id: admin_info.id,
                     shop_id: admin_info.shop_id,
                     role_type: admin_info.role_type,
                     name: admin_info.name,
-                    phone: admin_info.phone
+                    phone: admin_info.phone,
+                    ...shop_info,
                 },
                 authority_list
             };
+
+
             return this.success(result, '请求成功!');
         } catch (e) {
             this.dealErr(e);

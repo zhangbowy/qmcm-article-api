@@ -25,7 +25,7 @@ export default class extends Base {
   async getList() {
     try {
       // @ts-ignore
-      const shop_id = this.ctx.state.admin_info.shop_id;
+      const shop_id =   this.post('shop_id') || this.ctx.state.admin_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       const status: number = Number(this.post('status') || 0);
@@ -39,9 +39,11 @@ export default class extends Base {
       const express_number: number = this.post('express_number');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
-      where.shop_id = shop_id;
       if (status) {
         where.status = status;
+      }
+      if (shop_id) {
+        where.shop_id = shop_id;
       }
       if (start_time && end_time) {
         where.created_at = {'>=': start_time, '<=': end_time};
@@ -108,7 +110,7 @@ export default class extends Base {
   async orderCountAction() {
     try {
       // @ts-ignore
-      const shop_id = this.ctx.state.admin_info.shop_id;
+      const shop_id =   this.post('shop_id') || this.ctx.state.admin_info.shop_id;
       const page: number = this.post('currentPage') || 1;
       const limit: number = this.post('pageSize') || 10;
       // const status: number = this.post('status') || 0;
@@ -122,10 +124,10 @@ export default class extends Base {
       const express_number: number = this.post('express_number');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
-      where.shop_id = shop_id;
-      // if (status) {
-      //   // where.status = status
-      // }
+      // where.shop_id = shop_id;
+      if (shop_id) {
+        where.shop_id = shop_id;
+      }
       if (start_time && end_time) {
         where.created_at = {'>=': start_time, '<=': end_time};
       }

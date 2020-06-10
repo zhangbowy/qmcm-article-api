@@ -9,7 +9,7 @@ export default class extends Base {
         const shop_id = this.ctx.state.admin_info.shop_id;
         const total_pay_amount: any = await this.model('order').where(`shop_id=${shop_id} and ` + '`status` NOT IN (1,-2,5,6)').sum('pay_amount');
         // const today_pay_amount: any = await this.model('order').where(`shop_id=${shop_id} and ` + '`status` NOT IN (1,-2,5,6)').sum('pay_amount');
-        const total_commission  = await this.model('order').where({designer_status: ['IN' ,  '2,3,4']}).sum('designer_price');
+        const total_commission  = await this.model('order').where({shop_id, designer_status: ['IN' ,  '2,3,4']}).sum('designer_price');
         const audit_commission = await this.model('cash').where({shop_id, status: ['IN' ,  '1']}).sum('cash_amount') || 0;
         const withdrawals_commission = await this.model('cash').where({shop_id, status: ['IN' ,  '3']}).sum('cash_amount') || 0;
 

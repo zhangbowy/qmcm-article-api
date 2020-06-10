@@ -30,11 +30,10 @@ export default class extends restController {
         this.ctx.state.shop_id = config.shop_id;
         this.ctx.state.shop_info = res;
 
-        if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 ) {
+        if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1) {
           if (this.ctx.state.userInfo == null) {
             return this.fail(402, '未登录');
           }
-
         } else {
           console.log(this.ctx.state.userInfo);
           // if(this.ctx.state.userInfo != null && this.ctx.path.indexOf('wx/user/login') > -1)
@@ -44,7 +43,7 @@ export default class extends restController {
         }
       }
     } catch (e) {
-     return  this.fail(1001, e);
+      return this.fail(1001, e);
     }
     if (this.ctx.path.indexOf('/user/login') === -1) {
       if (!await this.session('token')) {

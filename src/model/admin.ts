@@ -19,6 +19,6 @@ export default class extends think.Model {
         return await this.add($data);
     }
     async editAdmin($id: number, $data: AddUserParams) {
-        return this.where({shop_id: $id}).update($data);
+        return this.where({shop_id: $id, role_type: 2}).update($data);
     }
 }

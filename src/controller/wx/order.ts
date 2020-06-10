@@ -259,7 +259,7 @@ export default class extends Base {
      */
     async refundAction() {
        try {
-           const order = {order_no: '20200609184400190346384', shop_id: 15};
+           const order = {order_no: '20200609110740995740542', shop_id: 15};
            // const orderInfo = await this.model('order').where({order_no}).find();
            const res = await this.refund(order);
            return this.success(res);
@@ -293,8 +293,8 @@ export default class extends Base {
             mch_id:  shopConfig.mch_id,
             op_user_id: '管理员',
             out_refund_no: 'zhang1bo' + Math.random().toString().substr(2, 10),
-            total_fee: 1000 , // 原支付金额ge't
-            refund_fee: 1000, // 退款金额
+            total_fee: 1500 , // 原支付金额ge't
+            refund_fee: 1500, // 退款金额
             // transaction_id: '微信订单号'
             out_trade_no: $order.order_no
         };

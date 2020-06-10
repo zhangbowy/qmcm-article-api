@@ -22,7 +22,7 @@ export default class extends think.Model {
                 fKey: 'shop_id',
                 key: 'shop_id',
                 field: 'shop_id,phone,name',
-                where: {role_type: ['NOTIN', '1'], del: 0},
+                where: {role_type: ['NOTIN', '1,3'], del: 0},
             },
             shop_setting: {
                 type: think.Model.HAS_ONE,

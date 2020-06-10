@@ -35,6 +35,12 @@ export default class extends restController {
         if (think.isEmpty(admin_info)) {
           return this.fail(402, '登录过期,请重新登录!', []);
         }
+        const now = new Date().getTime();
+        const shop_info = await this.model('shops').where({shop_id: admin_info.shop_id}).find();
+        const endTime = new Date(shop_info.system_end_time).getTime();
+        if (now > endTime) {
+          return this.fail(-1, '店铺已过期,请联系平台!');
+        }
         // if (!await this.session('token')) {
         //   return this.fail(402, '未登录!', []);
         // }
