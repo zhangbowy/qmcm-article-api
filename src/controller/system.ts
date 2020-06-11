@@ -77,7 +77,7 @@ export default class extends Base {
                 height,
                 shop_id
             };
-            const res = await this.model('emb_template_price').add(params);
+            const res: any = await this.model('emb_template_price').add(params);
             return this.success(res, '请求成功!');
         } catch (e) {
             this.dealErr(e);
@@ -383,7 +383,7 @@ export default class extends Base {
                 full_amount,
                 region_rules
             };
-            const res = await this.model('express_template').add(params);
+            const res: any = await this.model('express_template').add(params);
             if (res) {
                 return this.success(res, '添加成功!');
             }
@@ -523,7 +523,7 @@ export default class extends Base {
                 design_bg_width,
                 design_bg_height
             };
-            const res = await this.model('custom_category').add(params);
+            const res: any = await this.model('custom_category').add(params);
             if (!res) {
                 return this.fail(-1, '添加失败!');
             }
@@ -758,7 +758,7 @@ export default class extends Base {
                 machine_name,
                 desc
             };
-            const res = await this.model('machine').add(params);
+            const res: any = await this.model('machine').add(params);
             if (!res) {
                 return this.fail(-1, '添加失败!');
             }
@@ -929,10 +929,8 @@ export default class extends Base {
         }
     }
 
-
     /**
      * 保存店铺设置
-     *
      */
     async saveShopConfigAction() {
         try {

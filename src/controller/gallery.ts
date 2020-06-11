@@ -15,17 +15,21 @@ export default class extends Base {
      * 图库列表
      */
     async indexAction(): Promise<any>  {
-        const page: number = this.post('currentPage') || 1;
-        const limit: number = this.post('pageSize') || 10;
-        const gallery_group_id: number = Number(this.post('gallery_group_id'));
-        const img_name: number = this.post('img_name') || "";
-        const model = this.model('gallery') as GalleryModel;
-        const groupModel = this.model('gallery_group') as GroupModel;
-        const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
-        // @ts-ignore
-        const shop_id = this.ctx.state.admin_info.shop_id;
-        const data = await model.list({page, limit, shop_id, gallery_group_id: group_list, img_name});
-        return this.success(data, '请求成功!');
+        try {
+            const page: number = this.post('currentPage') || 1;
+            const limit: number = this.post('pageSize') || 10;
+            const gallery_group_id: number = Number(this.post('gallery_group_id'));
+            const img_name: number = this.post('img_name') || "";
+            const model = this.model('gallery') as GalleryModel;
+            const groupModel = this.model('gallery_group') as GroupModel;
+            // const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
+            // @ts-ignore
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const data = await model.list({page, limit, shop_id, gallery_group_id, img_name});
+            return this.success(data, '请求成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
     }
 
     /**
@@ -206,8 +210,16 @@ export default class extends Base {
                 level,
                 shop_id
             };
+            const gallery_group = await this.model('gallery_group').where({id: parent_id}).find();
+            if (Object.keys(gallery_group).length == 0) {
+                return this.fail(-1, '该上级分类不存在!');
+            }
             const model = this.model('gallery_group') as GroupModel;
-            const data = await model.addGruop(params);
+            const levels = await model.getLevel(parent_id);
+            if (levels >= 3) {
+                return this.fail(-1, '图库分类最多三级!');
+            }
+            const data: any = await model.addGruop(params);
             if (data) {
                 return this.success(data, '添加成功!');
             }
@@ -258,20 +270,20 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const model = this.model('gallery_group') as GroupModel;
             const galleryModel = this.model('gallery') as GalleryModel;
-            const group_list: any  = await model.getNeedsTree(gallery_group_id);
-
+            // const group_list: any  = await model.getNeedsTree(gallery_group_id);
+            const group = await this.model('gallery_group').where({id: gallery_group_id}).find()
+            if (think.isEmpty(group)) {
+                return this.fail(-1, '分组不存在!', []);
+            }
+            /**
+             * 清除分组Id
+             */
+            const data: any = await galleryModel.deletePid(gallery_group_id);
             /**
              * 删除分组
              */
-            const data: any = await model.deleteGroup(group_list);
-            if (data) {
-                /**
-                 * 清除分组Id
-                 */
-                const res = await galleryModel.deletePid(group_list);
-                return this.success([], '删除成功!');
-            }
-            return this.fail(-1, '分组不存在!', []);
+            const res = await model.deleteGroup(gallery_group_id);
+            return this.success([], '删除成功!');
         } catch (e) {
            this.dealErr(e);
         }

@@ -15,13 +15,20 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
+        let where = `del= 0 and shop_id= ${$data.shop_id} and img_name like '%${$data.img_name}%' `;
         if ($data.gallery_group_id == -1) {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
-        } else {
+            // return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
+            // where =  `del= 0 and shop_id= ${$data.shop_id} and img_name like '%${$data.img_name}%'`;
+        }  else if ($data.gallery_group_id == 0) {
             // @ts-ignore
-            return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, gallery_group_id: ['in', $data.gallery_group_id], img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).countSelect({cache: false});
+            where +=  `and FIND_IN_SET(gallery_group_id,0) `;
+        } else {
+            where  +=  `and FIND_IN_SET(gallery_group_id,getGalelryGroupId(${$data.gallery_group_id}))`;
         }
+        // @ts-ignore
+        return this.order({created_at: 'DESC'}).where(where).page(page, limit).countSelect({cache: false});
+        // SELECT * from t_areainfo where FIND_IN_SET(id,queryChildrenAreaInfo1(7));
     }
     async addImage($data: any) {
         return await this.add($data);
@@ -30,7 +37,7 @@ export default class extends think.Model {
      * 清除分组Id
      */
     async deletePid($ids: any) {
-        return this.where({gallery_group_id: ['IN', $ids]}).update({gallery_group_id: 0});
+        return this.where(`FIND_IN_SET(gallery_group_id,getGalelryGroupId(${$ids})`).update({gallery_group_id: 0});
     }
     /**
      * 图片设置分组

@@ -360,20 +360,19 @@ export default class extends Base {
                 shop_id,
                 logo
             };
-            const timer = 1;
             if (parent_id != 0) {
                 const data = await this.model('item_category').where({id: parent_id}).find();
                 if (Object.keys(data).length == 0) {
                     return this.fail(-1, '该上级分类不存在!');
                 }
-                // let level = await this.getLevel(parent_id,timer);
-                // if(level > 2)
-                // {
-                //     return this.fail(-1,"分类不能超过三级")
-                // }
-                // const res = await this.model('item_category').where({id:res.id}).find();
+                // @ts-ignore
+                const level: any = await this.model('item_category').getLevel(parent_id);
+                if (level >= 3) {
+                    return this.fail(-1, '商品分类最多三级!');
+                }
+
             }
-            const res = await this.model('item_category').add(params);
+            const res: any = await this.model('item_category').add(params);
             if (res) {
                 return this.success(res, '添加成功!');
             }
@@ -443,14 +442,10 @@ export default class extends Base {
                 return this.fail(-1, '分类不存在');
             }
             const model = this.model('item_category') as item_category;
-            const ids = await model.getChild(id);
-            const res: number = await this.model('item_category').where({id: ['in', ids], shop_id}).update({del: 1});
-            if (res) {
-                const data: any = await this.model('item').where({id: ['in', ids], shop_id}).update({category_id: 0});
-                return this.success("", '删除成功!');
-            } else {
-                return this.fail(-1, '分类不存在!');
-            }
+            // const ids = await model.getChild(id);
+            const data: any = await this.model('item').where(`shop_id=${shop_id} and FIND_IN_SET(category_id,getGoodCate(${id}))`).update({category_id: 0});
+            const res: number = await this.model('item_category').where(`shop_id=${shop_id} and FIND_IN_SET(id,getGoodCate(${id}))`).update({del: 1});
+            return this.success("", '删除成功!');
         } catch (e) {
             this.dealErr(e);
         }

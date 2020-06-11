@@ -58,7 +58,14 @@ export default class extends think.Model {
     async editGoods($id: number, $data: any) {
         return this.where({id: $id}).update($data);
     }
+    async getLevel($id: number) {
+        const sql = `select getLevel(${$id})`
+        const res =  await this.query(sql);
+        const txt = `getLevel(${$id})`
+        const result =  res[0][txt];
+        return result
 
+    }
     async  getChild($group_id: any) {
         if ($group_id == 0) {
             return  [0];

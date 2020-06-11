@@ -46,7 +46,7 @@ module.exports = class extends think.Service {
     }
     uploadFiles($files: any[]) {
         return new Promise((resolve, reject) => {
-            // const filePath1 = "temp-file-to-upload" // 本地文件路径
+            const filePath1 = "temp-file-to-upload" // 本地文件路径
             // const filePath2 = "temp-file-to-upload" // 本地文件路径
             // files: [{
             //     Bucket: 'examplebucket-1250000000',
