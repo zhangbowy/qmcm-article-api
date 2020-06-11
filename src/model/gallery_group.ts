@@ -28,11 +28,11 @@ export default class extends think.Model {
         return this.where({id: $id}).update($data);
     }
     async getLevel($id: number) {
-        const sql = `select getGalleryGroupLevel(${$id})`
+        const sql = `select getGalleryGroupLevel(${$id})`;
         const res =  await this.query(sql);
-        const txt = `getGalleryGroupLevel(${$id})`
+        const txt = `getGalleryGroupLevel(${$id})`;
         const result =  res[0][txt];
-        return result
+        return result;
 
     }
     // async getNeedsTree($group_id: number) {
