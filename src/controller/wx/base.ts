@@ -22,14 +22,20 @@ export default class extends restController {
         if (Object.keys(config).length == 0) {
           return this.fail(1001, '店铺不存在或域名未配置!');
         }
-        const res = await think.model('shops').where({shop_id: config.shop_id}).find();
+        const shopInfo = await think.model('shops').where({shop_id: config.shop_id}).find();
         if (Object.keys(config).length == 0) {
-          return this.fail(res, '店铺不存在');
+          return this.fail(shopInfo, '店铺不存在');
         }
         await think.config('shopConfig', config);
         this.ctx.state.shop_id = config.shop_id;
-        this.ctx.state.shop_info = res;
+        this.ctx.state.shop_info = shopInfo;
 
+        const now = new Date().getTime();
+        const shop_info = await this.model('shops').where({shop_id: config.shop_id}).find();
+        const endTime = new Date(shop_info.system_end_time).getTime();
+        if (now > endTime) {
+          return this.fail(-1, '店铺异常,请联系商家!');
+        }
         if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1) {
           if (this.ctx.state.userInfo == null) {
             return this.fail(402, '未登录');

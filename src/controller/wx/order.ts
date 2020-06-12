@@ -260,6 +260,7 @@ export default class extends Base {
     async refundAction() {
        try {
            const order = {order_no: '20200609110740995740542', shop_id: 15};
+           // const order = {order_no: '20200611091858244587926', shop_id: 15};
            // const orderInfo = await this.model('order').where({order_no}).find();
            const res = await this.refund(order);
            return this.success(res);
@@ -294,6 +295,7 @@ export default class extends Base {
             op_user_id: '管理员',
             out_refund_no: 'zhang1bo' + Math.random().toString().substr(2, 10),
             total_fee: 1500 , // 原支付金额ge't
+            // total_fee: 1 , // 原支付金额ge't
             refund_fee: 1500, // 退款金额
             // transaction_id: '微信订单号'
             out_trade_no: $order.order_no
@@ -894,18 +896,26 @@ export default class extends Base {
 
                                         item_info.custom_template_id = cart_v.design_info.custom_template_id;
 
-                                        const emb_template: any =  await this.model('emb_template').where({emb_template_id: item_info.custom_template_id}).find();
+                                        const emb_template: any =  await this.model('emb_template').where({emb_template_id: ['IN', item_info.custom_template_id]}).getField('template_name');
                                         if (think.isEmpty(emb_template)) {
                                             return '定制模板不存在';
                                         }
-                                        item_info.special_template_name = emb_template.template_name;
+                                        item_info.special_template_name = emb_template.join(',');
                                         item_info.special_custom_width = cart_v.design_info.special_custom_width;
                                         item_info.special_custom_height = cart_v.design_info.special_custom_height;
                                         item_info.special_color_num = cart_v.design_info.special_color_num;
                                         item_info.special_custom_desc = cart_v.design_info.special_custom_desc;
                                         const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
                                         const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
-                                        const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                        let price_template;
+                                        // 多选 用多功能混合绣的价格 单选用自己
+                                        if (item_info.custom_template_id.length > 1) {
+                                            price_template = 11;
+                                        } else {
+                                            price_template = item_info.custom_template_id[0];
+
+                                        }
+                                        const price = await this.getEmbPrice(sqr, price_template);
                                         item_info.special_custom_sqr = sqr;
                                         item_info.special_custom_price = price;
                                         pay_amount += price;
@@ -964,8 +974,17 @@ export default class extends Base {
                                     item_info.draw_image = `http://${res.Location}`;
                                     item_info.image = cart_v.design_info.preview_image;
                                 }
-                                item_info.item_total_price += item.current_price * cart_v.buy_num;
-                                pay_amount += item.current_price * cart_v.buy_num;
+
+                                if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {
+                                     // item_info.item_total_price += item.current_price * cart_v.buy_num;
+                                     // pay_amount += item.current_price * cart_v.buy_num;
+                                    item_info.is_only_design = 1
+
+                                } else {
+                                     item_info.item_total_price += item.current_price * cart_v.buy_num;
+                                     pay_amount += item.current_price * cart_v.buy_num;
+                                 }
+
                                 item_list.push(item_info);
                             } else {
                                 for (const sku_v of sku_list) {
@@ -1192,11 +1211,12 @@ export default class extends Base {
 
                                                 item_info.custom_template_id = cart_v.design_info.custom_template_id;
 
-                                                const emb_template: any =  await this.model('emb_template').where({emb_template_id: item_info.custom_template_id}).find();
+                                                const emb_template: any =  await this.model('emb_template').where({emb_template_id: ['IN', item_info.custom_template_id]}).getField('template_name');
                                                 if (think.isEmpty(emb_template)) {
-                                                   return '定制模板不存在';
+                                                    return '定制模板不存在';
                                                 }
-                                                item_info.special_template_name = emb_template.template_name;
+                                                item_info.special_template_name = emb_template.join(',');
+                                                // item_info.special_template_name = emb_template.template_name;
                                                 item_info.special_custom_width = cart_v.design_info.special_custom_width;
                                                 item_info.special_custom_height = cart_v.design_info.special_custom_height;
                                                 item_info.special_color_num = cart_v.design_info.special_color_num;
@@ -1204,7 +1224,16 @@ export default class extends Base {
 
                                                 const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
                                                 const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
-                                                const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
+                                                let price_template;
+                                                // 多选 用多功能混合绣的价格 单选用自己
+                                                if (item_info.custom_template_id.length > 1) {
+                                                    price_template = 11;
+                                                } else {
+                                                    price_template = item_info.custom_template_id[0];
+
+                                                }
+                                                const price = await this.getEmbPrice(sqr, price_template);
+
                                                 item_info.special_custom_sqr = sqr;
                                                 item_info.special_custom_price = price;
                                                 pay_amount += price;
@@ -1269,8 +1298,16 @@ export default class extends Base {
                                              */
                                             item_info.image = cart_v.design_info.preview_image;
                                         }
-                                        item_info.item_total_price += sku_v.current_price * cart_v.buy_num;
-                                        pay_amount += sku_v.current_price * cart_v.buy_num;
+
+                                        if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {
+                                            // item_info.item_total_price += item.current_price * cart_v.buy_num;
+                                            // pay_amount += item.current_price * cart_v.buy_num;
+                                            item_info.is_only_design = 1;
+                                            pay_amount += 0;
+                                        } else {
+                                            item_info.item_total_price += item.current_price * cart_v.buy_num;
+                                            pay_amount += item.current_price * cart_v.buy_num;
+                                        }
                                         item_list.push(item_info);
                                     }
                                 }
