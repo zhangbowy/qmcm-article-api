@@ -112,6 +112,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.shop_id;
             const res = await this.model('design').field('design_id,designer_id,designer_team_id,prev_png_path,price,design_name').page(page, limit).where({
                 status: 3,
+                del: 0,
                 shop_id
             }).countSelect();
             return this.success(res, '请求成功!');
