@@ -44,9 +44,9 @@ export default class extends Base {
             const model = this.model('shops') as ShopsModel;
             const adminModel =  this.model('admin') as AdminModel;
             const isHaveName = await model.getShopByName(shop_name);
-            if (!think.isEmpty(isHaveName)) {
-                return this.fail(-1, '店鋪名已存在', []);
-            }
+            // if (!think.isEmpty(isHaveName)) {
+            //     return this.fail(-1, '店鋪名已存在', []);
+            // }
             const isHaveUser = await adminModel.getUserByPhone(phone);
             if (!think.isEmpty(isHaveUser)) {
                 return this.fail(-1, '该手机号已被使用', []);
@@ -67,6 +67,7 @@ export default class extends Base {
             this.dealErr(e);
         }
     }
+
     /**
      * 编辑店鋪
      * @param {shop_name} 店铺名称
@@ -117,8 +118,10 @@ export default class extends Base {
            this.dealErr(e);
         }
     }
+
     /**
      * 刪除店鋪
+     * @param {shop_id} 店鋪id
      */
     async delShopAction() {
         try {

@@ -438,7 +438,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = Number(this.post('id'));
             const category = await this.model('item_category').where({id}).find();
-            if (Object.keys(category).length == 0) {
+            if (think.isEmpty(category)) {
                 return this.fail(-1, '分类不存在');
             }
             const model = this.model('item_category') as item_category;

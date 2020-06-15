@@ -6,6 +6,9 @@ import {think} from "thinkjs";
 export default class extends Base {
     /**
      * 登录
+     * @param {phone} 手机号
+     * @param {password} 密码
+     * @param {code} 验证码
      */
     async loginAction(): Promise<void> {
         try {
@@ -123,6 +126,7 @@ export default class extends Base {
 
     /**
      * 验证码
+     * @param {phone} 手机号
      * @return {验证码图片}
      */
     async getCaptchaAction(): Promise<void> {

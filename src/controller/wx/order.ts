@@ -53,7 +53,7 @@ export default class extends Base {
     }
 
     /**
-     * 订单支付
+     * 创建订单
      * @params {cart_list} 购物列表 {goods_id,buy_num,sku_id}
      * @params {shopping_type} 订单类型
      * @params {address_id} 收货地址id
@@ -67,7 +67,8 @@ export default class extends Base {
             // const order_type: any = this.post('shopping_type') || 1;
             const pay_type: any = this.post('pay_type') || 1;
             const buyer_message: any = this.post('buyer_message') || "";
-            const user_id: any = this.ctx.state.userInfo.id;
+            const userInfo = this.ctx.state.userInfo;
+            const user_id: any = userInfo.id;
             if (!address_id) {
                 return this.fail(-1, "收货地址不能为空!");
             }
@@ -78,7 +79,7 @@ export default class extends Base {
             /**
              * 再次计算商品信息和价格
              */
-            const item_info: any = await this.calculation();
+            const item_info: any = await this.calculation(true);
             if (typeof item_info == 'string') {
                 return this.fail(-1, item_info);
             }
@@ -111,8 +112,11 @@ export default class extends Base {
                     break;
             }
             const _order_type =  getOrderType(order_type);
+            delete this.ctx.state.userInfo.id;
             const order_id = await this.model('order').add({
                 user_id,
+                nickname: userInfo.nickname,
+                headimgurl: userInfo.headimgurl,
                 _status,
                 status,
                 order_type,
@@ -292,8 +296,8 @@ export default class extends Base {
         const params = {
             appid: shopConfig.appid,
             mch_id:  shopConfig.mch_id,
-            op_user_id: '管理员',
-            out_refund_no: 'zhang1bo' + Math.random().toString().substr(2, 10),
+            op_user_id: '店铺',
+            out_refund_no: 'zhangbo' + Math.random().toString().substr(2, 10),
             total_fee: 1500 , // 原支付金额ge't
             // total_fee: 1 , // 原支付金额ge't
             refund_fee: 1500, // 退款金额
@@ -446,7 +450,7 @@ export default class extends Base {
                 if (result.return_code == 'SUCCESS') {
                     const  payParams: any = {
                         appId: shopConfig.appid,
-                        timeStamp: Math.floor(Date.now() / 1000) + "",
+                        timeStamp: Math.floor(Date.now() / 1000) + " ",
                         nonceStr: result.nonce_str,
                         package: "prepay_id=" + result.prepay_id,
                         signType: "MD5"
@@ -570,7 +574,7 @@ export default class extends Base {
      * @params {cart_list} 购物列表 {id,buy_num,sku_id}
      * @params {address_id} 收货地址
      */
-    async calculation() {
+    async calculation($from: boolean) {
         try {
             const shop_id: number = this.ctx.state.shop_id;
             const user_id: number = this.ctx.state.userInfo.id;
@@ -877,10 +881,31 @@ export default class extends Base {
                                             item_info.custom_image = cart_v.design_info.custom_image;
                                         }
 
-                                        item_info.design_area_image = cart_v.design_info.design_area_image;
-                                        item_info.preview_image = cart_v.design_info.preview_image;
+                                        if ($from) {
+                                            const design_area_image_buffer = await this.getBuffer(this, cart_v.design_info.design_area_image, true);
+                                            const preview_image_buffer = await this.getBuffer(this,  cart_v.design_info.preview_image, true);
+                                            const oss = await think.service('oss');
+                                            const fileName = think.uuid('v4');
+                                            const fileName2 = think.uuid('v4');
+                                            const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                            const design_area_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                            const preview_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName2}.png`;
+                                            /**
+                                             * 上传到腾讯OSS
+                                             */
+                                            // @ts-ignore
+                                            const area_res: any = await oss.upload(Buffer.from(design_area_image_buffer), design_area_image_path, true);
+                                            item_info.design_area_image = 'http://' + area_res.Location;
+                                            // @ts-ignore
+                                            const preview_res: any = await oss.upload(Buffer.from(preview_image_buffer), preview_image_path, true);
+                                            item_info.preview_image = 'http://' + preview_res.Location;
+                                        } else {
+                                            item_info.design_area_image = cart_v.design_info.design_area_image;
+                                            item_info.preview_image = cart_v.design_info.preview_image;
+                                        }
+
                                         item_info.order_type = 2;
-                                        item_info.image = cart_v.design_info.preview_image;
+                                        item_info.image = item_info.preview_image;
                                         item_info._order_type = getOrderType(item_info.order_type);
 
                                     } else {
@@ -962,9 +987,28 @@ export default class extends Base {
                                     item_info.draw_height = cart_v.design_info.draw_height;
                                     item_info.draw_width = cart_v.design_info.draw_width;
 
-                                    item_info.design_area_image = cart_v.design_info.design_area_image;
-                                    item_info.preview_image = cart_v.design_info.preview_image;
-
+                                    if ($from) {
+                                        const design_area_image_buffer = await this.getBuffer(this, cart_v.design_info.design_area_image, true);
+                                        const preview_image_buffer = await this.getBuffer(this,  cart_v.design_info.preview_image, true);
+                                        const oss1 = await think.service('oss');
+                                        const fileName1 = think.uuid('v4');
+                                        const fileName2 = think.uuid('v4');
+                                        const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                        const design_area_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName1}.png`;
+                                        const preview_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName2}.png`;
+                                        /**
+                                         * 上传到腾讯OSS
+                                         */
+                                            // @ts-ignore
+                                        const area_res: any = await oss1.upload(Buffer.from(design_area_image_buffer), design_area_image_path);
+                                        item_info.design_area_image = 'http://' + area_res.Location;
+                                        // @ts-ignore
+                                        const preview_res: any = await oss.upload(Buffer.from(preview_image_buffer), preview_image_path);
+                                        item_info.preview_image = 'http://' + preview_res.Location;
+                                    } else {
+                                        item_info.design_area_image = cart_v.design_info.design_area_image;
+                                        item_info.preview_image = cart_v.design_info.preview_image;
+                                    }
                                     const baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g, '');
                                     const drawBuffer = Buffer.from(baseData, 'base64');
                                     const fileName = think.uuid('v4');
@@ -972,13 +1016,13 @@ export default class extends Base {
                                     const filePath = `/demo/${1}/${fileName}.png`;
                                     const res: any = await oss.upload(Buffer.from(drawBuffer), filePath, true);
                                     item_info.draw_image = `http://${res.Location}`;
-                                    item_info.image = cart_v.design_info.preview_image;
+                                    item_info.image = item_info.preview_image;
                                 }
 
                                 if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {
                                      // item_info.item_total_price += item.current_price * cart_v.buy_num;
                                      // pay_amount += item.current_price * cart_v.buy_num;
-                                    item_info.is_only_design = 1
+                                    item_info.is_only_design = 1;
 
                                 } else {
                                      item_info.item_total_price += item.current_price * cart_v.buy_num;
@@ -1193,10 +1237,32 @@ export default class extends Base {
                                                         item_info.custom_image = cart_v.design_info.custom_image;
                                                     }
 
-                                                    item_info.preview_image = cart_v.design_info.preview_image;
-                                                    item_info.design_area_image = cart_v.design_info.design_area_image;
+                                                    if ($from) {
+                                                        const design_area_image_buffer = await this.getBuffer(this, cart_v.design_info.design_area_image, true);
+                                                        const preview_image_buffer = await this.getBuffer(this,  cart_v.design_info.preview_image, true);
+                                                        const oss = await think.service('oss');
+                                                        const fileName = think.uuid('v4');
+                                                        const fileName2 = think.uuid('v4');
+                                                        const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                        const design_area_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+                                                        const preview_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName2}.png`;
+                                                        /**
+                                                         * 上传到腾讯OSS
+                                                         */
+                                                            // @ts-ignore
+                                                        const area_res: any = await oss.upload(Buffer.from(design_area_image_buffer), design_area_image_path, true);
+                                                        item_info.design_area_image = 'http://' + area_res.Location;
+                                                        // @ts-ignore
+                                                        const preview_res: any = await oss.upload(Buffer.from(preview_image_buffer), preview_image_path, true);
+                                                        item_info.preview_image = 'http://' + preview_res.Location;
+                                                    } else {
+                                                        item_info.design_area_image = cart_v.design_info.design_area_image;
+                                                        item_info.preview_image = cart_v.design_info.preview_image;
+                                                    }
+                                                    // item_info.preview_image = cart_v.design_info.preview_image;
+                                                    // item_info.design_area_image = cart_v.design_info.design_area_image;
                                                     item_info.order_type = 2;
-                                                    item_info.image = cart_v.design_info.preview_image;
+                                                    item_info.image =  item_info.preview_image;
                                                     item_info._order_type = getOrderType(Number(item_info.order_type));
                                                 } else {
                                                     return 'design_info of empty';
@@ -1284,8 +1350,28 @@ export default class extends Base {
                                             /**
                                              * 上传手绘的图
                                              */
-                                            item_info.design_area_image = cart_v.design_info.design_area_image;
-                                            item_info.preview_image = cart_v.design_info.preview_image;
+                                            if ($from) {
+                                                const design_area_image_buffer = await this.getBuffer(this, cart_v.design_info.design_area_image, true);
+                                                const preview_image_buffer = await this.getBuffer(this,  cart_v.design_info.preview_image, true);
+                                                const oss1 = await think.service('oss');
+                                                const fileName1 = think.uuid('v4');
+                                                const fileName2 = think.uuid('v4');
+                                                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                                                const design_area_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName1}.png`;
+                                                const preview_image_path = `/custom/${shop_id}/${user_id}/${day}/${fileName2}.png`;
+                                                /**
+                                                 * 上传到腾讯OSS
+                                                 */
+                                                    // @ts-ignore
+                                                const area_res: any = await oss1.upload(Buffer.from(design_area_image_buffer), design_area_image_path, true);
+                                                item_info.design_area_image = 'http://' + area_res.Location;
+                                                // @ts-ignore
+                                                const preview_res: any = await oss1.upload(Buffer.from(preview_image_buffer), preview_image_path, true);
+                                                item_info.preview_image = 'http://' + preview_res.Location;
+                                            } else {
+                                                item_info.design_area_image = cart_v.design_info.design_area_image;
+                                                item_info.preview_image = cart_v.design_info.preview_image;
+                                            }
                                             const baseData = cart_v.design_info.draw_image.replace(/data:image\/png;base64,/g, '');
                                             const drawBuffer = Buffer.from(baseData, 'base64');
                                             const fileName = think.uuid('v4');
@@ -1296,7 +1382,7 @@ export default class extends Base {
                                             /**
                                              * 订单预览图变成设计预览图
                                              */
-                                            item_info.image = cart_v.design_info.preview_image;
+                                            item_info.image = item_info.preview_image;
                                         }
 
                                         if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {
@@ -1339,13 +1425,30 @@ export default class extends Base {
     }
 
     /**
+     * 上传定制的图片到 桶
+     * @param $url
+     * @param $path
+     * @param $buffer
+     */
+    async uploadCustomImage($url: string, $path: string, $buffer: boolean) {
+        const shop_id  = this.ctx.state.shop_id;
+        const user_id: any = this.ctx.state.userInfo.id;
+        const oss = await think.service('oss');
+        const fileName = think.uuid('v4');
+        const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+        const filePath = `/custom/${shop_id}/${user_id}/${day}/${fileName}.png`;
+        const res: any = await oss.upload($path, filePath, $buffer);
+        return  `http://${res.Location}`;
+    }
+
+    /**
      * 计算价格
      * @params {cart_list} 购物列表 {id,buy_num,sku_id}
      * @params {address_id} 收货地址
      */
     async calculationAction() {
         try {
-            const res =  await this.calculation();
+            const res =  await this.calculation(false);
             if (typeof res == 'string') {
                 return this.fail(-1, res);
             }

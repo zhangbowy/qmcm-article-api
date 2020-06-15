@@ -4,7 +4,7 @@ import restController from './rest';
 export default class extends restController {
   async __before() {
     try {
-      // await think.timeout(500);
+      // await think.timeout(800);
       this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
       this.header('Access-Control-Allow-Headers', ["x-requested-with", 'origin', 'content-type', 'adm_sign']);
       this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');

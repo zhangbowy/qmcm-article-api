@@ -272,6 +272,10 @@ export default class extends Base {
     }
   }
 
+  /**
+   * 退款
+   * @param $order
+   */
   async refund($order: any) {
     const shopConfig = await think.model('shop_setting').where({shop_id: $order.shop_id}).find();
     const path1 = path.join(think.RUNTIME_PATH, '/cert/15.p12');

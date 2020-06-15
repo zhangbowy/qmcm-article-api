@@ -31,6 +31,8 @@ module.exports = class extends Base {
 
     /**
      * 角色详情
+     * @param {admin_role_id} 角色id
+     * @return roleDetail
      */
     async roleDetailAction(): Promise<void> {
         try {
@@ -52,6 +54,8 @@ module.exports = class extends Base {
 
     /**
      * 添加角色
+     * @param {admin_role_name} 角色名称
+     * @param {authority_list} 权限列表
      */
     async addRoleAction(): Promise<void> {
         try {
@@ -89,6 +93,10 @@ module.exports = class extends Base {
 
     /**
      * 编辑角色
+     * @param {admin_role_id} 角色id
+     * @param {admin_role_name} 角色名称
+     * @param {authority_list} 权限列表
+     * @return boolean
      */
     async editRoleAction(): Promise<void> {
         try {
@@ -125,8 +133,11 @@ module.exports = class extends Base {
             this.dealErr(e);
         }
     }
+
     /**
      * 删除角色
+     * @param {admin_role_id} 角色id
+     * @return boolean
      */
     async delRoleAction(): Promise<void> {
         try {
@@ -142,8 +153,10 @@ module.exports = class extends Base {
             this.dealErr(e);
         }
     }
+
     /**
      * 管理员列表
+     * @param {name?} 管理员名称
      */
     async adminListAction(): Promise<void> {
         try {
@@ -164,8 +177,15 @@ module.exports = class extends Base {
            this.dealErr(e);
         }
     }
+
     /**
      * 添加管理员
+     * @param {name} 姓名
+     * @param {phone} 手机号
+     * @param {password} 密码
+     * @param {role_id} 角色id
+     * @param {password} 密码
+     * @return boolean
      */
     async addAdminAction(): Promise<void> {
         try {
@@ -198,8 +218,16 @@ module.exports = class extends Base {
             this.dealErr(e);
         }
     }
+
     /**
      * 编辑管理员
+     * @param {id} id
+     * @param {name} 姓名
+     * @param {phone} 手机号
+     * @param {password} 密码
+     * @param {role_id} 角色id
+     * @param {password} 密码
+     * @return boolean
      */
     async editAdminAction(): Promise<void> {
         try {
@@ -239,8 +267,10 @@ module.exports = class extends Base {
             this.dealErr(e);
         }
     }
+
     /**
      * 删除管理员
+     * @param {id} 管理员id
      */
     async delAdminAction(): Promise<void> {
         try {

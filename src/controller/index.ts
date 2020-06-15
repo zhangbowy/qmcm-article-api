@@ -3,6 +3,7 @@ import {ancestorWhere} from "tslint";
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const AdmZip = require('adm-zip');
 export default class extends Base {
   indexAction() {
     // return this.display();
@@ -73,13 +74,31 @@ export default class extends Base {
         'erd_order_cents oc , erd_order od,erd_order_ope op ' +
         'where oc.order_id = od.id and op.order_id = od.id';
     const res = this.query(sql);
-    return res
-        `select date_format(时间字段,'%Y-%m-%d') days,count(*) from 表名 where date_format(时间字段,'%Y')='2019' group by days
-    --或
-    select count(*),DATE(时间字段名) from 表名 where YEAR(时间字段名)='2019' group by DAY(时间字段名)`;
+    return res;
   }
 
-  async getDstAction() {
+  /**
+   * 获取DST
+   */
+  async  getDstAction() {
+    // creating archives
+    const zip = new AdmZip();
+
+    // add file directly
+    const content = "zhangbo";
+    zip.addFile("order_no.EMB", Buffer.alloc(content.length, content), "entry comment goes here");
+    zip.addFile("order_no.DST", Buffer.alloc(content.length, content), "entry comment goes here");
+    zip.addFile("order_no.TXT", Buffer.alloc(content.length, content), "entry comment goes here");
+    // add local file
+    // zip.addLocalFile("/home/me/some_picture.png");
+    // get everything as a buffer
+    const willSendthis = zip.toBuffer();
+    // or write everything to disk
+    this.ctx.attachment('order_no.zip');
+    this.ctx.body = willSendthis;
+    // zip.writeZip(/*target file name*/"/home/me/files.zip");
+  }
+  async getDstAction1() {
     // if (this.header("ops")) {
     //   // @ts-ignore
     //   const received: string = this.header("ops");
@@ -120,6 +139,8 @@ export default class extends Base {
     //   }
     // }
     // res.writeHead(200, {
+
+
     //   'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + SNAPSHOT_BOUNDARY + '"',
     //   Connection: 'keep-alive',
     //   Expires: 'Fri, 01 Jan 1990 00:00:00 GMT',
@@ -153,5 +174,17 @@ export default class extends Base {
     //     res.write(buffer);
     //   });
     // }
+  }
+
+  async copyCosAction() {
+    try {
+      const fromPath = 'cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-06-11/5a34d800-dcbc-4bb2-b6e3-bf7addd8911b.png';
+      const toPath = `/test/copy/2.png`;
+      const oss = think.service('oss');
+      const res = await oss.copyFile(toPath, fromPath);
+      this.success(res);
+    } catch (e) {
+      this.dealErr(e);
+    }
   }
 }

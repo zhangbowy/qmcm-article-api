@@ -10,6 +10,13 @@ module.exports = class extends think.Service {
     constructor() {
         super();
     }
+
+    /**
+     * 上传单个文件
+     * @param $file 本地文件路径 or buffer
+     * @param $path 要写入到桶里的路径
+     * @param $buffer? 是否是buffer
+     */
      upload($file: string, $path: string, $buffer: boolean) {
         return new Promise((resolve, rejected) => {
             cos.putObject({
@@ -29,6 +36,11 @@ module.exports = class extends think.Service {
         });
 
     }
+
+    /**
+     * 批量删除文件
+     * @param $fileList 删除的文件列表
+     */
     deleteFile($fileList: any[]) {
         return new Promise((resolve, rejected) => {
             cos.deleteMultipleObject({
@@ -44,9 +56,14 @@ module.exports = class extends think.Service {
         });
 
     }
+
+    /**
+     * 批量上传文件
+     * @param $files 文件列表
+     */
     uploadFiles($files: any[]) {
         return new Promise((resolve, reject) => {
-            const filePath1 = "temp-file-to-upload" // 本地文件路径
+            const filePath1 = "temp-file-to-upload"; // 本地文件路径
             // const filePath2 = "temp-file-to-upload" // 本地文件路径
             // files: [{
             //     Bucket: 'examplebucket-1250000000',
@@ -74,9 +91,28 @@ module.exports = class extends think.Service {
                 // tslint:disable-next-line:only-arrow-functions
             }, function(err: any, data: any) {
                 console.log(err || data);
-                if (data) {
-                  resolve(data);
-                }
+                resolve(err || data);
+            });
+        });
+    }
+
+    /**
+     * 复制文件
+     * @param $path to path
+     * @param $copyPath from url
+     */
+    copyFile($path: string, $copyPath: string) {
+        return new Promise((resolve, reject) => {
+            // @ts-ignore
+            cos.putObjectCopy({
+                Bucket: think.config('tencentCos').bucket, /* 桶 */
+                Region:  think.config('tencentCos').region, /* 地区 */
+                Key: $path,   /* 必须  写入到桶里的路径  */
+                CopySource: $copyPath, /* 必须  要复制的资源url */
+                // tslint:disable-next-line:only-arrow-functions
+            }, function(err: any, data: any) {
+                console.log(err || data);
+                resolve(err || data);
             });
         });
     }

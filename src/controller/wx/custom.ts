@@ -172,10 +172,223 @@ export default class extends Base {
 
      }
 
+    async getPreviewAction() {
+        try {
+
+            const id = this.post('id') || 88;
+            const type = this.post('type') || 2;
+
+            const design_id = this.post('design_id');
+            const custom_image = this.post('custom_image');
+            const design_image = this.post('design_image') || '';
+            const custom_template_id = this.post('custom_template_id');
+            if (type == 2) {
+                if (think.isEmpty(design_id) &&  think.isEmpty(custom_image)) {
+                    // return this.fail(-1, '花样或图片不能为空!')
+                }
+                if (design_image.indexOf('base64') === -1) {
+                    return this.fail(-1, 'design_image不是有效的base64')
+                }
+            }
+            const top_scale = this.post('top_scale') || 0.21;
+            const top_font_scale = this.post('top_font_scale') || 0.8;
+            const top_font_content = this.post('top_font_content') || [1, 2, 3];
+            const top_font_color = this.post('top_font_color') || '#e33e33';
+            const middle_scale = this.post('middle_scale') || 0.58;
+            const bottom_scale = this.post('bottom_scale') || 0.21;
+            const bottom_font_scale = this.post('bottom_font_scale') || 0.8;
+            const bottom_font_content = this.post('bottom_font_content') || [1, 2, 3, 4, 5, 6];
+            const bottom_font_color = this.post('bottom_font_color') || '#06c7f1';
+
+            /**
+             * 手绘区域宽高比例
+             */
+            const draw_height_scale = this.post('draw_height_scale') || 1;
+            const draw_left_scale = this.post('draw_left_scale') || 0;
+            const draw_top_scale = this.post('draw_top_scale') || 0;
+            const draw_image = this.post('draw_image') || '';
+
+            const result: any = {};
+            const item = await this.model('item').where({id}).find();
+            const design_area_info = await this.model('custom_category').where({custom_category_id: item.custom_category_id}).find();
+            if (think.isEmpty(design_area_info)) {
+                return this.fail(-1, '定制模板不存在');
+            }
+
+            /**
+             * 后台设置的设计区域信息
+             */
+            const design_width =  design_area_info.design_width;
+            const design_height =  design_area_info.design_height;
+            const design_top =  design_area_info.design_top;
+            const design_left =  design_area_info.design_left;
+            const design_bg =  design_area_info.design_bg;
+            const design_bg_width =  design_area_info.design_bg_width;
+            const design_bg_height =  design_area_info.design_bg_height;
+            const preview_bg_url = design_bg;
+            const preview_bg_buffer = await this.getBuffer(this, preview_bg_url, true);
+            /**
+             * 背景图元信息
+             */
+            const bgMata  = await sharp(preview_bg_buffer).metadata();
+            const preview_bg_width = bgMata.width;
+            const preview_bg_height = bgMata.height;
+            /**
+             * 设计区域的和背景图的比例
+             */
+            const scale = preview_bg_width / design_bg_width;
+            const area_left =  Math.floor(design_left * scale);
+            const area_top = Math.floor(design_top * scale);
+            const area_width = Math.floor(design_width * scale);
+            const area_height = Math.floor(design_height * scale);
+            const area_width_mm =  Math.floor(area_width / 120 * 25.4);
+            const area_height_mm = Math.floor(area_height / 120 * 25.4);
+
+            let composite: any = [];
+            let designBuffer;
+            /**
+             * type == 2 一般定制
+             */
+            if (type == 2) {
+                /**
+                 * 一般设计 花样 上传图片 区域大小
+                 */
+
+                    /**
+                     * rezize 改变大小到标准尺寸下的大小
+                     */
+                        const baseData = design_image.replace(/data:image\/png;base64,/g, '');
+
+                        const a = Buffer.from(baseData, 'base64');
+
+                        designBuffer = await sharp(a).resize({ width: area_width}).toBuffer() ;
+                    // const design_preview_meta  = await sharp(design_preview_buffer).metadata();
+                    // middle_design_width = design_preview_meta.width;
+                        composite = [
+                    { input: designBuffer, left: 0, top: 0},
+                ];
+                } else {
+
+                }
+
+            /**
+             * type == 4 手绘订单
+             */
+            if (type == 4) {
+                /**
+                 * 绘制的高度
+                 */
+                const drawArea_height = Math.floor(area_height * draw_height_scale);
+                const drawArea_width = Math.floor(area_width * draw_height_scale);
+                const drawArea_left = Math.floor(area_width * draw_left_scale);
+                const drawArea_top = Math.floor(area_height * draw_top_scale);
+                const baseData = draw_image.replace(/data:image\/png;base64,/g, '');
+                let drawBuffer;
+                const setting = await this.model('setting').where({key: 'is_request_wilcom', value: 1}).find();
+                if (!think.isEmpty(setting)) {
+                    const wilcom = think.service('wilcom');
+                    const embPng =  await wilcom.getEmbByImg(baseData, 100, 100);
+                    drawBuffer = Buffer.from(embPng, 'base64');
+                } else {
+                    drawBuffer = Buffer.from(baseData, 'base64');
+                }
+                // const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).webp().toBuffer() ;
+                const drawAreaBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).toBuffer() ;
+                designBuffer = await sharp(drawBuffer).resize({height: drawArea_height}).toBuffer() ;
+                const drawAreaBuffer_meta  = await sharp(drawAreaBuffer).metadata();
+                const drawAreaBuffer_width = drawAreaBuffer_meta.width;
+                const drawAreaBuffer_height = drawAreaBuffer_meta.height;
+                // area_width =(drawAreaBuffer_width>area_width?drawAreaBuffer_width:area_width);
+                // area_height =(drawAreaBuffer_height>area_height?drawAreaBuffer_height:area_height);
+                // const drawAreaBuffer_top = Math.floor((area_height- drawAreaBuffer_height) / 2);
+                // const drawAreaBuffer_left = Math.floor((area_width - drawAreaBuffer_width ) / 2);
+                /**
+                 * 合成的图 手绘图
+                 */
+                composite = [
+                    { input: drawAreaBuffer, left: drawArea_left, top: drawArea_top},
+                ];
+                /**
+                 * 设计区的内容
+                 */
+                designBuffer = await sharp({
+                    create: {
+                        width: drawAreaBuffer_width > area_width ? drawAreaBuffer_width : area_width,
+                        height: drawAreaBuffer_height > area_height ? drawAreaBuffer_height : area_height,
+                        channels: 4,
+                        background: { r: 255, g: 255, b: 255, alpha: 0}
+                    }
+                })
+                    .composite(composite)
+                    .png()
+                    .toBuffer();
+            }
+            // /**
+            //  * 设计区的内容
+            //  */
+            // const designAreaBuffer = await sharp({
+            //     create: {
+            //         width: area_width,
+            //         height: area_height,
+            //         channels: 4,
+            //         background: { r: 255, g: 255, b: 255, alpha: 0}
+            //     }
+            // })
+            //     .composite(composite)
+            //     .png()
+            //     .toBuffer();
+            const data = await sharp(preview_bg_buffer).composite([{ input: designBuffer, left: area_left, top: area_top}]).toBuffer();
+            // const data12 = Buffer.from(data, 'utf8');
+            // let img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
+            const oss = await think.service('oss');
+            const fileName = `${think.uuid('v4')}.png`;
+            const fileName2 = `${think.uuid('v4')}.png`;
+            // const filepath = path.join(think.ROOT_PATH, `www/static/custom/preview/${fileName}.png`)
+            // await think.mkdir(path.dirname(filepath));
+            // fs.writeFileSync(filepath,)
+            // this.ctx.type = 'image/png';
+            const filePath: any = path.join(think.ROOT_PATH, `/www/static/preview/${fileName}`);
+            const filePath2: any = path.join(think.ROOT_PATH, `/www/static/preview/${fileName2}`);
+            const visitPath: any = `/static/preview/${fileName}`;
+            const visitPath2: any = `/static/preview/${fileName2}`;
+            //     this.ctx.body = data;
+            await think.mkdir(path.dirname(filePath));
+            await fs.writeFileSync(filePath, data);
+            // await fs.writeFileSync(filePath2, designAreaBuffer);
+            const img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
+
+            // const res: any = await oss.upload(Buffer.from(data), filePath,true);
+            const result1: any = {
+                preview_image: `${think.config('domain')}${visitPath}`,
+                design_area_image: `${think.config('domain')}${visitPath2}`
+            };
+            return this.success(result1);
+            // return this.success(img);
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 代理图片
+     */
+    async getImageAction() {
+        try {
+
+        } catch (e) {
+
+        }
+        const url = this.get('url');
+        const data =  await this.getBuffer(this, url, false);
+        // this.ctx.type = 'image/png';
+        // this.ctx.body = data;
+        return this.success(data, 'base64');
+    }
+
     /**
      * 获取刺绣预览图
      */
-    async getPreviewAction() {
+    async getPreview1Action() {
         try {
 
             const id = this.post('id') || 88;
