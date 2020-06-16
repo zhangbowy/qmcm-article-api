@@ -30,16 +30,15 @@ export default class extends Base {
                 // if (categoryItem.parent_id == 0) {
                 //     categorys = category_id
                 // } else {
-                const categoryModel = this.model('item_category') as item_category;
-                categorys = await categoryModel.getChild(category_id);
+                // const categoryModel = this.model('item_category') as item_category;
+                // categorys = await categoryModel.getChild(category_id);
                 // }
-            } else {
-                categorys = 0;
             }
             const model = this.model('item') as ItemModel;
             // @ts-ignore
             const shop_id = this.ctx.state.shop_id;
-            const data = await model.goodsList({page, limit, shop_id, status, name, categorys});
+            // @ts-ignore
+            const data = await model.goodsList({page, limit, shop_id, status, name, category_id});
             return this.success(data, '请求成功!');
         } catch ($err) {
             this.dealErr($err);

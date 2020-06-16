@@ -24,7 +24,7 @@ interface GoodsListParams {
     shop_id: number;
     status: number;
     name: string;
-    categorys?: string;
+    category_id?: string;
 }
 export default class extends think.Model {
     async goodsList($data: GoodsListParams) {
@@ -32,20 +32,21 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
-        const where: any = {name: ['like', `%${$data.name}%`], del: 0, shop_id: $data.shop_id};
-        if ($data.categorys) {
-            where.category_id = ['in', $data.categorys];
+        let where: any = `name like '%${$data.name}%' and del=0 and shop_id = ${$data.shop_id} `;
+        if ($data.category_id) {
+            where += `and FIND_IN_SET(category_id,getGoodCate(${$data.category_id}))`;
+            // const sql = `select getGoodCate(${$data.category_id})`;
+            // const cate = await this.query(sql);
+            // where.category_id = ['in', $data.category_id];
         }
         if ($data.status == -1) {
-
             // @ts-ignore
-            return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
         } else {
-            where.status = $data.status;
-            // @ts-ignore
-            // ,sku_list,sku_show,detail
-            return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
+            where += `and status = ${$data.status}`;
+            // where.status = $data.status;
         }
+        // @ts-ignore
+        return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
         // return this.order({created_at: 'DESC'}).where({del: 0}).field('shop_id,shop_name,logo,system_end_time,created_at').page(page, limit).countSelect();
     }
     async addGoods($data: AddGoodsParams) {
