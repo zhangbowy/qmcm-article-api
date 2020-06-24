@@ -67,9 +67,7 @@ export default class extends Base {
         } else {
           where.id = 0;
         }
-        // result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
       } else {
-        // result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
       }
       result = await this.model('order').order('updated_at DESC').page(page, limit).where(where).countSelect();
       if (this.ctx.state.isExcel) {

@@ -8,7 +8,7 @@ module.exports = class extends Base {
      */
     async authorityListAction(): Promise<void> {
         try {
-            const res = await this.model('authority').where({is_show: 1, only_role_type: 3}).fieldReverse('del').select();
+            const res = await this.model('authority').where({is_show: 1, only_role_type: ['IN', [3, 0]]}).fieldReverse('del').select();
             const data = this.getTree(res, 0);
             return this.success(data);
         } catch (e) {

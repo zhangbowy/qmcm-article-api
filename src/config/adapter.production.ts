@@ -15,7 +15,7 @@ exports.model = {
     },
     mysql: {
         handle: mysql,
-        database: 'yuncixiu', //数据库名
+        database: 'test', //数据库名
         prefix: '',//表前缀
         encoding: 'utf8',
         // host: '129.211.65.201',//host
@@ -23,7 +23,7 @@ exports.model = {
         port: 3306,//端口
         // user: 'root',//用户名
         user: 'yuncixiu',//用户名
-        password: 'PCSXsX2HCJnfCYEb',//密码
+        password: 'd7DmpHNHD87PWYfR',//密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,

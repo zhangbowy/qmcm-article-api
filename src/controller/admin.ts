@@ -82,7 +82,7 @@ export default class extends Base {
                 authority_list = await this.model('authority').where({only_role_type: ['in', [1, 0]], is_show: 1, del: 0}).getField('id');
             }
 
-            const shop_info = await this.model('shops').setRelation(false).where({shop_id: admin_info.shop_id}).fieldReverse('domain,shop_setting,del,id').find()
+            const shop_info = await this.model('shops').setRelation(false).where({shop_id: admin_info.shop_id}).fieldReverse('domain,shop_setting,del,id').find();
 
             const result = {
                 admin_info: {
@@ -95,7 +95,6 @@ export default class extends Base {
                 },
                 authority_list
             };
-
 
             return this.success(result, '请求成功!');
         } catch (e) {

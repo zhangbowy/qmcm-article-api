@@ -21,6 +21,9 @@ export default class extends Base {
         return this.success(url);
     }
 
+    /**
+     * 中间跳转域名
+     */
     async notifyAction() {
         const code: string = this.get('code');
         const state1: any = this.get('state');
