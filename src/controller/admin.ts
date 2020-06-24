@@ -30,6 +30,14 @@ export default class extends Base {
             if (!think.isEmpty(res)) {
                 const bufferPwd = new Buffer(res.pwd, 'binary' ).toString('utf-8');
                 if (pwd === bufferPwd) {
+                    // 判断店铺过期
+                    const now = new Date().getTime();
+                    const shop_info = await this.model('shops').where({shop_id: res.shop_id}).find();
+                    const endTime = new Date(shop_info.system_end_time).getTime();
+                    if (now > endTime) {
+                        return this.fail(-1, '店铺已过期,请联系平台!');
+                    }
+
                     const tokenFuc =  think.service('token');
                     /**
                      * 生成token
