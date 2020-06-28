@@ -116,7 +116,17 @@ export default class extends Base {
                 return this.fail(-1, '该手机号已被其他店铺使用', []);
             }
             const shopData = await  model.editShop(shop_id, params);
+            if (!shopData) {
+                return this.fail(-1, '该店铺不存在!');
+            }
             const data: any = await  adminModel.editAdmin(shop_id, adminParams);
+            if (!data) {
+                adminParams.shop_id = shop_id;
+                const add = await this.model('admin').add(adminParams);
+                if (!add) {
+                    return this.fail(-1, '添加失败!');
+                }
+            }
             return this.success(data, '请求成功!');
         } catch (e) {
            this.dealErr(e);

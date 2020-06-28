@@ -22,8 +22,9 @@ exports.model = {
         host: '127.0.0.1',//host
         port: 3306,//端口
         // user: 'root',//用户名
-        user: 'yuncixiu',//用户名
-        password: 'd7DmpHNHD87PWYfR',//密码
+        user: 'root',//用户名
+        password: '1234567qm',//密码
+        // password: 'd7DmpHNHD87PWYfR',//密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,
