@@ -40,7 +40,7 @@ export default class extends think.Model {
      * 清除分组Id
      */
     async deletePid($ids: any) {
-        return this.where(`del=0 and FIND_IN_SET(gallery_group_id,getGalelryGroupId(${$ids})`).update({gallery_group_id: 0});
+        return this.where(`del=0 and FIND_IN_SET(gallery_group_id,getGalelryGroupId(${$ids}))`).update({gallery_group_id: 0});
     }
     /**
      * 图片设置分组
