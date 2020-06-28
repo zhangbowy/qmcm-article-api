@@ -24,7 +24,11 @@ export default class extends Base {
             const groupModel = this.model('gallery_group') as GroupModel;
             // const group_list: any  = await groupModel.getNeedsTree(gallery_group_id);
             // @ts-ignore
-            const shop_id = this.ctx.state.admin_info.shop_id;
+            const admin_info = this.ctx.state.admin_info;
+            let shop_id = admin_info.shop_id;
+            if (admin_info.role_type == 1) {
+                shop_id = 0
+            }
             const data = await model.list({page, limit, shop_id, gallery_group_id, img_name});
             return this.success(data, '请求成功!');
         } catch (e) {

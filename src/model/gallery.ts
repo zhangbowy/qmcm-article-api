@@ -15,7 +15,10 @@ export default class extends think.Model {
         const limit: number = $data.limit || 10;
         const offset: number = (page - 1) * limit;
         // @ts-ignore
-        let where = `del= 0 and shop_id= ${$data.shop_id} and img_name like '%${$data.img_name}%' `;
+        let where = `del= 0  and img_name like '%${$data.img_name}%' `;
+        if ($data.shop_id) {
+            where += `and shop_id= ${$data.shop_id}`;
+        }
         if ($data.gallery_group_id == -1) {
             // @ts-ignore
             // return this.order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id, img_name: ['like', `%${$data.img_name}%`]}).page(page, limit).cache(0).countSelect({cache: false});
