@@ -18,8 +18,8 @@ exports.model = {
         database: 'test', //数据库名
         prefix: '',//表前缀
         encoding: 'utf8',
-        // host: '129.211.65.201',//host
-        host: '127.0.0.1',//host
+        host: '129.211.65.201',//host
+        // host: '127.0.0.1',//host
         port: 3306,//端口
         // user: 'root',//用户名
         user: 'root',//用户名
