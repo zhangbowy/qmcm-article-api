@@ -17,7 +17,7 @@ export default class extends think.Model {
         // @ts-ignore
         let where = `del= 0  and img_name like '%${$data.img_name}%' `;
         if ($data.shop_id) {
-            where += `and shop_id= ${$data.shop_id}`;
+            where += ` and shop_id= ${$data.shop_id} `;
         }
         if ($data.gallery_group_id == -1) {
             // @ts-ignore
