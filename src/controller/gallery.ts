@@ -27,7 +27,7 @@ export default class extends Base {
             const admin_info = this.ctx.state.admin_info;
             let shop_id = admin_info.shop_id;
             if (admin_info.role_type == 1) {
-                shop_id = 0
+                shop_id = 0;
             }
             const data = await model.list({page, limit, shop_id, gallery_group_id, img_name});
             return this.success(data, '请求成功!');
@@ -215,7 +215,7 @@ export default class extends Base {
                 shop_id
             };
             const gallery_group = await this.model('gallery_group').where({id: parent_id}).find();
-            if (Object.keys(gallery_group).length == 0) {
+            if (Object.keys(gallery_group).length == 0 && parent_id != 0) {
                 return this.fail(-1, '该上级分类不存在!');
             }
             const model = this.model('gallery_group') as GroupModel;

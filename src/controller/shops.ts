@@ -111,6 +111,10 @@ export default class extends Base {
             // if (!think.isEmpty(isHaveUser)) {
             //     return this.fail(-1, '该手机号已被其他店铺使用', []);
             // }
+            const isHaveUser = await this.model('admin').where({shop_id: ['NOTIN', [shop_id]], phone}).find()
+            if (!think.isEmpty(isHaveUser)) {
+                return this.fail(-1, '该手机号已被其他店铺使用', []);
+            }
             const shopData = await  model.editShop(shop_id, params);
             const data: any = await  adminModel.editAdmin(shop_id, adminParams);
             return this.success(data, '请求成功!');
