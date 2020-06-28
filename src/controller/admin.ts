@@ -144,10 +144,10 @@ export default class extends Base {
             noise: 1, // number of noise lines
             color: false, // default grey, true if background option is set
             background: '#ffffff', // background color of the svg image
-            width: 150, // width of captcha
-            height: 50, // height of captcha
+            width: 120, // width of captcha
+            height: 40, // height of captcha
             // fontPath: './fonts/Comismsh.ttf', // your font path
-            fontSize: 70, // captcha text size
+            fontSize: 60, // captcha text size
             charPreset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' // random character preset
         };
         const captcha = new ThinkSvgCaptcha(defaultOptions);
