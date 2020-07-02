@@ -49,6 +49,7 @@ export default class extends Base {
             const url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
 
             const res = await this.fetch(url).then(($res) => $res.json());
+            console.log(res, 'access_token')
             if (res && res.errcode) {
                 return this.success(res);
             }
