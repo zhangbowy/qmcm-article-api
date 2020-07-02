@@ -43,7 +43,7 @@ export = [
       token: 'aaacc',
       appid: 'wx5421da096af52832',
       encodingAESKey: 'GmVWlme21bDIVVMBL2qhL0N7BDZb6jP4gSe8xXJabF3',
-      checkSignature: true // 可选，默认为true。由于微信公众平台接口调试工具在明文模式下不发送签名，所以如要使用该测试工具，请将其设置为false
+      checkSignature: false // 可选，默认为true。由于微信公众平台接口调试工具在明文模式下不发送签名，所以如要使用该测试工具，请将其设置为false
     }
   },
   {

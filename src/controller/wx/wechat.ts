@@ -24,11 +24,15 @@ export default class extends Base {
         const shaStr = sha1(str);
 
         // 获得加密后的字符串可与signature对比，验证标识该请求来源于微信服务器
+        console.log(shaStr, signature)
         if (shaStr === signature) {
             // 确认此次GET请求来自微信服务器，请原样返回echostr参数内容，则接入生效
-            return this.ctx.body = echostr;
+            this.success(shaStr)
+            // return this.ctx.body = echostr;
         } else {
-            return this.ctx.body = 'no';
+            // return this.ctx.body = 'no';
+            this.success('no')
+
         }
         // const echostr = this.get('echostr');
     }
