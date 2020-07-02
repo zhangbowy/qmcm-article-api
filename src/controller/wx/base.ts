@@ -7,10 +7,11 @@ export default class extends restController {
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
     try {
-      this.ctx.state.token = this.cookie('user_sign') || '';
+      this.ctx.state.token = await this.cookie('user_sign') || '';
       const tokenSerivce = think.service('wx/token');
       this.ctx.state.userInfo = await tokenSerivce.parse1(this.ctx.state.token);
-
+      console.log( this.ctx.state.token, 'user_sign')
+      console.log(  this.ctx.state.userInfo , 'userInfo base wx')
       const host = this.ctx.req.headers.host;
       const whiteList = ['/wx/order/getDst', '/wx/order/notify', 'wx/order/crontab'];
       if (host != 'cxmob.tecqm.club' && whiteList.indexOf(this.ctx.path) === -1 ) {
