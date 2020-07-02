@@ -41,6 +41,7 @@ export default class extends Base {
             if (!code) {
                 return this.fail(-1., 'code不能为空');
             }
+            const shop_id = this.ctx.state.shop_id;
             const appid = this.config('shopConfig').appid;
             const secret = this.config('shopConfig').appsecret;
             /**
@@ -57,7 +58,7 @@ export default class extends Base {
             /**
              * 判断是否新用户
              */
-            const info = await this.model('user').where({openid: openId}).find();
+            const info = await this.model('user').where({shop_id, openid: openId}).find();
             let userInfo;
             /**
              * 老用户
@@ -81,7 +82,6 @@ export default class extends Base {
                 const access_token = res.access_token;
                 const getInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openId}&lang=zh_CN`;
                 userInfo = await this.fetch(getInfoUrl).then(($res) => $res.json());
-                const shop_id = this.ctx.state.shop_id;
                 const params: object = {
                     nickname: userInfo.nickname,
                     sex: userInfo.sex,
