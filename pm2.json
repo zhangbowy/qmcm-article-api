@@ -6,6 +6,7 @@
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
+    "instances": 2,
     "node_args": [],
     "args": [],
     "env": {

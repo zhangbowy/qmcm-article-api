@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node development.js",
     "prod": "tsc && node production.js",
-    "compile": "tsc",
+    "compile": "./node_modules/.bin/tsc",
     "lint": "tslint \"src/**/*.ts\""
   },
   "dependencies": {

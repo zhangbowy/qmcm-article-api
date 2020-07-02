@@ -697,7 +697,7 @@ export default class extends Base {
             const data = fs.readFileSync('2.EMB');
             // const imgBuffer: any  = await this.getBuffer(this, img, true);
             // const imgBase64 = imgBuffer.toString('base64');
-
+            const post = this.post()
             // const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');
 
