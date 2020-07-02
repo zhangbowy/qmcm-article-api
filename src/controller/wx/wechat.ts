@@ -92,7 +92,6 @@ export default class extends Base {
                         name: "商城主页",
                         url: 'http://' + 'cxgh.tecqm.club',
                     }
-
                 ]
             };
             const createMenu = think.promisify(api.createMenu, api);

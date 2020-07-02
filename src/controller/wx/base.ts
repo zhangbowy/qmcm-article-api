@@ -23,7 +23,7 @@ export default class extends restController {
         if (Object.keys(config).length == 0) {
           return this.fail(1001, '店铺不存在或域名未配置!');
         }
-        const shopInfo = await think.model('shops').where({shop_id: config.shop_id}).find();
+        const shopInfo = await think.model('shops').where({del: 0, shop_id: config.shop_id}).find();
         if (Object.keys(config).length == 0) {
           return this.fail(shopInfo, '店铺不存在');
         }

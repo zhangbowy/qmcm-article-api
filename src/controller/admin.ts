@@ -32,7 +32,10 @@ export default class extends Base {
                 if (pwd === bufferPwd) {
                     // 判断店铺过期
                     const now = new Date().getTime();
-                    const shop_info = await this.model('shops').where({shop_id: res.shop_id}).find();
+                    const shop_info = await this.model('shops').where({del: 0, shop_id: res.shop_id}).find();
+                    if (think.isEmpty(shop_info)) {
+                        return this.fail(-1, '店铺不存在!');
+                    }
                     const endTime = new Date(shop_info.system_end_time).getTime();
                     if (now > endTime) {
                         return this.fail(-1, '店铺已过期,请联系平台!');
