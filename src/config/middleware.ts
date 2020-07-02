@@ -38,7 +38,7 @@ export = [
   },
   {
     handle: thinkWechat,
-    match: '/wx/wechat',
+    match: '/api/wx/wechat',
     options: {
       token: 'aaacc',
       appid: 'wx5421da096af52832',
