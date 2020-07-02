@@ -3,6 +3,7 @@ import { think } from 'thinkjs';
 import * as path from 'path';
 // @ts-ignore
 // const cors = require('koa-cors');
+const thinkWechat = require('think-wechat');
 const isDev = think.env === 'development';
 
 export = [
@@ -33,6 +34,16 @@ export = [
         500: path.join(think.ROOT_PATH, 'view/error/500.html'),
         502: path.join(think.ROOT_PATH, 'view/error/502.html')
       }
+    }
+  },
+  {
+    handle: thinkWechat,
+    match: '/wx/wechat',
+    options: {
+      token: 'aaacc',
+      appid: 'wx5421da096af52832',
+      encodingAESKey: 'GmVWlme21bDIVVMBL2qhL0N7BDZb6jP4gSe8xXJabF3',
+      checkSignature: true // 可选，默认为true。由于微信公众平台接口调试工具在明文模式下不发送签名，所以如要使用该测试工具，请将其设置为false
     }
   },
   {

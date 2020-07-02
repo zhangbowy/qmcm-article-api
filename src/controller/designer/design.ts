@@ -694,7 +694,7 @@ export default class extends Base {
         try {
             const url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-29-12:33:43/�к���.EMB';
             const img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
-            const data = fs.readFileSync('1.EMB');
+            const data = fs.readFileSync('2.EMB');
             // const imgBuffer: any  = await this.getBuffer(this, img, true);
             // const imgBase64 = imgBuffer.toString('base64');
 
@@ -716,7 +716,7 @@ export default class extends Base {
                 str += `${this.getString(color.color)} ${this.getString(item.$.num_stitches)}  ${this.getString(color.code)}   ${this.getString(color.description, 15)}    ${this.getString(color.brand)}\r\n`;
             }
             await fs.writeFileSync('1.txt', str);
-            return this.success({str, threadList, stop_recordList});
+            return this.success({design_info, str, threadList, stop_recordList});
         } catch (e) {
             this.dealErr(e);
         }

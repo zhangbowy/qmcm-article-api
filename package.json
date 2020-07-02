@@ -36,6 +36,7 @@
     "think-view-nunjucks": "^1.0.10",
     "think-websocket": "^1.0.7",
     "think-websocket-socket.io": "^1.0.11",
+    "think-wechat": "^1.1.0",
     "thinkjs": "^3.2.11",
     "thinkjs3-ts": "^1.0.1",
     "weixin-pay": "^1.1.7",
