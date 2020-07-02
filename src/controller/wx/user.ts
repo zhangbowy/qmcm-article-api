@@ -11,7 +11,7 @@ export default class extends Base {
         const appid = this.config('shopConfig').appid;
         const returnUrl: any = this.ctx.req.headers.host;
         const returnApi = returnUrl + '/api/wx/user/auth';
-        const params: any = { 
+        const params: any = {
             returnUrl,
             returnApi
         };
@@ -108,7 +108,7 @@ export default class extends Base {
                 maxAge: 1000 * 1000 * 1000 * 1000,
                 expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000
             });
-
+            console.log(userInfo, 'auth')
             const urls = `http://${this.ctx.req.headers.host}`;
             /**
              * 重定向到首页
