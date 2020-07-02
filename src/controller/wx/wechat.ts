@@ -1,6 +1,8 @@
 import Base from './base.js';
-const sha1  = require('sha1')
+const sha1  = require('sha1');
 const DEFULT_AUTO_REPLY = '功能正在开发中~';
+const wechatApi = require('wechat-api');
+const util = require('util');
 export default class extends Base {
     /**
      * index action
@@ -24,14 +26,14 @@ export default class extends Base {
         const shaStr = sha1(str);
 
         // 获得加密后的字符串可与signature对比，验证标识该请求来源于微信服务器
-        console.log(shaStr, signature)
+        console.log(shaStr, signature);
         if (shaStr === signature) {
             // 确认此次GET请求来自微信服务器，请原样返回echostr参数内容，则接入生效
-            this.success(shaStr)
+            this.success(shaStr);
             // return this.ctx.body = echostr;
         } else {
             // return this.ctx.body = 'no';
-            this.success('no')
+            this.success('no');
 
         }
         // const echostr = this.get('echostr');
@@ -76,8 +78,32 @@ export default class extends Base {
     }
     linkAction() {
         const message = this.post();
+
         this.success(JSON.stringify(message));
     }
+    async createMenuAction() {
+        try {
+            const message = this.post();
+            const api = new wechatApi('wx5421da096af52832', 'e37b2afb56be4fd64e4578c18ac61871');
+            const menu = {
+                button: [
+                    {
+                        type: "view",
+                        name: "商城主页",
+                        url: 'http://' + 'cxgh.tecqm.club',
+                    }
+
+                ]
+            };
+            const createMenu = think.promisify(api.createMenu, api);
+            const res = await createMenu(menu);
+            this.success(res);
+        } catch (e) {
+            this.success(e);
+        }
+
+    }
+// @ts-ignore
     __call() {
         this.success(DEFULT_AUTO_REPLY);
     }

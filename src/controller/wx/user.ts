@@ -11,7 +11,7 @@ export default class extends Base {
         const appid = this.config('shopConfig').appid;
         const returnUrl: any = this.ctx.req.headers.host;
         const returnApi = returnUrl + '/api/wx/user/auth';
-        const params: any = {
+        const params: any = { 
             returnUrl,
             returnApi
         };

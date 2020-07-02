@@ -13,7 +13,7 @@ export default class extends restController {
 
       const host = this.ctx.req.headers.host;
       const whiteList = ['/wx/order/getDst', '/wx/order/notify', 'wx/order/crontab'];
-      if (host != 'cxmob.tecqm.club' && whiteList.indexOf(this.ctx.path) === -1) {
+      if (host != 'cxmob.tecqm.club' && whiteList.indexOf(this.ctx.path) === -1 ) {
         if (!host) {
           return this.fail(1001, '域名未配置!');
         }
@@ -36,7 +36,7 @@ export default class extends restController {
         if (now > endTime) {
           return this.fail(-1, '店铺异常,请联系商家!');
         }
-        if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1) {
+        if (this.ctx.path.indexOf('wx/user/login') === -1 && this.ctx.path.indexOf('wx/user/auth') === -1 && !/wx\/wechat/.test(this.ctx.path)) {
           if (this.ctx.state.userInfo == null) {
             return this.fail(402, '未登录');
           }
