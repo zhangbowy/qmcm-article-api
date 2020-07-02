@@ -1,6 +1,5 @@
-const Base = require('./base.js');
+import Base from './base.js';
 const DEFULT_AUTO_REPLY = '功能正在开发中~';
-
 export default class extends Base {
     /**
      * index action
@@ -41,8 +40,9 @@ export default class extends Base {
     }
     textAction() {
         // 发送文本消息
-     const {Content} = this.post();
-     this.success('你发送给我的是:' + Content.trim());
+     // @ts-ignore
+        const {Content} = this.post();
+        this.success('你发送给我的是:' + Content.trim());
     }
     // async textAction(){
     //     const {Content} = this.post();
