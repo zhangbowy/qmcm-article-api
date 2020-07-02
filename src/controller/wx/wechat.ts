@@ -74,6 +74,10 @@ export default class extends Base {
 
         this.success(JSON.stringify(message));
     }
+    linkAction() {
+        const message = this.post();
+        this.success(JSON.stringify(message));
+    }
     __call() {
         this.success(DEFULT_AUTO_REPLY);
     }
