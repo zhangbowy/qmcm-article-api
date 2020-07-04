@@ -165,7 +165,6 @@ export default class extends Base {
                     // });
                 }
                 return this.success(imageObj);
-
             }
         } catch (e) {
             this.dealErr(e);
@@ -355,9 +354,8 @@ export default class extends Base {
             //     this.ctx.body = data;
             await think.mkdir(path.dirname(filePath));
             await fs.writeFileSync(filePath, data);
-            // await fs.writeFileSync(filePath2, designAreaBuffer);
+            await fs.writeFileSync(filePath2, designBuffer);
             const img = 'data:image/png;base64,' + Buffer.from(data, 'utf8').toString('base64');
-
             // const res: any = await oss.upload(Buffer.from(data), filePath,true);
             const result1: any = {
                 preview_image: `${think.config('domain')}${visitPath}`,
