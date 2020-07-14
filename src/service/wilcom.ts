@@ -21,7 +21,8 @@ module.exports = class extends think.Service {
         const base64Image = $image;
         const options = {
             method: 'POST',
-            uri: 'http://ewa.wilcom.com/2.0/api/bitmapartdesign',
+            uri: 'http://161.117.60.187/api/bitmapartdesign',
+            // uri: 'http://ewa.wilcom.com/2.0/api/bitmapartdesign',
             // uri: 'http://ewa.wilcom.com/2.0/api/vectorArtDesign',
             body: {
                 appId,
@@ -43,6 +44,7 @@ module.exports = class extends think.Service {
                   <output
                      trueview_file="final_design_trueview.png"
                      design_file="final_design.emb"
+                     design_version="Wilcom All-in-One Designs e2 (*.EMB)"
                      dpi ="270"
                   />
                   <files>
@@ -74,7 +76,8 @@ module.exports = class extends think.Service {
     async getDesignInfo($embData: string) {
         const options3 = {
             method: 'POST',
-            uri: 'http://ewa.wilcom.com/2.0/api/designInfo',
+            // uri: 'http://ewa.wilcom.com/2.0/api/designInfo',
+            uri: 'http://161.117.60.187/api/designInfo',
             body: {
                 appId,
                 appKey,
