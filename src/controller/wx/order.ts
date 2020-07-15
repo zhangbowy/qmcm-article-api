@@ -1741,14 +1741,15 @@ export default class extends Base {
                 const order_id = orderInfo.id;
                 const order_item = await this.model('order_item').where({ order_id }).find();
                 const res: any = await this.fetch(order_item.design_dst_path);
+                console.log(order_item.design_dst_path);
                 // this.ctx.set({
                 //     // 'Content-Length': isHaveFile.size,
                 //     "Content-Disposition": "attachment; filename=" + `${orderInfo.order_no}.DST`,
                 // });
                 const PassThrough = require('stream').PassThrough;
                 await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
-                this.ctx.body = res.body;
-                // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+                // this.ctx.body = res.body;
+                this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
             } else {
                 return this.fail(-1, '签名错误!');
             }
