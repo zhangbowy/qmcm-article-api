@@ -1741,10 +1741,10 @@ export default class extends Base {
                 const order_id = orderInfo.id;
                 const order_item = await this.model('order_item').where({ order_id }).find();
                 const res: any = await this.fetch(order_item.design_dst_path);
-                this.ctx.set({
-                    // 'Content-Length': isHaveFile.size,
-                    "Content-Disposition": "attachment; filename=" + `${orderInfo.order_no}.DST`,
-                });
+                // this.ctx.set({
+                //     // 'Content-Length': isHaveFile.size,
+                //     "Content-Disposition": "attachment; filename=" + `${orderInfo.order_no}.DST`,
+                // });
                 const PassThrough = require('stream').PassThrough;
                 await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
                 this.ctx.body = res.body;
