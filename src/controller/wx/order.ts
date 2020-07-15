@@ -1751,6 +1751,7 @@ export default class extends Base {
                 await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
                 // this.ctx.body = res.body;
                 this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+                console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
             } else {
                 return this.fail(-1, '签名错误!');
             }
