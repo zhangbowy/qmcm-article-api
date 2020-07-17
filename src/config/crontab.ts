@@ -6,9 +6,6 @@ module.exports = [
     //     enable: true,
     //     // handle: 'wx/order/crontab'
     // },
-
-
-
     {
     interval: '30s',
     immediate: true,
@@ -37,8 +34,10 @@ module.exports = [
             }
         }
     }
-  }, {
-    cron: '0 */1 * * *',
-    handle: 'crontab/test',
-    type: 'all'
-  }];
+  },
+  //   {
+  //   cron: '0 */1 * * *',
+  //   handle: 'crontab/test',
+  //   type: 'all'
+  // }
+  ];
