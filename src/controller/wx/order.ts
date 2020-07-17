@@ -1741,9 +1741,10 @@ export default class extends Base {
                 const order_id = orderInfo.id;
                 const order_item = await this.model('order_item').where({ order_id }).find();
                 const res: any = await this.fetch(order_item.design_dst_path);
+                // const res: any = await this.fetch(order_item.design_dst_path);
                 console.log(order_item.design_dst_path);
                 this.ctx.set({
-                    // 'Content-Length': isHaveFile.size,
+                    'Content-Length': res.headers._headers['content-length'][0],
                     'Content-Type': 'multipart/form-data',
                     "Content-Disposition": "attachment; filename=" + `${orderInfo.order_no}.DST`,
                 });
