@@ -1746,7 +1746,7 @@ export default class extends Base {
                 this.ctx.set({
                     'Content-Length': res.headers._headers['content-length'][0],
                     'Content-Type': 'multipart/form-data',
-                    "Content-Disposition": "attachment; filename=" + `${orderInfo.order_no}.DST`,
+                    "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.DST`,
                 });
                 const PassThrough = require('stream').PassThrough;
                 await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
