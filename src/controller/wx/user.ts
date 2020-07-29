@@ -50,7 +50,7 @@ export default class extends Base {
             const url =  `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${appid}&secret=${secret}&code=${code}&grant_type=authorization_code`;
 
             const res = await this.fetch(url).then(($res) => $res.json());
-            console.log(res, 'access_token')
+            console.log(res, 'access_token');
             if (res && res.errcode) {
                 return this.success(res);
             }
@@ -217,19 +217,19 @@ export default class extends Base {
 
     /**
      * 添加收货地址
-     * @params {shop_id} 店铺id
-     * @params {user_id} 用户id
-     * @params {name} 收货人姓名
-     * @params {phone} 手机号
-     * @params {province} 省份
-     * @params {province_code} 省份代码
-     * @params {city} 城市
-     * @params {city_code} 城市代码
-     * @params {area} 区/县
-     * @params {area_code} 区县代码
-     * @params {address} 地址
-     * @params {is_default}? 是否默认
-     * @params {post_code}? 邮政编码
+     * @param {shop_id} 店铺id
+     * @param {user_id} 用户id
+     * @param {name} 收货人姓名
+     * @param {phone} 手机号
+     * @param {province} 省份
+     * @param {province_code} 省份代码
+     * @param {city} 城市
+     * @param {city_code} 城市代码
+     * @param {area} 区/县
+     * @param {area_code} 区县代码
+     * @param {address} 地址
+     * @param {is_default}? 是否默认
+     * @param {post_code}? 邮政编码
      */
     async addAddressAction() {
         try {
@@ -276,18 +276,18 @@ export default class extends Base {
 
     /**
      * 编辑收货地址
-     * @params {shop_id} 店铺id
-     * @params {user_id} 用户id
-     * @params {name} 收货人姓名
-     * @params {phone} 手机号
-     * @params {province} 省份
-     * @params {province_code} 省份代码
-     * @params {city} 城市
-     * @params {city_code} 城市代码
-     * @params {area} 区/县
-     * @params {area_code} 区县代码
-     * @params {address} 地址
-     * @params {is_default}? 是否默认
+     * @param {shop_id} 店铺id
+     * @param {user_id} 用户id
+     * @param {name} 收货人姓名
+     * @param {phone} 手机号
+     * @param {province} 省份
+     * @param {province_code} 省份代码
+     * @param {city} 城市
+     * @param {city_code} 城市代码
+     * @param {area} 区/县
+     * @param {area_code} 区县代码
+     * @param {address} 地址
+     * @param {is_default}? 是否默认
      */
     async editAddressAction() {
         try {
@@ -336,9 +336,9 @@ export default class extends Base {
 
     /**
      * 删除收货地址
-     * @params {shop_id} 店铺Id
-     * @params {user_id} 用户id
-     * @params {address_id} 地址id
+     * @param {shop_id} 店铺Id
+     * @param {user_id} 用户id
+     * @param {address_id} 地址id
      * @return boolean
      */
     async delAddressAction() {
@@ -357,14 +357,14 @@ export default class extends Base {
     }
 
     /**
-     * 删除收货地址
+     * 获取微信jssdk config
      * @return boolean
      */
     async getJsConfigAction() {
         try {
             const shop_id: number = this.ctx.state.shop_id;
             const shopConfig = await think.model('shop_setting').where({shop_id}).find();
-            const url = this.post('url') || 'http://cxgh.tecqm.club';
+            const url = this.post('url') || 'http://cxgh.tecqm.club/';
             const jsTicket =  think.service('wx/jsTicket');
             const res = await jsTicket.getJsSign(url, shopConfig);
             return this.json(res);

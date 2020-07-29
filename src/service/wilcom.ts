@@ -10,9 +10,11 @@ module.exports = class extends think.Service {
     constructor() {
         super();
     }
+
     /**
      * 根据图片获取刺绣预览图
      * @$image 图片base64字符串
+     * @return 刺绣图片<base64>
      */
      async getEmbByImg($image: string, $width: any, $height: any) {
 
@@ -73,6 +75,9 @@ module.exports = class extends think.Service {
 
     }
 
+    /**
+     * 获取emb文件设计信息 针数、换色顺序等
+     */
     async getDesignInfo($embData: string) {
         const options3 = {
             method: 'POST',

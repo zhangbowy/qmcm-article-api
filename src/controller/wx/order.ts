@@ -1752,7 +1752,7 @@ export default class extends Base {
                 await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
                 // this.ctx.body = res.body;
                 this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
-                console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
+                // console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
             } else {
                 return this.fail(-1, '签名错误!');
             }
@@ -1771,10 +1771,14 @@ export default class extends Base {
             // const width = this.get('width');
             // const height = this.get('height');
             // const sqr = width * height;
+            const shop_id: any = this.ctx.state.shop_id;
             const sqr = $sqr;
             const emb_template_id = $emb_template_id || 1;
             const template_type = this.get('template_type') || 1;
-            const priceList = await this.model('emb_template_price').where({emb_template_id}).select();
+            /**
+             * 查找 当前店铺 当前模板的价格列表
+             */
+            const priceList = await this.model('emb_template_price').where({shop_id, emb_template_id}).select();
             const priceObj = {};
             for (const v of priceList) {
                 if (!priceObj[v.width * v.height]) {

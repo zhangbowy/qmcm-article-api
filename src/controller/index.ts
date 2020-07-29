@@ -94,87 +94,101 @@ export default class extends Base {
     // get everything as a buffer
     const willSendthis = zip.toBuffer();
     // or write everything to disk
-    this.ctx.attachment('order_no.zip');
-    this.ctx.body = willSendthis;
+    // this.ctx.attachment('order_no.zip');
+    // this.ctx.body = willSendthis;
     // zip.writeZip(/*target file name*/"/home/me/files.zip");
-  }
-  async getDstAction1() {
-    // if (this.header("ops")) {
-    //   // @ts-ignore
-    //   const received: string = this.header("ops");
-    //   const arr_rec: any[] = received.split("@@");
-    //   const r_tsp: string = arr_rec[2];
-    //   const r_sign: string = arr_rec[3];
-    //
-    //   const mechineId = arr_rec[1] || 1;
-    //   const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
-    //   const data: string = sid + skey + r_tsp + mid;
-    //   const sign: string = crypto.createHash('md5').update(data).digest("hex");
-    //   console.log('sign:', sign);
-    //   const uid = this.post("id") || "uid";
-    //   if (r_sign == sign) {
-          const order_item  = await this.model('order_item').where({item_status: 10}).find();
-          if (think.isEmpty(order_item)) {
-              return this.fail(-1, '还没有待下发机器文件');
-          }
-          // await this.getBuffer(this, order_item.order_dst_path, true);
-          const res: any = await this.fetch(order_item.order_dst_path);
-          // @ts-ignore
-          this.ctx.set({
-            // 'Content-Type': 'multipart/form-data',
-            // 'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + 'AMZ90RFX875LKMFasdf09DDFF3' + '"',
-            // 'ServiceBusNotification-Format': 'gcm',
-            'x-ms-version': '2015-04',
-            // 'Content-Length': isHaveFile.size,
-            "Content-Disposition": "attachment; filename=" + `${order_item.order_id}.DST`,
-          });
-          const PassThrough = require('stream').PassThrough;
-          // this.ctx.body = await res.body.pipe(this.ctx.body);
-          // const readStream = res.body.on('error',  this.ctx.onerror).pipe(PassThrough())
-          this.ctx.body =  res.body;
-          // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
-          // res.body.pipe(this.ctx.body);
-    //   } else {
-    //     return this.fail(-1, '签名错误');
-    //   }
-    // }
-    // res.writeHead(200, {
+    const res: any = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:32/246db614-eb3e-440f-a297-9289abdac3a5.DST');
+    let content_length = res.headers._headers['content-length'][0]
 
-
-    //   'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + SNAPSHOT_BOUNDARY + '"',
-    //   Connection: 'keep-alive',
-    //   Expires: 'Fri, 01 Jan 1990 00:00:00 GMT',
-    //   'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-    //   Pragma: 'no-cache'
-    // });
-    //
-    // feed.snapshots.forEach(function (item) {
-    //   writeResponse(item);
-    // });
-    //
-    // function writeResponse(item) {
-    //   var buffer = new Buffer(0);
-    //   var readStream = getGridFs().createReadStream({root: 'items', _id: snapshotItem._id});
-    //
-    //   readStream.on('error', function (err) {
-    //     if (err) {
-    //       // handle error
-    //     }
-    //   });
-    //
-    //   readStream.on('data', function (chunk) {
-    //     buffer = Buffer.concat([buffer, chunk]);
-    //   });
-    //
-    //   readStream.on('end', function () {
-    //     res.write('\n\n' + SNAPSHOT_BOUNDARY + '\n');
-    //     res.write('Content-Disposition: filename="' + item.filename + '" \n');
-    //     res.write('Content-Type: application/zip \n');
-    //     res.write('Content-length: ' + buffer.length + '\n\n');
-    //     res.write(buffer);
-    //   });
-    // }
+    // const res: any = await this.fetch(order_item.design_dst_path);
+    // console.log(order_item.design_dst_path);
+    this.ctx.set({
+      // 'Content-Length': isHaveFile.size,
+      'Content-Type': 'multipart/form-data',
+      // "Content-Disposition": "attachment; filename=" + `${content}.DST`,
+    });
+    const PassThrough = require('stream').PassThrough;
+    // await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
+    // this.ctx.body = res.body;
+    this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
   }
+  // async getDstAction1() {
+  //   // if (this.header("ops")) {
+  //   //   // @ts-ignore
+  //   //   const received: string = this.header("ops");
+  //   //   const arr_rec: any[] = received.split("@@");
+  //   //   const r_tsp: string = arr_rec[2];
+  //   //   const r_sign: string = arr_rec[3];
+  //   //
+  //   //   const mechineId = arr_rec[1] || 1;
+  //   //   const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
+  //   //   const data: string = sid + skey + r_tsp + mid;
+  //   //   const sign: string = crypto.createHash('md5').update(data).digest("hex");
+  //   //   console.log('sign:', sign);
+  //   //   const uid = this.post("id") || "uid";
+  //   //   if (r_sign == sign) {
+  //         const order_item  = await this.model('order_item').where({item_status: 10}).find();
+  //         if (think.isEmpty(order_item)) {
+  //             return this.fail(-1, '还没有待下发机器文件');
+  //         }
+  //         // await this.getBuffer(this, order_item.order_dst_path, true);
+  //         const res: any = await this.fetch(order_item.order_dst_path);
+  //         // @ts-ignore
+  //         this.ctx.set({
+  //           // 'Content-Type': 'multipart/form-data',
+  //           // 'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + 'AMZ90RFX875LKMFasdf09DDFF3' + '"',
+  //           // 'ServiceBusNotification-Format': 'gcm',
+  //           'x-ms-version': '2015-04',
+  //           // 'Content-Length': isHaveFile.size,
+  //           "Content-Disposition": "attachment; filename=" + `${order_item.order_id}.DST`,
+  //         });
+  //         const PassThrough = require('stream').PassThrough;
+  //         // this.ctx.body = await res.body.pipe(this.ctx.body);
+  //         // const readStream = res.body.on('error',  this.ctx.onerror).pipe(PassThrough())
+  //         this.ctx.body =  res.body;
+  //         // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+  //         // res.body.pipe(this.ctx.body);
+  //   //   } else {
+  //   //     return this.fail(-1, '签名错误');
+  //   //   }
+  //   // }
+  //   // res.writeHead(200, {
+  //
+  //
+  //   //   'Content-Type': 'multipart/x-mixed-replace; charset=UTF-8; boundary="' + SNAPSHOT_BOUNDARY + '"',
+  //   //   Connection: 'keep-alive',
+  //   //   Expires: 'Fri, 01 Jan 1990 00:00:00 GMT',
+  //   //   'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+  //   //   Pragma: 'no-cache'
+  //   // });
+  //   //
+  //   // feed.snapshots.forEach(function (item) {
+  //   //   writeResponse(item);
+  //   // });
+  //   //
+  //   // function writeResponse(item) {
+  //   //   var buffer = new Buffer(0);
+  //   //   var readStream = getGridFs().createReadStream({root: 'items', _id: snapshotItem._id});
+  //   //
+  //   //   readStream.on('error', function (err) {
+  //   //     if (err) {
+  //   //       // handle error
+  //   //     }
+  //   //   });
+  //   //
+  //   //   readStream.on('data', function (chunk) {
+  //   //     buffer = Buffer.concat([buffer, chunk]);
+  //   //   });
+  //   //
+  //   //   readStream.on('end', function () {
+  //   //     res.write('\n\n' + SNAPSHOT_BOUNDARY + '\n');
+  //   //     res.write('Content-Disposition: filename="' + item.filename + '" \n');
+  //   //     res.write('Content-Type: application/zip \n');
+  //   //     res.write('Content-length: ' + buffer.length + '\n\n');
+  //   //     res.write(buffer);
+  //   //   });
+  //   // }
+  // }
 
   async copyCosAction() {
     try {
