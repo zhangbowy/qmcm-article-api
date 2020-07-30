@@ -363,8 +363,8 @@ export default class extends Base {
     async getJsConfigAction() {
         try {
             const shop_id: number = this.ctx.state.shop_id;
-            const shopConfig = await think.model('shop_setting').where({shop_id}).find();
-            const url = this.post('url') || 'http://cxgh.tecqm.club/';
+            const shopConfig: any = await think.model('shop_setting').where({shop_id}).find();
+            const url: string = this.post('url') || 'http://cxgh.tecqm.club/';
             const jsTicket =  think.service('wx/jsTicket');
             const res = await jsTicket.getJsSign(url, shopConfig);
             return this.json(res);

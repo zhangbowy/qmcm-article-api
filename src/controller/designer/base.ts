@@ -1,6 +1,8 @@
 import {think} from 'thinkjs';
 import restController from '../rest';
-
+const path = require('path');
+const fs = require('fs');
+const AdmZip = require('adm-zip');
 export default class extends restController {
     async __before() {
         this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
@@ -47,6 +49,118 @@ export default class extends restController {
             return this.fail(1001, e);
         }
     }
+
+    async exportFile($file: any, updOrder?: any) {
+
+        const obj = [
+            '.DST',
+            '.EMB',
+            '.PNG',
+            '-1.PNG',
+        ];
+        // tslint:disable-next-line:max-line-length
+        let objName: { order_emb_path: string; order_dst_path: string; order_png_path: string; order_txt_png_path: string; '.DST'?: undefined; '.EMB'?: undefined; '.PNG'?: undefined; '-1.PNG'?: undefined; } | { '.DST': string; '.EMB': string; '.PNG': string; '-1.PNG': string; order_emb_path?: undefined; order_dst_path?: undefined; order_png_path?: undefined; order_txt_png_path?: undefined; }
+        if (updOrder) {
+            objName = {
+                '.DST': "order_dst_path",
+                '.EMB': "order_emb_path",
+                '.PNG': "order_png_path",
+                '-1.PNG': "order_txt_png_path",
+            };
+        } else {
+            objName = {
+                '.DST': "dst_path",
+                '.EMB': "emb_path",
+                '.PNG': "prev_png_path",
+                '-1.PNG': "txt_png_path",
+            };
+        }
+
+        const design_info = this.ctx.state.designer_info;
+        const shop_id: number = design_info.shop_id;
+        const designer_id: number = design_info.designer_id;
+        return new Promise((resolve, reject) => {
+            const zip = new AdmZip($file);
+            const aaa = zip.getEntries();
+            const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
+            const path1 = path.dirname(filepath);
+            think.mkdir(path1);
+            zip.extractAllTo(filepath, true);
+            if (fs.existsSync(filepath)) {
+                const files = fs.readdirSync(filepath);
+                if (files.length > 4) {
+                    return resolve('请检查压缩包内是否包含多余文件!');
+                }
+                const fileList = [];
+                const fileObj = {};
+                const str = '';
+                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
+                let ossPath;
+                if (updOrder) {
+                    ossPath =  `/order/${shop_id}/${designer_id}/${day}/`;
+                } else {
+                    ossPath = `/design/${shop_id}/${designer_id}/${day}/`;
+                }
+                const fileLastList: any = [];
+                for (const  v of obj) {
+                    for (const item of files) {
+                        if (item.indexOf(v) > -1) {
+                            const fileName = think.uuid('v4');
+                            const obj1 = {
+                                Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+                                Region: 'ap-guangzhou',
+                                Key: ossPath + fileName + v,
+                                FilePath: filepath + item,
+                            };
+                            if (v === '.PNG' ) {
+                                if (item.indexOf('-1.PNG') === -1) {
+                                    fileList.push(obj1);
+
+                                    fileLastList.push(v);
+                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                                }
+                            } else {
+                                fileList.push(obj1);
+                                fileLastList.push(v);
+                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                            }
+                        }
+                    }
+                    // if (fileLastList.includes(v)) {
+                    //     return resolve(`后缀为${v}的文件重复`)
+                    // }
+                    if (fileLastList.indexOf(v) == -1) {
+                        resolve(`后缀${v}的文件不存在`);
+                    }
+                    // if (!files.indexOf(item)) {
+                    //     // str+=item+','
+                    //     resolve(`文件${item}不存在!`);
+                    // } else {
+                    //     let k;
+                    //     if (item.indexOf('-')> -1) {
+                    //         k = item.split('-')[0];
+                    //     } else {
+                    //         k = item.split('.')[0];
+                    //     }
+                    //     let obj = {
+                    //         Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+                    //         Region: 'ap-guangzhou',
+                    //         Key: ossPath + item,
+                    //         FilePath: filepath+item,
+                    //     };
+                    //     fileList.push(obj);
+                    //     fileObj[k] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
+                    // }
+                }
+                // const list = new Set(fileList);
+                // resolve( Array.from(list))
+                resolve({fileObj, fileList});
+            } else {
+                console.log('无文件');
+            }
+        });
+    }
+
     __call() {
         return this.fail(404, 'design_controller');
     }

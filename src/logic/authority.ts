@@ -97,7 +97,7 @@ export default class extends base {
     delAdminAction() {
         const rules = {
             id: {
-                string: true,
+                // string: true,
                 required: true,
                 method: 'post'
             }

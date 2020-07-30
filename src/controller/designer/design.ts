@@ -23,7 +23,8 @@ export default class extends Base {
 
             const shop_id: boolean = this.ctx.state.designer_info.shop_id;
             const designer_id: number = this.ctx.state.designer_info.designer_id;
-            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,status,created_at,updated_at').where({designer_id: ['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
+            const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,status,created_at,updated_at').where({ shop_id, designer_team_id, del: 0}).countSelect();
+            // const res = await this.model('designer').page(page, limit).field('designer_id,designer_team_id,designer_name,avatar_url,designer_phone,is_active,is_leader,default_password,status,created_at,updated_at').where({designer_id: ['!=', designer_id], shop_id, designer_team_id, del: 0}).countSelect();
             return this.success(res, '请求成功!');
         } catch ($err) {
             this.dealErr($err);
@@ -40,7 +41,7 @@ export default class extends Base {
             const is_leader_info: boolean = this.ctx.state.designer_info.is_leader;
             const designer_team_id: boolean = this.ctx.state.designer_info.designer_team_id;
             if (!is_leader_info) {
-                 return  this.fail(-1, '权限不足!');
+                 return  this.fail(-1, '权限不足, 您不是团队管理者!');
              }
             const shop_id: number = this.ctx.state.designer_info.shop_id;
             const designer_name = this.post('designer_name');
@@ -694,31 +695,94 @@ export default class extends Base {
         try {
             const url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-29-12:33:43/�к���.EMB';
             const img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
-            const data = fs.readFileSync('2.EMB');
+            const data = fs.readFileSync('3.EMB');
             // const imgBuffer: any  = await this.getBuffer(this, img, true);
             // const imgBase64 = imgBuffer.toString('base64');
-            const post = this.post()
+            const post = this.post();
             // const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');
 
             // const embData = await wilcom.getEmbByImg(imgBase64);
             const embBase64 = data.toString('base64');
+
             const design_info = await wilcom.getDesignInfo(embBase64);
             const res: any = await this.parseXML(design_info);
             // @ts-ignore
             const threadList = res.design_info.colorways.colorway.threads.thread;
             const stop_recordList = res.design_info.stop_sequence.stop_record;
-            let str = '颜色       针迹         代码         名字               图表\r\n';
-            for (const item of stop_recordList) {
-                // @ts-ignore
-                const index = Number(item.$.color_idx);
-                const color = threadList[index].$;
-                str += `${this.getString(color.color)} ${this.getString(item.$.num_stitches)}  ${this.getString(color.code)}   ${this.getString(color.description, 15)}    ${this.getString(color.brand)}\r\n`;
-            }
+            // let str = '颜色                 针迹         代码         名字               图表\r\n';
+            let str = '';
+            stop_recordList.forEach(($item: any, i: number) => {
+                const color_index = Number($item.$.color_idx);
+                const color = threadList[color_index].$;
+                str += `${i + 1};${color_index + 1};${color.code};${color.brand};${this.colorRgb(Number(color.color).toString(16))}\r\n`;
+                // str += `${i};${color_index};${$item.$.num_stitches};${color.code};${color.brand};${this.colorRgb(Number(color.color).toString(16))}\r\n`;
+
+            })
+            // for (const item of stop_recordList) {
+            //     // @ts-ignore
+            //     const index = Number(item.$.color_idx);
+            //     const color = threadList[index].$;
+            //     // @ts-ignore
+            //     str += `${this.getString(this.colorRgb(Number(color.color).toString(16)), 20)} ${this.getString(item.$.num_stitches)}  ${this.getString(color.code)}   ${this.getString(color.description, 15)}    ${this.getString(color.brand)}\r\n`;
+            // }
             await fs.writeFileSync('1.txt', str);
             return this.success({design_info, str, threadList, stop_recordList});
         } catch (e) {
             this.dealErr(e);
+        }
+    }
+    // rgbToHex(r, g, b) { return ((r << 16) | (g << 8) | b).toString(16); }
+
+    colorRgb($color: string) {
+        // 16进制颜色值的正则
+        const reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+        // 把颜色值变成小写
+        if ($color.length == 1) {
+            $color +=  '00000';
+
+        }
+        if ($color.length == 5) {
+            $color +=  '0';
+        }
+        if ($color.length == 6) {
+            // $color +=  '00';
+            // $color = this.shiftCircle($color, 2);
+            const start = $color.substr(0, 2);
+            const mid = $color.substr(2, 2);
+            const end = $color.substr(4, 2);
+            $color =  end + mid + start;
+        }
+        if ($color.length == 2) {
+            $color +=  '0000';
+        }
+        if ($color.length == 4) {
+            const start = $color.substr(0, 2);
+            const end = $color.substr(2, 2);
+            $color =  end + start + '00';
+        }
+
+        let color = ('#' + $color).toLowerCase();
+        if (reg.test(color)) {
+            // 如果只有三位的值，需变成六位，如：#fff => #ffffff
+            if (color.length === 4) {
+                let colorNew = "#";
+                for (let i = 1; i < 4; i += 1) {
+                    colorNew += color.slice(i, i + 1).concat(color.slice(i, i + 1));
+                }
+                color = colorNew;
+            }
+            // 处理六位的颜色值，转为RGB
+            // tslint:disable-next-line:prefer-const
+            let colorChange = [];
+            for (var i = 1; i < 7; i += 2) {
+                // tslint:disable-next-line:radix
+                colorChange.push(parseInt("0x" + color.slice(i, i + 2)));
+            }
+            // return "RGB(" + colorChange.join(",") + ")";
+            return colorChange.join(",");
+        } else {
+            return color;
         }
     }
     getString($string: string, $len?: number) {
@@ -740,99 +804,6 @@ export default class extends Base {
             parser.parseString(xml, function(err: any, result: any) {
                 resolve(result);
             });
-        });
-    }
-    async exportFile($file: any, $filePath?: any) {
-
-        const obj = [
-            '.DST',
-            '.EMB',
-            '.PNG',
-            '-1.PNG',
-        ];
-        const objName = {
-            '.DST': "dst_path",
-            '.EMB': "emb_path",
-            '.PNG': "prev_png_path",
-            '-1.PNG': "txt_png_path",
-        };
-        const design_info = this.ctx.state.designer_info;
-        const shop_id: number = design_info.shop_id;
-        const designer_id: number = design_info.designer_id;
-        return new Promise((resolve, reject) => {
-            const zip = new AdmZip($file);
-            const aaa = zip.getEntries();
-            const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
-            const path1 = path.dirname(filepath);
-            think.mkdir(path1);
-            zip.extractAllTo(filepath, true);
-            if (fs.existsSync(filepath)) {
-                const files = fs.readdirSync(filepath);
-                if (files.length > 4) {
-                    return resolve('请检查压缩包内是否包含多余文件!');
-                }
-                const fileList = [];
-                const fileObj = {};
-                const str = '';
-                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
-                const ossPath = `/design/${shop_id}/${designer_id}/${day}/`;
-                const fileLastList: any = [];
-                for (const  v of obj) {
-                    for (const item of files) {
-                        if (item.indexOf(v) > -1) {
-                            const fileName = think.uuid('v4');
-                            const obj1 = {
-                                Bucket: 'cos-cx-n1-1257124629', /* 桶 */
-                                Region: 'ap-guangzhou',
-                                Key: ossPath + fileName + v,
-                                FilePath: filepath + item,
-                            };
-                            if (v === '.PNG' ) {
-                                if (item.indexOf('-1.PNG') === -1) {
-                                    fileList.push(obj1);
-
-                                    fileLastList.push(v);
-                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
-                                }
-                            } else {
-                                fileList.push(obj1);
-                                fileLastList.push(v);
-                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
-                            }
-                        }
-                    }
-                    // if (fileLastList.includes(v)) {
-                    //     return resolve(`后缀为${v}的文件重复`)
-                    // }
-                    if (fileLastList.indexOf(v) == -1) {
-                        resolve(`后缀${v}的文件不存在`);
-                    }
-                    // if (!files.indexOf(item)) {
-                    //     // str+=item+','
-                    //     resolve(`文件${item}不存在!`);
-                    // } else {
-                    //     let k;
-                    //     if (item.indexOf('-')> -1) {
-                    //         k = item.split('-')[0];
-                    //     } else {
-                    //         k = item.split('.')[0];
-                    //     }
-                    //     let obj = {
-                    //         Bucket: 'cos-cx-n1-1257124629', /* 桶 */
-                    //         Region: 'ap-guangzhou',
-                    //         Key: ossPath + item,
-                    //         FilePath: filepath+item,
-                    //     };
-                    //     fileList.push(obj);
-                    //     fileObj[k] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com'+ossPath+item
-                    // }
-                }
-                // const list = new Set(fileList);
-                // resolve( Array.from(list))
-                resolve({fileObj, fileList});
-            } else {
-                console.log('无文件');
-            }
         });
     }
 

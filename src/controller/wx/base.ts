@@ -2,6 +2,7 @@ import { think } from 'thinkjs';
 import restController from '../rest';
 export default class extends restController {
   async __before() {
+    // this.header('development', 'http://ww.qinkeji.cn');
     this.header('Access-Control-Allow-Origin', this.header("origin") || "*");
     this.header('Access-Control-Allow-Headers', ["x-requested-with", 'origin', 'token', 'content-type', 'ops']);
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');

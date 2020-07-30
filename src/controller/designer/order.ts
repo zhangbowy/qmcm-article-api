@@ -202,9 +202,9 @@ export default class extends Base {
        */
       if (order.designer_status != 1) {
         let msg: string = '';
-        switch (order.status) {
+        switch (order.designer_status) {
           case 2:
-            msg = '该订单派单!';
+            msg = '该订单已接单，待派单!';
             break;
           case 3:
             msg = '该订单已指派!';
@@ -254,7 +254,7 @@ export default class extends Base {
        */
       if (order.designer_status != 2) {
         let msg: string = '';
-        switch (order.status) {
+        switch (order.designer_status) {
           case 1:
             msg = '该订单待接单!';
             break;
@@ -277,6 +277,90 @@ export default class extends Base {
   }
 
   /**
+   * @param {order_id} 订单id
+   * @param {design} 设计文件zip
+   * @return boolean
+   */
+  async uploadDesignAction() {
+    try {
+      /**
+       * 设计师信息
+       */
+      const designer_info = this.ctx.state.designer_info;
+      const shop_id: number = designer_info.shop_id;
+      const designer_id: number = designer_info.designer_id;
+      const designer_team_id: number = designer_info.designer_team_id;
+      /**
+       * 请求参数
+       */
+      const file = this.file('design');
+      const order_id = this.post('order_id');
+      if (!file || !file.type) {
+        return this.fail(-1, '订单花样文件包不能为空', []);
+      }
+      const orderInfo = await this.model('order').where({ id: order_id, shop_id, designer_team_id, designer_id}).find();
+      if (think.isEmpty(orderInfo)) {
+        return this.fail(-1, '该订单不存在');
+      }
+      if (orderInfo.status != 9) {
+        const msg: string = await getStatus(orderInfo.status);
+        return this.fail(-1, msg);
+      }
+      if (orderInfo.designer_status != 3) {
+        let msg: string = '';
+        switch (orderInfo.designer_status) {
+          case 1:
+            msg = '该订单管理者待接单!';
+            break;
+          case 3:
+            msg = '该订单已指派给设计!';
+            break;
+          case 4:
+            msg = '该订单已制作完成!';
+            break;
+          case 0:
+            msg = '该订单未派给你团队!';
+            break;
+        }
+        return this.fail(-1, msg);
+      }
+      const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
+      if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
+        const res: any = await this.exportFile(file.path, true);
+        if (typeof res === 'string') {
+          this.deleteFolder(filepath);
+          return this.fail(-1, res);
+        }
+        const param: any = res.fileObj;
+        const oss = await think.service('oss');
+        /**
+         * 上传到腾讯OSS
+         */
+        const ossRes: any = await oss.uploadFiles(res.fileList);
+        /**
+         * 订单状态为10就是设计师上传完待打印
+         */
+        param.item_status = 10;
+        const itemCount = await this.model('order_item').where({order_id}).update(param);
+        if (think.isEmpty(itemCount)) {
+          return this.fail(-1, '订单不存在!');
+        }
+        await this.model('order').where({id: order_id, shop_id}).update({
+          _status: '待打印',
+          status: 10,
+          designer_status: 4,
+          _designer_status: '设计师制作完成'
+        });
+        return this.success([], '操作成功!');
+      } else {
+        return this.fail(-1, '上传文件格式必须为zip');
+      }
+    } catch ($err) {
+      this.dealErr($err);
+    }
+  }
+  /**
+   *  2020-7-30 废弃 该用上传一个压缩包
    * 上传订单花样
    * @param {order_id} 订单id
    * @param {emb} emb
@@ -285,7 +369,7 @@ export default class extends Base {
    * @param {txt_png} 工艺单图片
    * @return boolean
    */
-  async uploadDesignAction() {
+  async uploadDesignAction1() {
     try {
       const order_id = this.post('order_id');
       const order_emb_path = this.file('emb');
@@ -433,4 +517,41 @@ export default class extends Base {
       this.dealErr(e);
     }
   }
+}
+
+async function getStatus($status: number) {
+  let msg: string = '';
+  switch ($status) {
+    case 1:
+      msg = '该订单未支付!';
+      break;
+    case 4:
+      msg = '该订单已完成!';
+      break;
+    case -2:
+      msg = '该订单已关闭!';
+      break;
+    case 2:
+      msg = '该订单等待发货!';
+      break;
+    case 3:
+      msg = '该订单待收货!';
+      break;
+    case 4:
+      msg = '该订单已完成!';
+      break;
+    case 5 || 6:
+      msg = '该订单议价中!';
+      break;
+    case 8:
+      msg = '该订单已在派单中,请勿重复操作!';
+      break;
+    case 9:
+      msg = '该订单设计师处理中!';
+      break;
+    case 10:
+      msg = '该订单已在待打印!';
+      break;
+  }
+  return msg;
 }

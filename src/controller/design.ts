@@ -18,7 +18,7 @@ export default class extends Base {
     }
 
     /**
-     * 添加设计师
+     * 添加设计师团队
      * @param {designer_name} 设计师名称
      * @param {designer_phone} 设计师
      * @param {is_leader} 是否管理者
@@ -27,15 +27,16 @@ export default class extends Base {
         try {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const designer_team_name = this.post('designer_team_name');
-            const designer_team_id: any = await this.model('designer_team').add({designer_team_name, shop_id});
-            if (!designer_team_id) {
-                return  this.fail(-1, '团队添加失败!');
-            }
+
             const designer_name = this.post('designer_name');
             const designer_phone = this.post('designer_phone');
             const user = await this.model('designer').where({designer_phone}).find();
             if (!think.isEmpty(user)) {
                 return  this.fail(-1, '手机号已被使用!');
+            }
+            const designer_team_id: any = await this.model('designer_team').add({designer_team_name, shop_id});
+            if (!designer_team_id) {
+                return  this.fail(-1, '团队添加失败!');
             }
             /**
              * 后台添加的 是管理者 默认都为 1
@@ -71,6 +72,7 @@ export default class extends Base {
      */
     async editDesignerAction(): Promise<any> {
         try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const designer_id = this.post('designer_id');
             const designer_name = this.post('designer_name');
             const designer_phone = this.post('designer_phone');
@@ -81,7 +83,7 @@ export default class extends Base {
                 // is_leader,
                 // designer_team_id
             };
-            const res: any = await this.model('designer').where({designer_id}).update(params);
+            const res: any = await this.model('designer').where({shop_id, designer_id}).update(params);
             if (!res) {
                 return  this.fail(-1, '修改失败!');
             }
@@ -97,11 +99,16 @@ export default class extends Base {
      */
     async delDesignerAction(): Promise<any>  {
         try {
+            return this.fail(-1, '设计师团队暂不支持删除!');
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
             const designer_team_id = this.post('designer_team_id');
-            const res = await this.model('designer_team').where({designer_team_id}).update({del: 1});
-            if (!res) {
+            await this.model('order').where({shop_id, designer_team_id, status: 3});
+
+            const designer_team = await this.model('designer_team').where({shop_id, designer_team_id}).update({del: 1});
+            if (!designer_team) {
                 return  this.fail(-1, '设计师团队不存在!');
             }
+            const designer = await this.model('designer').where({shop_id, designer_team_id}).update({del: 1});
             return this.success([], '删除成功!');
         } catch (e) {
             this.dealErr(e);

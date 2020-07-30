@@ -42,12 +42,17 @@ export default class extends base {
         }
     }
     uploadDesignAction() {
+        this.allowMethods = 'post';
         const rules = {
             order_id: {
                 string: true,
                 required: true,
                 method: 'post'
             },
+            design: {
+                required: true,
+                method: 'file'
+            }
         };
         const msgs: object = {
             required: '{name}不能为空'

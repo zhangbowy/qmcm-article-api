@@ -62,7 +62,7 @@ module.exports = class extends think.Service {
        }
    }
 
-   async getJsSign($url: string, $config: any, $noCache: boolean) {
+   async getJsSign($url: string, $config: any, $noCache?: boolean) {
        // tslint:disable-next-line:one-variable-per-declaration
        const ticket = await this.getTicket($config, $noCache);
        if (think.isObject(ticket) ) {

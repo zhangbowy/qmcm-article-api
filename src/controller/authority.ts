@@ -228,6 +228,7 @@ module.exports = class extends Base {
      * @param {role_id} 角色id
      * @param {password} 密码
      * @return boolean
+     *
      */
     async editAdminAction(): Promise<void> {
         try {
@@ -276,7 +277,7 @@ module.exports = class extends Base {
         try {
             const id = this.post('id');
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const res = await this.model('admin').where({id, shop_id}).update({del: 1});
+            const res = await this.model('admin').where({id, shop_id}).delete();
             if (!res) {
                 return this.fail(-1, '管理员不存在!');
             }

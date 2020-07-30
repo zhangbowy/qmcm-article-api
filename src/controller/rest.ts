@@ -4,7 +4,7 @@ const fs = require("fs");
 export default class extends think.Controller {
 
     async __before() {
-
+        this.header('development', 'http://www.wkdao.com');
     }
 
     test1Action() {

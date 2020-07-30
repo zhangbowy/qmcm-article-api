@@ -226,7 +226,7 @@ export default class extends Base {
             const design_bg_width =  design_area_info.design_bg_width;
             const design_bg_height =  design_area_info.design_bg_height;
             // const preview_bg_url = design_bg;
-            // 取sku的图
+            // 取sku的图 没有的话就传null
             const preview_bg_url = this.post('background') || design_bg;
             const preview_bg_buffer = await this.getBuffer(this, preview_bg_url, true);
             /**

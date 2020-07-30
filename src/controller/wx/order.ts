@@ -20,7 +20,7 @@ export default class extends Base {
             const page: number = this.post('currentPage') || 1;
             const limit: number = this.post('pageSize') || 10;
             const status = this.post('status') || 0;
-            const where: any = {};
+            const where: any = {del: 0};
             where.shop_id = shop_id;
             where.user_id = user_id;
             if (status) {
@@ -42,7 +42,7 @@ export default class extends Base {
             const user_id: any = this.ctx.state.userInfo.id;
             const order_no: any = this.get('order_no');
             const shop_id = this.ctx.state.shop_id;
-            const res = await this.model('order').setRelation('order_item').order('order_no DESC').where({user_id, shop_id, order_no}).find();
+            const res = await this.model('order').setRelation('order_item').order('order_no DESC').where({del: 0, user_id, shop_id, order_no}).find();
             if (think.isEmpty(res)) {
                 return this.fail(-1, '该订单不存在!');
             }
@@ -1586,7 +1586,7 @@ export default class extends Base {
     }
 
     /**
-     * 询问
+     * 特殊定制询价
      * @param {order_id} 订单id
      * @param {buyer_message} 留言
      * @param {price} 价格
@@ -1691,80 +1691,123 @@ export default class extends Base {
      * @param {machine_code} 机器码
      */
     async scanMachineAction() {
-       const order_no =  this.post('order_no');
-       const machine_code =  this.post('machine_code');
+        try {
+            const order_no =  this.post('order_no');
+            const machine_code =  this.post('machine_code');
 
-       const orderInfo = await this.model('order').where({order_no}).find();
-       if (think.isEmpty(orderInfo)) {
-           return this.fail(-1, '该订单不存在!');
-       }
-       if (orderInfo.logistics_type != 2) {
-           return this.fail(-1, '该订单不是门店自提订单');
-       }
-       if (orderInfo.status == 1) {
-           return this.fail(-1, '该订单未支付!');
-       }
-       if (orderInfo.status == -2) {
-           return this.fail(-1, '该订单已取消!');
+            const orderInfo = await this.model('order').where({order_no}).find();
+            if (think.isEmpty(orderInfo)) {
+                return this.fail(-1, '该订单不存在!');
+            }
+            if (orderInfo.logistics_type != 2) {
+                return this.fail(-1, '该订单不是门店自提订单');
+            }
+            if (orderInfo.status == 1) {
+                return this.fail(-1, '该订单未支付!');
+            }
+            if (orderInfo.status == -2) {
+                return this.fail(-1, '该订单已取消!');
+            }
+
+            await this.model('order').where({machine_code}).update({machine_code: 0});
+            await this.model('order').where({order_no}).update({
+                machine_code,
+                is_scan: 1
+            });
+            // await this.model('order').where({order_no}).increment('view_nums', 1); //将阅读数加 1
+            return this.success([], '就绪,等待机器请求!');
+        } catch (e) {
+            this.dealErr(e);
         }
-
-       await this.model('order').where({machine_code}).update({machine_code: 0});
-       await this.model('order').where({order_no}).update({
-           machine_code,
-           is_scan: 1
-       });
-        // await this.model('order').where({order_no}).increment('view_nums', 1); //将阅读数加 1
-       return this.success([], '就绪,等待机器请求!');
     }
 
-    async getDstAction() {
-        if (this.header("ops")) {
-            // @ts-ignore
-            const received: string = this.header("ops");
-            const arr_rec: any[] = received.split("@@");
-            const r_tsp: string = arr_rec[2];
-            const r_sign: string = arr_rec[3];
-
-            const mechineId = arr_rec[1] || 1;
-            const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
-            const data: string = sid + skey + r_tsp + mid;
-            const sign: string = crypto.createHash('md5').update(data).digest("hex");
-            console.log('sign:', sign);
-            const uid = this.post("id") || "uid";
-            if (r_sign == sign) {
-                // const machine_code = this.post('machine_code');
-                const orderInfo = await this.model('order').where({machine_code: mechineId}).find();
-                if (think.isEmpty(orderInfo)) {
-                    return this.fail(-1, '暂无数据!');
-                }
-                console.log(mechineId, 'machineId');
-                const order_id = orderInfo.id;
-                const order_item = await this.model('order_item').where({ order_id }).find();
-                const res: any = await this.fetch(order_item.design_dst_path);
-                // const res: any = await this.fetch(order_item.design_dst_path);
-                console.log(order_item.design_dst_path);
-                this.ctx.set({
-                    'Content-Length': res.headers._headers['content-length'][0],
-                    'Content-Type': 'multipart/form-data',
-                    "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.DST`,
-                });
-                const PassThrough = require('stream').PassThrough;
-                await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
-                // this.ctx.body = res.body;
-                this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
-                // console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
-            } else {
-                return this.fail(-1, '签名错误!');
+    /**
+     * 删除订单
+     * @param {order_no} 订单号
+     * @return boolean
+     */
+    async delOrderAction() {
+        try {
+            const user_id: any = this.ctx.state.userInfo.id;
+            const shop_id: any = this.ctx.state.shop_id;
+            const order_no = this.post('order_no');
+            const orderInfo = await this.model('order').where({del: 0, order_no, user_id, shop_id}).find();
+            if (think.isEmpty(orderInfo)) {
+                return this.fail(-1, '该订单不存在!');
             }
-        } else {
-            return this.fail(-1, '无效请求!');
+            /**
+             * 当订单不是已完成或者已关闭的时候
+             */
+            if (orderInfo.status != -2 && orderInfo.status != 4) {
+                const msg = await getOrderStatus(orderInfo.status);
+                return this.fail(-1, msg);
+            }
+            const res = await this.model('order').where({del: 0, order_no, user_id, shop_id}).update({del: 1});
+            if (think.isEmpty(res)) {
+                return this.fail(-1, '该订单不存在!');
+            }
+            return this.success([], '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 下发单个DST
+     */
+    async getDstAction() {
+        try {
+            if (this.header("ops")) {
+                // @ts-ignore
+                const received: string = this.header("ops");
+                const arr_rec: any[] = received.split("@@");
+                const r_tsp: string = arr_rec[2];
+                const r_sign: string = arr_rec[3];
+
+                const mechineId = arr_rec[1] || 1;
+                const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
+                const data: string = sid + skey + r_tsp + mid;
+                const sign: string = crypto.createHash('md5').update(data).digest("hex");
+                console.log('sign:', sign);
+                const uid = this.post("id") || "uid";
+                if (r_sign == sign) {
+                    // const machine_code = this.post('machine_code');
+                    const orderInfo = await this.model('order').where({machine_code: mechineId}).find();
+                    if (think.isEmpty(orderInfo)) {
+                        return this.fail(-1, '暂无数据!');
+                    }
+                    console.log(mechineId, 'machineId');
+                    const order_id = orderInfo.id;
+                    const order_item = await this.model('order_item').where({ order_id }).find();
+                    const res: any = await this.fetch(order_item.design_dst_path);
+                    // const res: any = await this.fetch(order_item.design_dst_path);
+                    console.log(order_item.design_dst_path);
+                    this.ctx.set({
+                        'Content-Length': res.headers._headers['content-length'][0],
+                        'Content-Type': 'multipart/form-data',
+                        "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.DST`,
+                    });
+                    const PassThrough = require('stream').PassThrough;
+                    await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
+                    // this.ctx.body = res.body;
+                    this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+                    // console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
+                } else {
+                    return this.fail(-1, '签名错误!');
+                }
+            } else {
+                return this.fail(-1, '无效请求!');
+            }
+        } catch (e) {
+            this.dealErr(e);
         }
     }
 
     /**
      * 获取刺绣模板的价格
-     * @parm {emb_template_id} 模板id
-     * @parm {template_type} 模板類型
+     * @parm {$sqr} 设计尺寸面积 px^2
+     * @parm {$emb_template_id} 刺绣定制模板id
+     * @return 该尺寸的价格
      */
     async getEmbPrice($sqr: any, $emb_template_id: any) {
         try {
@@ -1865,4 +1908,44 @@ function getOrderType($type: any) {
             break;
     }
     return _order_type;
+}
+
+async function getOrderStatus($status: number) {
+    let msg: string = '';
+    switch ($status) {
+        case 1:
+            msg = '该订单未支付!';
+            break;
+        case 4:
+            msg = '该订单已完成!';
+            break;
+        case -2:
+            msg = '该订单已关闭!';
+            break;
+        case 2:
+            msg = '该订单等待发货!';
+            break;
+        case 3:
+            msg = '该订单待收货!';
+            break;
+        case 4:
+            msg = '该订单已完成!';
+            break;
+        case 5:
+            msg = '该订单已在询价中!';
+            break;
+        case 7:
+            msg = '该订单待派单!';
+            break;
+        case 8:
+            msg = '该订单已在派单中';
+            break;
+        case 9:
+            msg = '该订单设计师处理中!';
+            break;
+        case 10:
+            msg = '该订单待打印!';
+            break;
+    }
+    return msg;
 }
