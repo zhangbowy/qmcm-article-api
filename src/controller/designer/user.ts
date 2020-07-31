@@ -170,7 +170,7 @@ export default class extends Base {
         const phone_code  = await this.session('phone_captcha');
         const res = await sms.sendMessage(phone, code);
         await this.session('phone_captcha', code);
-        return this.success(res);
+        return this.success(res, '发送成功!');
     }
 
     /**

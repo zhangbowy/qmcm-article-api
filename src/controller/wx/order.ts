@@ -7,6 +7,7 @@ const sharp = require('sharp');
 const _ = require('lodash');
 const WXPay = require('weixin-pay');
 const crypto = require('crypto');
+const AdmZip = require('adm-zip');
 
 export default class extends Base {
 
@@ -27,7 +28,7 @@ export default class extends Base {
                 where.status = ['in', status];
             }
             const res = await this.model('order').setRelation('order_item').page(page, limit).order('order_no DESC').where(where).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '获取订单列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -46,7 +47,7 @@ export default class extends Base {
             if (think.isEmpty(res)) {
                 return this.fail(-1, '该订单不存在!');
             }
-            return this.success(res, '请求成功!');
+            return this.success(res, '订单详情!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -1565,7 +1566,7 @@ export default class extends Base {
             const _status = '已完成';
             const res: any = await this.model('order').where({shop_id, order_no, user_id}).update({_status, status: 4});
             if (res) {
-                return this.success(res, '请求成功!');
+                return this.success(res, '操作成功!');
             }
         } catch ($err) {
             this.dealErr($err);
@@ -1754,6 +1755,7 @@ export default class extends Base {
 
     /**
      * 下发单个DST
+     * @heder {ops} 包含了签名、机器码 的串
      */
     async getDstAction() {
         try {
@@ -1772,6 +1774,7 @@ export default class extends Base {
                 const uid = this.post("id") || "uid";
                 if (r_sign == sign) {
                     // const machine_code = this.post('machine_code');
+                    // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
                     const orderInfo = await this.model('order').where({machine_code: mechineId}).find();
                     if (think.isEmpty(orderInfo)) {
                         return this.fail(-1, '暂无数据!');
@@ -1779,19 +1782,26 @@ export default class extends Base {
                     console.log(mechineId, 'machineId');
                     const order_id = orderInfo.id;
                     const order_item = await this.model('order_item').where({ order_id }).find();
-                    const res: any = await this.fetch(order_item.design_dst_path);
-                    // const res: any = await this.fetch(order_item.design_dst_path);
-                    console.log(order_item.design_dst_path);
+                    const dst_Buffer: any = await this.getBuffer(this, order_item.design_dst_path, true);
+                    const zip = new AdmZip();
+                    const content = "zhangbo";
+                    zip.addFile(`${orderInfo.id}.DST`, Buffer.alloc(dst_Buffer.length, dst_Buffer), "DST FILE");
+                    // 获取子级控制器实例，然后调用其方法
+                    const designController = this.controller('designer/design');
+                    // @ts-ignore
+                    const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
+                    zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
+                    const zip_buffer = zip.toBuffer();
+                    // const content_length = res.headers._headers['content-length'][0];
                     this.ctx.set({
-                        'Content-Length': res.headers._headers['content-length'][0],
+                        // 'Content-Length': res.headers._headers['content-length'][0],
                         'Content-Type': 'multipart/form-data',
-                        "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.DST`,
+                        "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.zip`,
                     });
                     const PassThrough = require('stream').PassThrough;
                     await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
-                    // this.ctx.body = res.body;
-                    this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
-                    // console.log(res.body.on('error',  this.ctx.onerror).pipe(PassThrough()));
+                    this.ctx.body = zip_buffer;
+                    // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
                 } else {
                     return this.fail(-1, '签名错误!');
                 }

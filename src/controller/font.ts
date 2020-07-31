@@ -14,7 +14,7 @@ export default class extends Base {
             for (const item of res) {
                 item.font_content = JSON.parse(item.font_content);
             }
-            return this.success(res, "请求成功!");
+            return this.success(res, "字体列表!");
         } catch (e) {
             this.dealErr(e);
         }

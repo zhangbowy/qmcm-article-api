@@ -134,7 +134,7 @@ export default class extends Base {
                 await this.cookie('user_sign', '');
                 return this.fail(402, '未登录');
             }
-            return this.success(this.ctx.state.userInfo, '请求成功!');
+            return this.success(this.ctx.state.userInfo, '获取用户信息!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -209,7 +209,7 @@ export default class extends Base {
              */
             const id = this.ctx.state.userInfo.id;
             const res = await this.model('address').fieldReverse('id').order('is_default DESC').where({user_id: id, shop_id, del: 0}).select();
-            return this.success(res, '请求成功!');
+            return this.success(res, '收货地址列表!');
         } catch ($err) {
             this.dealErr($err);
         }

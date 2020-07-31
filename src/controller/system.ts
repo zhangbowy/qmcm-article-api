@@ -22,7 +22,7 @@ export default class extends Base {
              */
             // @ts-ignore
             const res = await this.model('emb_template').setRelation('emb_template_price', {where}).where({template_type}).select();
-            return this.success(res, '请求成功!');
+            return this.success(res, '刺绣模板列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -78,7 +78,7 @@ export default class extends Base {
                 shop_id
             };
             const res: any = await this.model('emb_template_price').add(params);
-            return this.success(res, '请求成功!');
+            return this.success(res, '添加成功!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -146,7 +146,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('slider').order('sort ASC').where({shop_id}).select();
-            return this.success(res, '请求成功!');
+            return this.success(res, '首页广告位!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -295,7 +295,7 @@ export default class extends Base {
         try {
             const region1: any[] = await this.model('region').field('id,pid,name,level,citycode as city_code,yzcode as yz_code').select();
             const region = this.getTree(region1, 100000);
-            return this.success(region, '请求成功!');
+            return this.success(region, '省市区列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -311,7 +311,7 @@ export default class extends Base {
             const page: number = this.get('currentPage');
             const limit: number = this.get('pageSize');
             const res = await (this.model('express_template') as ExpressTemp).getList({page, limit, shop_id});
-            return this.success(res, '请求成功!');
+            return this.success(res, '运费模板列表!');
         } catch (e) {
             return this.dealErr(e);
         }
@@ -329,7 +329,7 @@ export default class extends Base {
             const res = await this.model('express_template').where({shop_id, express_template_id}).find();
             if (Object.keys(res).length > 0) {
                 res.region_rules = JSON.parse(res.region_rules);
-                return this.success(res, '请求成功!');
+                return this.success(res, '运费模板详情!');
             }
             return  this.fail(-1, '该物流模板不存在!');
         } catch (e) {
@@ -481,7 +481,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('custom_category').order('created_at DESC').where({shop_id, del: 0}).select();
-            return this.success(res, '请求成功!');
+            return this.success(res, '可定制分类表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -618,7 +618,7 @@ export default class extends Base {
             const result = {
                 width, height, format: buffer_meta.format, size: buffer_meta.size, width_px: buffer_meta.width, height_px: buffer_meta.height, buffer_meta
             };
-            return this.success(result);
+            return this.success(result, '获取图片元信息');
         } catch (e) {
             this.dealErr(e);
         }
@@ -710,7 +710,7 @@ export default class extends Base {
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const custom_category_id: number = this.get('custom_category_id');
             const res: any = await this.model('machine').where({shop_id, del: 0, custom_category_id}).select();
-            return this.success(res, '请求成功!');
+            return this.success(res, '根据定制分类Id获取机器列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -732,7 +732,7 @@ export default class extends Base {
                 // as: 'c', // 表别名
                 on: ['custom_category_id', 'custom_category_id'] // ON 条件
             }).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '机器列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -953,7 +953,7 @@ export default class extends Base {
     async authorityListAction(): Promise<void> {
         try {
            const res = await this.model('authority_category').select();
-           return this.success(res);
+           return this.success(res, '权限列表');
         } catch (e) {
             this.dealErr(e);
         }

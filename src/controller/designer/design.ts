@@ -691,43 +691,35 @@ export default class extends Base {
         }
     }
 
-    async getDesignInfoAction() {
+    async getDesignInfo($emb_path: string) {
         try {
-            const url = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-29-12:33:43/�к���.EMB';
-            const img = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/15/7/2020-05-26/5efa4dfb-1dea-4f13-bd9b-3e95ab9a51e8.png';
-            const data = fs.readFileSync('3.EMB');
-            // const imgBuffer: any  = await this.getBuffer(this, img, true);
-            // const imgBase64 = imgBuffer.toString('base64');
+            // const data = fs.readFileSync('3.EMB');
+            const embBuffer: any  = await this.getBuffer(this, $emb_path, true);
+            const embBase64 = embBuffer.toString('base64');
             const post = this.post();
             // const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');
-
             // const embData = await wilcom.getEmbByImg(imgBase64);
-            const embBase64 = data.toString('base64');
-
             const design_info = await wilcom.getDesignInfo(embBase64);
             const res: any = await this.parseXML(design_info);
             // @ts-ignore
             const threadList = res.design_info.colorways.colorway.threads.thread;
             const stop_recordList = res.design_info.stop_sequence.stop_record;
-            // let str = '颜色                 针迹         代码         名字               图表\r\n';
-            let str = '';
+            /**
+             * @tip 刺绣txt文件
+             * 每一行构成: 色序+线号+(R,G,B)+品牌+针位。
+             */
+            let txt_str: string = '{\r\n';
             stop_recordList.forEach(($item: any, i: number) => {
                 const color_index = Number($item.$.color_idx);
                 const color = threadList[color_index].$;
-                str += `${i + 1};${color_index + 1};${color.code};${color.brand};${this.colorRgb(Number(color.color).toString(16))}\r\n`;
+                txt_str += `${i + 1}:${color.code}:${this.colorRgb(Number(color.color).toString(16))}:${color.brand}:${color_index + 1}\r\n`;
                 // str += `${i};${color_index};${$item.$.num_stitches};${color.code};${color.brand};${this.colorRgb(Number(color.color).toString(16))}\r\n`;
-
-            })
-            // for (const item of stop_recordList) {
-            //     // @ts-ignore
-            //     const index = Number(item.$.color_idx);
-            //     const color = threadList[index].$;
-            //     // @ts-ignore
-            //     str += `${this.getString(this.colorRgb(Number(color.color).toString(16)), 20)} ${this.getString(item.$.num_stitches)}  ${this.getString(color.code)}   ${this.getString(color.description, 15)}    ${this.getString(color.brand)}\r\n`;
-            // }
-            await fs.writeFileSync('1.txt', str);
-            return this.success({design_info, str, threadList, stop_recordList});
+            });
+            txt_str += '}';
+            // await fs.writeFileSync('1.txt', txt_str);
+            // return this.success({design_info, txt_str, threadList, stop_recordList});
+            return txt_str;
         } catch (e) {
             this.dealErr(e);
         }
@@ -777,10 +769,10 @@ export default class extends Base {
             let colorChange = [];
             for (var i = 1; i < 7; i += 2) {
                 // tslint:disable-next-line:radix
-                colorChange.push(parseInt("0x" + color.slice(i, i + 2)));
+                colorChange.push( parseInt("0x" + color.slice(i, i + 2)) );
             }
             // return "RGB(" + colorChange.join(",") + ")";
-            return colorChange.join(",");
+            return '(' + colorChange.join(",") + ')';
         } else {
             return color;
         }

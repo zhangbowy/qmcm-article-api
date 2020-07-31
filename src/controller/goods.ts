@@ -20,7 +20,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await model.goodsList({page, limit, shop_id, status, name});
-            return this.success(data, '请求成功!');
+            return this.success(data, '商品列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -159,7 +159,7 @@ export default class extends Base {
             res.images = JSON.parse(res.images);
             res.sku_list = JSON.parse(res.sku_list);
             res.sku_show = JSON.parse(res.sku_show);
-            return this.success(res, '请求成功!');
+            return this.success(res, '商品详情!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -329,7 +329,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await catemodel.categoryList({page, limit, shop_id});
             const res =  this.getTree(data, 0, 'id', 'parent_id');
-            return this.success(res, '请求成功!');
+            return this.success(res, '商品分类列表!');
         } catch (e) {
             this.dealErr(e);
         }

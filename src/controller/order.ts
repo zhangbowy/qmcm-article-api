@@ -96,7 +96,7 @@ export default class extends Base {
    */
   async orderListAction() {
     const res = await this.getList();
-    return this.success(res);
+    return this.success(res, '订单列表');
   }
 
   /**
@@ -245,7 +245,7 @@ export default class extends Base {
         }
         statusListn[0].count = total;
       }
-      return this.success(statusListn, '请求成功!');
+      return this.success(statusListn, '订单统计!');
     } catch (e) {
       this.dealErr(e);
     }
@@ -264,7 +264,7 @@ export default class extends Base {
       if (think.isEmpty(res)) {
         return this.fail(-1, '该订单不存在!');
       }
-      return this.success(res, '请求成功!');
+      return this.success(res, '订单详情!');
     } catch (e) {
       this.dealErr(e);
     }
@@ -504,7 +504,7 @@ export default class extends Base {
   async expressListAction() {
     try {
       const res = await this.model('express_list').fieldReverse('express_code').select();
-      return this.success(res, '请求成功!');
+      return this.success(res, '快递列表!');
     } catch (e) {
       this.dealErr(e);
     }
@@ -555,7 +555,7 @@ export default class extends Base {
         _state: res._state,
         traces: res.traces
       };
-      return this.success(result, '请求成功!');
+      return this.success(result, '查询快递!');
     } catch ($err) {
       this.dealErr($err);
     }

@@ -162,6 +162,6 @@ export default class extends restController {
     }
 
     __call() {
-        return this.fail(404, 'design_controller');
+        return this.display('error/404.html');
     }
 }

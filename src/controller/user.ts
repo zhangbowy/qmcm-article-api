@@ -10,7 +10,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('user').where({shop_id}).page(page, limit).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '会员列表!');
         } catch (e) {
             this.dealErr(e);
         }

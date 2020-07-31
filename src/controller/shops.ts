@@ -12,7 +12,7 @@ export default class extends Base {
             const shop_name: string = this.post('shop_name') || "";
             const model = this.model('shops') as ShopsModel;
             const data = await  model.shopList({page, limit, shop_name});
-            return this.success(data, '请求成功!');
+            return this.success(data, '店铺列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -127,7 +127,7 @@ export default class extends Base {
                     return this.fail(-1, '添加失败!');
                 }
             }
-            return this.success(data, '请求成功!');
+            return this.success(data, '操作成功!');
         } catch (e) {
            this.dealErr(e);
         }

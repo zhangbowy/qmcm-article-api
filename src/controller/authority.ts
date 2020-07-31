@@ -46,7 +46,7 @@ module.exports = class extends Base {
             // const res = await this.model('authority').where({is_page: 1, auth_id:['in',auth_list]}).getField('id');
             // const res = await this.model('authority').where({auth_id:['in',auth_list]}).getField('id');
             admin_role.authority_list = auth_list;
-            return this.success(admin_role);
+            return this.success(admin_role, '角色列表');
         } catch (e) {
             this.dealErr(e);
         }
@@ -172,7 +172,7 @@ module.exports = class extends Base {
                 as: 'c', // 表别名
                 on: ['role_id', 'admin_role_id']}) // ON 条件
                 .field('admin.id,admin.role_id,admin.name,admin.phone,admin.created_at,admin.updated_at,admin_role_name as role_name').page(page, limit).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '管理员列表!');
         } catch (e) {
            this.dealErr(e);
         }

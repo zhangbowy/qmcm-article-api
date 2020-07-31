@@ -14,7 +14,6 @@ interface UploadRes {
 
 const rename = think.promisify(fs.rename, fs);
 export default class extends Base {
-
     async addAction() {
         try {
             /**
@@ -31,7 +30,7 @@ export default class extends Base {
             }
 
             const res = await this.model('design').where(where).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '添加成功!');
         } catch (e) {
             return this.fail(-1, e.stack || e);
         }

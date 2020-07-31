@@ -64,6 +64,6 @@ export default class extends restController {
     }
   }
   __call() {
-    return this.fail(404, '404');
+    return this.display('error/404.html');
   }
 }

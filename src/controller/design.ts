@@ -11,7 +11,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id: number = this.ctx.state.admin_info.shop_id;
             const res = await this.model('designer_team').fieldReverse('del').where({shop_id, del: 0}).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '设计师团队列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -146,7 +146,7 @@ export default class extends Base {
             }
             // tslint:disable-next-line:max-line-length
             const res = await this.model('design').where(where).order('created_at DESC').page(page, limit).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '花样列表!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -207,7 +207,7 @@ export default class extends Base {
                 statusList[index].count = count;
             }
             statusList[0].count = res;
-            return this.success(statusList, '请求成功!');
+            return this.success(statusList, '花样统计!');
         } catch ($err) {
             this.dealErr($err);
         }

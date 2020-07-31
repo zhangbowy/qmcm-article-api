@@ -30,7 +30,7 @@ export default class extends Base {
                 shop_id = 0;
             }
             const data = await model.list({page, limit, shop_id, gallery_group_id, img_name});
-            return this.success(data, '请求成功!');
+            return this.success(data, '图库列表!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -173,7 +173,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const data: any = await model.setGroup(id, gallery_group_id);
-            return this.success([], '请求成功!');
+            return this.success([], '操作成功!');
         } catch (e) {
             this.dealErr(e);
         }
@@ -189,7 +189,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.admin_info.shop_id;
             const data = await model.list({shop_id});
             const res = this.getTree(data, 0, 'group_id', 'parent_id');
-            return this.success(res, '请求成功!');
+            return this.success(res, '图库分类列表!');
         } catch (e) {
             this.dealErr(e);
         }

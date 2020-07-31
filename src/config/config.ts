@@ -1,7 +1,7 @@
 // default config
 import { think } from "thinkjs";
 export = {
-  workers: 5,
+  workers: 1,
   port: 8001,
   errnoField: 'code',
   errmsgField: 'msg',

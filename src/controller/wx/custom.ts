@@ -53,7 +53,7 @@ export default class extends Base {
                     }
                 }
             }
-            return this.success(result, '请求成功!');
+            return this.success(result, '定制页,定制信息!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -95,7 +95,7 @@ export default class extends Base {
                 const fonC1 = 'data:image/png;base64,' + Buffer.from(colorData, 'utf8').toString('base64');
                 result.push(fonC1);
             }
-            return this.success(result, '请求成功!');
+            return this.success(result, '获取字体!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -115,7 +115,7 @@ export default class extends Base {
                 del: 0,
                 shop_id
             }).countSelect();
-            return this.success(res, '请求成功!');
+            return this.success(res, '获取花样!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -664,7 +664,7 @@ export default class extends Base {
                 'area=>price': priceObj,
                 // priceList,
             };
-            return this.success(result, '请求成功!');
+            return this.success(result, '获取刺绣价格!');
         } catch (e) {
             this.dealErr(e);
         }

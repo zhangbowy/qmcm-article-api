@@ -17,7 +17,8 @@ export default class extends think.Logic {
         // this.allowMethods = 'post';
     }
     __call() {
-        return this.fail(404, 'adm_logic');
+         return this.display('error/404.html');
+        // return this.fail(404, 'adm_logic');
     }
 
 }

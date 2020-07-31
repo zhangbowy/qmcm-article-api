@@ -32,7 +32,7 @@ export default class extends Base {
             // });
             // return  this.redirect('https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect');
             // return  this.redirect('http://cxgh.tecqm.club/');
-            return this.success(resObj, '请求成功!');
+            return this.success(resObj, '首页轮播图、热门花样、热门商品、公告!');
         } catch ($err) {
             this.dealErr($err);
         }

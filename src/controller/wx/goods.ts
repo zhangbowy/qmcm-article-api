@@ -39,7 +39,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.shop_id;
             // @ts-ignore
             const data = await model.goodsList({page, limit, shop_id, status, name, category_id});
-            return this.success(data, '请求成功!');
+            return this.success(data, '获取商品列表!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -63,7 +63,7 @@ export default class extends Base {
              * 商品的浏览量增加1
              */
             await this.model('item').where({id}).increment('pv', 1);
-            return this.success(res, '请求成功!');
+            return this.success(res, '获取商品详情!');
         } catch ($err) {
             this.dealErr($err);
         }
@@ -81,7 +81,7 @@ export default class extends Base {
             const shop_id = this.ctx.state.shop_id;
             const data = await catemodel.categoryList({page, limit, shop_id});
             const res = this.getTree(data, 0, 'id', 'parent_id');
-            return this.success(res, '请求成功!');
+            return this.success(res, '获取商品分类!');
         } catch ($err) {
             this.dealErr($err);
         }

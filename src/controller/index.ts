@@ -6,11 +6,10 @@ const fs = require('fs');
 const AdmZip = require('adm-zip');
 export default class extends Base {
   indexAction() {
-    // return this.display();
+    // return this.display('');
     return this.redirect('http://www.wkdao.com', '走错路发现世界,走对路发现自己');
     const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
     return this.success([], "请求成功!");
-    return this.download(filepath);
   }
 
   /**
@@ -81,27 +80,21 @@ export default class extends Base {
    * 获取DST
    */
   async  getDstAction() {
-    // creating archives
     const zip = new AdmZip();
-
-    // add file directly
     const content = "zhangbo";
     zip.addFile("order_no.EMB", Buffer.alloc(content.length, content), "entry comment goes here");
     zip.addFile("order_no.DST", Buffer.alloc(content.length, content), "entry comment goes here");
     zip.addFile("order_no.TXT", Buffer.alloc(content.length, content), "entry comment goes here");
-    // add local file
     // zip.addLocalFile("/home/me/some_picture.png");
     // get everything as a buffer
     const willSendthis = zip.toBuffer();
-    // or write everything to disk
     // this.ctx.attachment('order_no.zip');
     // this.ctx.body = willSendthis;
     // zip.writeZip(/*target file name*/"/home/me/files.zip");
-    const res: any = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:32/246db614-eb3e-440f-a297-9289abdac3a5.DST');
-    let content_length = res.headers._headers['content-length'][0]
 
+    const res: any = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:32/246db614-eb3e-440f-a297-9289abdac3a5.DST');
+    const content_length = res.headers._headers['content-length'][0];
     // const res: any = await this.fetch(order_item.design_dst_path);
-    // console.log(order_item.design_dst_path);
     this.ctx.set({
       // 'Content-Length': isHaveFile.size,
       'Content-Type': 'multipart/form-data',
@@ -189,7 +182,6 @@ export default class extends Base {
   //   //   });
   //   // }
   // }
-
   async copyCosAction() {
     try {
       const fromPath = 'cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-06-11/5a34d800-dcbc-4bb2-b6e3-bf7addd8911b.png';

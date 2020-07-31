@@ -111,7 +111,7 @@ export default class extends Base {
                 authority_list
             };
 
-            return this.success(result, '请求成功!');
+            return this.success(result, '后台用户信息!');
         } catch (e) {
             this.dealErr(e);
         }
