@@ -1791,6 +1791,7 @@ export default class extends Base {
                     const designController = this.controller('designer/design');
                     // @ts-ignore
                     const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
+                    console.log(txt_data, 'txt_data');
                     zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
                     const zip_buffer = zip.toBuffer();
                     // const content_length = res.headers._headers['content-length'][0];

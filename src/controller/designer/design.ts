@@ -721,7 +721,8 @@ export default class extends Base {
             // return this.success({design_info, txt_str, threadList, stop_recordList});
             return txt_str;
         } catch (e) {
-            this.dealErr(e);
+            // this.dealErr(e);
+            return e.stack;
         }
     }
     // rgbToHex(r, g, b) { return ((r << 16) | (g << 8) | b).toString(16); }
