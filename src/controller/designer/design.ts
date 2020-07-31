@@ -702,10 +702,11 @@ export default class extends Base {
             // const embData = await wilcom.getEmbByImg(imgBase64);
             const design_info = await wilcom.getDesignInfo(embBase64);
             const res: any = await this.parseXML(design_info);
-            console.log(res, 'xml');
             // @ts-ignore
             const threadList = res.design_info.colorways.colorway.threads.thread;
             const stop_recordList = res.design_info.stop_sequence.stop_record;
+            console.log(stop_recordList, 'stop_recordList');
+            console.log(threadList, 'threadList');
             if (!stop_recordList || !Array.isArray(stop_recordList)) {
                 return design_info;
             }
