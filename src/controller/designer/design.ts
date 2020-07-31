@@ -704,9 +704,10 @@ export default class extends Base {
             const res: any = await this.parseXML(design_info);
             // @ts-ignore
             const threadList = res.design_info.colorways.colorway.threads.thread;
-            const stop_recordList = res.design_info.stop_sequence.stop_record;
-            console.log(stop_recordList, 'stop_recordList');
-            console.log(threadList, 'threadList');
+            let stop_recordList = res.design_info.stop_sequence.stop_record;
+            if ( Object.prototype.toString.call(stop_recordList) === '[object Object]') {
+                stop_recordList = [stop_recordList];
+            }
             if (!stop_recordList || !Array.isArray(stop_recordList)) {
                 return design_info;
             }
