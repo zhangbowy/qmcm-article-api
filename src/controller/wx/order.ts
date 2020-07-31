@@ -1803,7 +1803,7 @@ export default class extends Base {
                     }
 
                     console.log(txt_data, 'txt_data');
-                    zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.txt_str.length, txt_data.txt_str), "TXT");
+                    zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data.txt_str), "TXT");
                     const zip_buffer = zip.toBuffer();
                     // const content_length = res.headers._headers['content-length'][0];
                     this.ctx.set({
