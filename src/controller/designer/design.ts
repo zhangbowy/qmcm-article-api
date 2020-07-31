@@ -703,8 +703,11 @@ export default class extends Base {
             const design_info = await wilcom.getDesignInfo(embBase64);
             const res: any = await this.parseXML(design_info);
             // @ts-ignore
-            const threadList = res.design_info.colorways.colorway.threads.thread;
+            let threadList = res.design_info.colorways.colorway.threads.thread;
             let stop_recordList = res.design_info.stop_sequence.stop_record;
+            if ( Object.prototype.toString.call(threadList) === '[object Object]') {
+                threadList = [threadList];
+            }
             if ( Object.prototype.toString.call(stop_recordList) === '[object Object]') {
                 stop_recordList = [stop_recordList];
             }
