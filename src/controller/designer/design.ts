@@ -705,6 +705,9 @@ export default class extends Base {
             // @ts-ignore
             const threadList = res.design_info.colorways.colorway.threads.thread;
             const stop_recordList = res.design_info.stop_sequence.stop_record;
+            if (!stop_recordList || !Array.isArray(stop_recordList)) {
+                return design_info;
+            }
             /**
              * @tip 刺绣txt文件
              * 每一行构成: 色序+线号+(R,G,B)+品牌+针位。
