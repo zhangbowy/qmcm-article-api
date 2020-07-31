@@ -1774,8 +1774,8 @@ export default class extends Base {
                 const uid = this.post("id") || "uid";
                 if (r_sign == sign) {
                     // const machine_code = this.post('machine_code');
-                    const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
-                    // const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
+                    // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
+                    const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
                     if (think.isEmpty(orderInfo)) {
                         return this.fail(-1, '暂无数据!');
                     }
@@ -1793,7 +1793,7 @@ export default class extends Base {
                     if (!order_item.design_txt_file_path) {
                         const designController = this.controller('designer/design');
                         // @ts-ignore
-                        const res = await designController.getDesignInfo('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:13/dd86e5c0-227c-496d-a901-e8930e6bb42a.DST');
+                        const res = await designController.getDesignInfo(order_item.design_emb_path);
                         if ( typeof res == 'string') {
                             return this.fail(-1, res);
                         }
