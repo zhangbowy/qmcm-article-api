@@ -691,11 +691,19 @@ export default class extends Base {
         }
     }
 
-    async getDesignInfo($emb_path: string) {
+    async getDesignInfo($emb_path: any) {
         try {
             // const data = fs.readFileSync('3.EMB');
-            const embBuffer: any  = await this.getBuffer(this, $emb_path, true);
-            const embBase64 = embBuffer.toString('base64');
+            let embBase64;
+            let embBuffer;
+            if ($emb_path instanceof Buffer) {
+                embBuffer = $emb_path;
+            } else {
+               embBuffer = await this.getBuffer(this, $emb_path, true);
+            }
+            // @ts-ignore
+            embBase64 = embBuffer.toString('base64');
+
             const post = this.post();
             // const embBuffer: any  = await this.getBuffer(this, url, true);
             const wilcom = think.service('wilcom');

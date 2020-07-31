@@ -59,7 +59,7 @@ export default class extends restController {
             '-1.PNG',
         ];
         // tslint:disable-next-line:max-line-length
-        let objName: { order_emb_path: string; order_dst_path: string; order_png_path: string; order_txt_png_path: string; '.DST'?: undefined; '.EMB'?: undefined; '.PNG'?: undefined; '-1.PNG'?: undefined; } | { '.DST': string; '.EMB': string; '.PNG': string; '-1.PNG': string; order_emb_path?: undefined; order_dst_path?: undefined; order_png_path?: undefined; order_txt_png_path?: undefined; }
+        let objName: { order_emb_path: string; order_dst_path: string; order_png_path: string; order_txt_png_path: string; '.DST'?: undefined; '.EMB'?: undefined; '.PNG'?: undefined; '-1.PNG'?: undefined; } | { '.DST': string; '.EMB': string; '.PNG': string; '-1.PNG': string; order_emb_path?: undefined; order_dst_path?: undefined; order_png_path?: undefined; order_txt_png_path?: undefined; };
         if (updOrder) {
             objName = {
                 '.DST': "order_dst_path",
@@ -79,7 +79,7 @@ export default class extends restController {
         const design_info = this.ctx.state.designer_info;
         const shop_id: number = design_info.shop_id;
         const designer_id: number = design_info.designer_id;
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const zip = new AdmZip($file);
             const aaa = zip.getEntries();
             const filepath = path.join(think.ROOT_PATH, 'www/static/updesign/');
@@ -92,7 +92,9 @@ export default class extends restController {
                     return resolve('请检查压缩包内是否包含多余文件!');
                 }
                 const fileList = [];
-                const fileObj = {};
+                const fileObj: any = {
+                    txt_file_path: ""
+                };
                 const str = '';
                 const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss');
                 let ossPath;
@@ -112,6 +114,24 @@ export default class extends restController {
                                 Key: ossPath + fileName + v,
                                 FilePath: filepath + item,
                             };
+                            if (v === '.EMB') {
+                                const embBuffer =  await fs.readFileSync(filepath + item);
+                                const designController = this.controller('designer/design');
+                                // @ts-ignore
+                                const res = await designController.getDesignInfo(embBuffer);
+                                if ( typeof res == 'string') {
+                                    resolve(res);
+                                }
+                                await fs.writeFileSync(filepath + fileName + '.TXT', res.txt_str)
+                                const obj2 = {
+                                    Bucket: 'cos-cx-n1-1257124629', /* 桶 */
+                                    Region: 'ap-guangzhou',
+                                    Key: ossPath + fileName + '.TXT',
+                                    FilePath: filepath + fileName + '.TXT',
+                                };
+                                fileList.push(obj2);
+                                fileObj.txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
+                            }
                             if (v === '.PNG' ) {
                                 if (item.indexOf('-1.PNG') === -1) {
                                     fileList.push(obj1);
