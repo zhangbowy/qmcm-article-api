@@ -719,7 +719,7 @@ export default class extends Base {
             txt_str += '}';
             // await fs.writeFileSync('1.txt', txt_str);
             // return this.success({design_info, txt_str, threadList, stop_recordList});
-            return txt_str;
+            return {txt_str};
         } catch (e) {
             // this.dealErr(e);
             return e.stack;

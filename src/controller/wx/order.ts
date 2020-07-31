@@ -1774,25 +1774,36 @@ export default class extends Base {
                 const uid = this.post("id") || "uid";
                 if (r_sign == sign) {
                     // const machine_code = this.post('machine_code');
-                    // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
-                    const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
+                    const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
+                    // const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
                     if (think.isEmpty(orderInfo)) {
                         return this.fail(-1, '暂无数据!');
                     }
                     console.log(mechineId, 'machineId');
                     const order_id = orderInfo.id;
                     const order_item = await this.model('order_item').where({ order_id }).find();
-                    console.log(order_item)
+                    console.log(order_item);
                     const dst_Buffer: any = await this.getBuffer(this, order_item.design_dst_path, true);
                     const zip = new AdmZip();
                     const content = "zhangbo";
                     zip.addFile(`${orderInfo.id}.DST`, Buffer.alloc(dst_Buffer.length, dst_Buffer), "DST FILE");
                     // 获取子级控制器实例，然后调用其方法
-                    const designController = this.controller('designer/design');
-                    // @ts-ignore
-                    const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
+                    // const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
+                    let txt_data;
+                    if (!order_item.design_txt_file_path) {
+                        const designController = this.controller('designer/design');
+                        // @ts-ignore
+                        const res = await designController.getDesignInfo('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:13/dd86e5c0-227c-496d-a901-e8930e6bb42a.DST');
+                        if ( typeof txt_data == 'string') {
+                            return this.fail(-1, txt_data);
+                        }
+                        txt_data = res.txt_str;
+                    } else {
+                        txt_data = await this.getBuffer(this, order_item.design_txt_file_path, true);
+                    }
+
                     console.log(txt_data, 'txt_data');
-                    zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
+                    zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.txt_str.length, txt_data.txt_str), "TXT");
                     const zip_buffer = zip.toBuffer();
                     // const content_length = res.headers._headers['content-length'][0];
                     this.ctx.set({
