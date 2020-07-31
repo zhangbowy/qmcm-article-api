@@ -1775,13 +1775,14 @@ export default class extends Base {
                 if (r_sign == sign) {
                     // const machine_code = this.post('machine_code');
                     // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
-                    const orderInfo = await this.model('order').where({machine_code: mechineId}).find();
+                    const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
                     if (think.isEmpty(orderInfo)) {
                         return this.fail(-1, '暂无数据!');
                     }
                     console.log(mechineId, 'machineId');
                     const order_id = orderInfo.id;
                     const order_item = await this.model('order_item').where({ order_id }).find();
+                    console.log(order_item)
                     const dst_Buffer: any = await this.getBuffer(this, order_item.design_dst_path, true);
                     const zip = new AdmZip();
                     const content = "zhangbo";
