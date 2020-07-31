@@ -1795,7 +1795,7 @@ export default class extends Base {
                         // @ts-ignore
                         const res = await designController.getDesignInfo('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:13/dd86e5c0-227c-496d-a901-e8930e6bb42a.DST');
                         if ( typeof res == 'string') {
-                            return this.fail(-1, txt_data);
+                            return this.fail(-1, res);
                         }
                         txt_data = res.txt_str;
                     } else {
