@@ -824,10 +824,17 @@ export default class extends Base {
      */
     async downLoadAction() {
         const file = this.get('url');
-        const fileName = this.get('fileName');
-        const fileBuffer = await getBuffer(this, file, true);
-        await fs.writeFileSync('1.PNG', fileBuffer);
-        this.download('1.PNG', fileName + '.png');
+        if (!file) {
+            return this.fail(-1, '');
+        }
+        const fileName = this.get('fileName') || think.uuid('v4') ;
+        const res = await this.fetch(file);
+        // const fileBuffer = await getBuffer(this, file, true);
+        // await fs.writeFileSync('1.PNG', fileBuffer);
+        const _name =  file.split('.')[file.split('.').length - 1];
+        await this.ctx.attachment(fileName + '.' + _name);
+        // this.download('1.PNG', fileName + _name);
+        this.ctx.body = res.body;
     }
 
 }
