@@ -75,6 +75,10 @@ export default class extends think.Controller {
 
         return ipInfo;
     }
+
+    /**
+     * 浮点运算避免精度丢失 方法
+     */
      accMul(arg1: any, arg2: any) {
          // tslint:disable-next-line:prefer-const one-variable-per-declaration
         let m = 0, s1 = arg1.toString(), s2 = arg2.toString();

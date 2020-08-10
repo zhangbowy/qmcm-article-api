@@ -356,7 +356,11 @@ export default class extends Base {
           /**
            * 有花样的订单 并且无文字只有一个花样 直接送去打印
            */
-          _status = "待打印";
+          if (orderInfo.logistics_type == 2) {
+            _status = "门店订单处理中";
+          } else {
+              _status = "待打印";
+          }
           udpOption = {is_choose_design: 1, design_price: order_item.design_price, designer_price: order_item.design_price, pay_time, designer_status: 4, _status, status: 10};
         } else {
           /**
@@ -397,34 +401,38 @@ export default class extends Base {
         return this.fail(-1, '该订单不存在');
       }
       if (orderInfo.status != 3) {
-        let msg: string = '';
-        switch (orderInfo.status) {
-          case 4:
-            msg = '该订单已完成!';
-            break;
-          case -2:
-            msg = '该订单已关闭!';
-            break;
-          case 2:
-            msg = '该订单已付款-待发货!';
-            break;
-          case 1:
-            msg = '该订单未支付!';
-            break;
-          case 5 || 6:
-            msg = '该订单询价中!';
-            break;
+        if (orderInfo.logistics_type == 2 && orderInfo.status == 10) {
+
+        } else {
+          let msg: string = '';
+          switch (orderInfo.status) {
+            case 4:
+              msg = '该订单已完成!';
+              break;
+            case -2:
+              msg = '该订单已关闭!';
+              break;
+            case 2:
+              msg = '该订单已付款-待发货!';
+              break;
+            case 1:
+              msg = '该订单未支付!';
+              break;
+            case 5 || 6:
+              msg = '该订单询价中!';
+              break;
+          }
+          return this.fail(-1, msg);
         }
-        return this.fail(-1, msg);
       }
-      const _status = '已完成';
+      const _status = '已完成(门店自提)';
       const res: any = await this.model('order').where({shop_id, id: order_id}).update({_status, status: 4});
       const orderUpdate: any = await this.model('order_item').where({order_id}).update({
-        item_status: 3,
+        item_status: 4,
         _item_status: _status
       });
       if (orderUpdate) {
-        return this.success(res, '确认收货成功!');
+        return this.success(res, '操作成功!');
       }
       return this.fail(-1, '操作失败!');
     } catch (e) {

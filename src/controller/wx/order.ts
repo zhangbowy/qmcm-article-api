@@ -400,7 +400,11 @@ export default class extends Base {
                 /**
                  * 有花样的订单 并且无文字只有一个花样 直接送去打印
                  */
-                _status = "待打印";
+                if (orderInfo.logistics_type == 2) {
+                     _status = "门店订单处理中";
+                } else {
+                    _status = "待打印";
+                }
                 udpOption = {designer_price: order_item.design_price, pay_time, _status, status: 10};
             } else {
                 /**

@@ -825,7 +825,7 @@ export default class extends Base {
     async downLoadAction() {
         const file = this.get('url');
         if (!file) {
-            return this.fail(-1, '');
+            return this.fail(-1, 'url is vaild');
         }
         const fileName = this.get('fileName') || think.uuid('v4') ;
         const res = await this.fetch(file);

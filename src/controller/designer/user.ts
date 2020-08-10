@@ -154,7 +154,7 @@ export default class extends Base {
 
     /**
      * 发送验证码
-     * @param {phone}
+     * @param {phone} 手机号
      * @return boolean
      */
     async sendSmsAction() {
@@ -175,13 +175,13 @@ export default class extends Base {
 
     /**
      * 保存用户信息
-     * @param {alipay}
-     * @param {birthday}
-     * @param {sex}
-     * @param {bank_card_number}
-     * @param {designer_name}
-     * @param {avatar_url}
-     * @param {wechat}
+     * @param {alipay} 支付宝账号
+     * @param {birthday} 生日
+     * @param {sex} 性别
+     * @param {bank_card_number} 银行卡
+     * @param {designer_name} 设计师姓名
+     * @param {avatar_url} 头像
+     * @param {wechat} 微信账号
      * @return boolean
      */
     async saveInfoAction() {

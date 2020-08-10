@@ -10,7 +10,7 @@ export default class extends Base {
    * @param {status} 订单状态 状态 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复
    * @param {order_no} 订单编号
    * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
-   * @return order_list
+   * @return order_list 
    */
   async orderListAction() {
     try {
@@ -28,18 +28,27 @@ export default class extends Base {
       where.order_no = ['like', `%${order_no}%`];
       where.shop_id = shop_id;
       where.designer_team_id = designer_team_id;
+      /**
+       * 不是团队管理者登录, 只允许查看指给自己的
+       */
       if (!designer_info.is_leader) {
         where.designer_id  = designer_info.designer_id;
       }
+      /**
+       * 订单状态
+       */
       if (status) {
         where.designer_status = ['IN', status];
       }
+      /**
+       * 订单类型
+       */
       if (order_type) {
         where.order_type = order_type;
       }
       const res = await this.model('order').order('order_no DESC').page(page, limit).where(where).countSelect();
       // let res = await this.model('order').group('status').where(where).countSelect();
-      return this.success(res, '请求成功!');
+      return this.success(res, '订单列表!');
     } catch (e) {
       this.dealErr(e);
     }
@@ -67,6 +76,9 @@ export default class extends Base {
       where.order_no = ['like', `%${order_no}%`];
       where.shop_id = shop_id;
       where.designer_team_id = designer_team_id;
+      /**
+       * 不是团队管理者 只查自己的
+       */
       if (!designer_info.is_leader) {
         where.designer_id  = designer_info.designer_id;
       }
@@ -126,7 +138,7 @@ export default class extends Base {
           result.push(item);
         }
       }
-      return this.success(result, '请求成功!');
+      return this.success(result, '订单状态统计!');
     } catch (e) {
       this.dealErr(e);
     }
