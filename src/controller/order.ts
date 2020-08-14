@@ -282,7 +282,7 @@ export default class extends Base {
       appid: shopConfig.appid,
       mch_id: shopConfig.mch_id,
       partner_key: shopConfig.wxpay_key, // 微信商户平台API密钥
-      pfx: data, //微信商户平台证书
+      pfx: data, // 微信商户平台证书
       // pfx: fs.readFileSync('./wxpay_cert.p12'), //微信商户平台证书
     });
     const params = {
@@ -395,12 +395,17 @@ export default class extends Base {
       const order_id: any = this.post('order_id');
       // @ts-ignore
       const shop_id = this.ctx.state.admin_info.shop_id;
-
+      /**
+       * 订单信息
+       */
       const orderInfo: any = await this.model('order').where({shop_id, id: order_id}).find();
       if (think.isEmpty(orderInfo)) {
         return this.fail(-1, '该订单不存在');
       }
       if (orderInfo.status != 3) {
+        /**
+         * 配送方式是门店自提 并且 订单状态为10 下发机器
+         */
         if (orderInfo.logistics_type == 2 && orderInfo.status == 10) {
 
         } else {
@@ -725,6 +730,44 @@ export default class extends Base {
       }
       this.success([], '操作成功!');
   }
+
+  /**
+   * 发送机器
+   * @param {order_item_id} 子订单id
+   * @param {custom_template_id} 定制分类id
+   * @param {machine_id} 机器id
+   */
+  async sendMachineAction() {
+    try {
+      const order_id = this.post('order_item_id');
+      const custom_template_id = this.post('custom_template_id');
+      const machine_id = this.post('machine_id');
+      if (!Array.isArray(order_id)) {
+        return this.fail(-1, 'order_item_id不是有效数组');
+      }
+      const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_id: ['IN', order_id]}).select();
+      if (think.isEmpty(order_item_list)) {
+        return this.fail(-1, '所选订单不存在!');
+      }
+      // const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_item_id: ['IN', order_item_id_list]}).select();
+      if (order_id.length != order_item_list.length) {
+        return this.fail(-1, '只有同一定制分类的订单才能同时下发!');
+      }
+      const machine_info  = await this.model('machine').where({custom_template_id, machine_id}).find();
+      if (think.isEmpty(machine_info)) {
+        return this.fail(-1, '该机器不存在');
+      }
+      const machine_code = machine_info.machine_info;
+      if (!machine_code) {
+        return this.fail(-1, '机器码不存在!');
+      }
+      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', machine_code});
+      return this.success([], '操作成功!');
+    } catch (e) {
+      this.dealErr(e);
+    }
+  }
+
   async exportExcelAction() {
     // tslint:disable-next-line:jsdoc-format
     this.ctx.state.isExcel = true;
@@ -776,8 +819,7 @@ export default class extends Base {
 // }
 
 /**
-  获取完整日期
- *
+ * 获取完整日期
  */
 function getFullTime() {
   const date = new Date();
@@ -818,11 +860,10 @@ function getExcelByData($data: any, $sheetStyle: { '!cols': Array<{ wch: number;
         rows[colK] = rowV[colV];  // 外围数据循环一次,这里在循环表头,将data[k]的每一行key对应数据拿出来到需要的格式
       });
       rowData.push(rows); // 用表头取到的数据push进表数据
+
     });
     const resultExcel2 = nodeXlsx.build([{name: "sheet1", data: rowData}], $sheetStyle); // node-xlsx模式
     resolve(resultExcel2);
-    // tslint:disable-next-line:only-arrow-functions
-    // tslint:disable-next-line:only-arrow-functions
     // fs.writeFile($outPath, resultExcel2, 'binary', function(err: any) {
     //   if (err) {
     //     reject(err);
@@ -832,4 +873,5 @@ function getExcelByData($data: any, $sheetStyle: { '!cols': Array<{ wch: number;
     //   }
     // });
   });
+
 }

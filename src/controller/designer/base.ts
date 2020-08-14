@@ -131,6 +131,7 @@ export default class extends restController {
                                 };
                                 fileList.push(obj2);
                                 fileObj.txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
+                                fileObj.order_txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
                             }
                             if (v === '.PNG' ) {
                                 if (item.indexOf('-1.PNG') === -1) {

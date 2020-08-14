@@ -116,7 +116,6 @@ export default class extends base {
       return this.fail(-1, msg);
     }
   }
-
   dispatchOrderAction() {
     const rules = {
       order_id: {
@@ -145,7 +144,7 @@ export default class extends base {
     }
   }
   replyOrderAction() {
-    this.allowMethods = 'POST'
+    this.allowMethods = 'POST';
     const rules = {
       order_id: {
         required: true,
@@ -153,6 +152,35 @@ export default class extends base {
         method: 'post'
       },
       price: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+    };
+    const msgs: object = {
+      required: '{name}不能为空'
+    };
+    if (!this.validate(rules, msgs)) { // 校验不通过
+      const keys: string[] = Object.keys(this.validateErrors);
+      const msg: string = this.validateErrors[keys[0]];
+      return this.fail(-1, msg);
+    }
+  }
+  sendMachineAction() {
+    this.allowMethods = 'POST';
+    const rules = {
+      order_item_id: {
+        required: true,
+        trim: true,
+        method: 'post',
+        array: true
+      },
+      custom_template_id: {
+        required: true,
+        trim: true,
+        method: 'post'
+      },
+      machine_id: {
         required: true,
         trim: true,
         method: 'post'
