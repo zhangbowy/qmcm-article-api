@@ -1779,7 +1779,7 @@ export default class extends Base {
                 if (r_sign == sign) {
                     // const machine_code = this.post('machine_code');
                     // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
-                    const orderInfo = await this.model('order').where({order_type: 2, machine_code: mechineId}).find();
+                    const orderInfo = await this.model('order').where({logistics_type: 2, status: 10, order_type: 2, machine_code: mechineId}).find();
                     if (think.isEmpty(orderInfo)) {
                         return this.fail(-1, '暂无数据!');
                     }
@@ -1789,7 +1789,6 @@ export default class extends Base {
                     console.log(order_item);
                     const dst_Buffer: any = await this.getBuffer(this, order_item.design_dst_path, true);
                     const zip = new AdmZip();
-                    const content = "zhangbo";
                     zip.addFile(`${orderInfo.id}.DST`, Buffer.alloc(dst_Buffer.length, dst_Buffer), "DST FILE");
                     // 获取子级控制器实例，然后调用其方法
                     // const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
@@ -1816,7 +1815,7 @@ export default class extends Base {
                         "Content-Disposition": "attachment; filename=" + `${orderInfo.id}.zip`,
                     });
                     const PassThrough = require('stream').PassThrough;
-                    await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
+                    await this.model('order').where({logistics_type: 2, status: 10, machine_code: mechineId}).update({machine_code: 0});
                     this.ctx.body = zip_buffer;
                     // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
                 } else {

@@ -112,7 +112,7 @@ export default class extends think.Model {
             '        UNION ALL ' +
             '            SELECT ' +
             '                created_at ' +
-            '            FROM  ' +
+                '            FROM  ' +
             '               `order` where ' +
             `shop_id=${$where.shop_id} and DATE_SUB(CURDATE(), INTERVAL 6 DAY) <= date(created_at)&&date(created_at)<=CURDATE() and` +
             ' `status` NOT IN (1,-2,5,6)' +

@@ -1,5 +1,6 @@
 import Base from './base';
 import {ancestorWhere} from "tslint";
+import {think} from "thinkjs";
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -77,34 +78,107 @@ export default class extends Base {
   }
 
   /**
+   * 下发多个DST
+   * @heder {ops} 包含了签名、机器码 的串
+   */
+  async getDstAction() {
+    try {
+      if (this.header("ops")) {
+        // @ts-ignore
+        const received: string = this.header("ops");
+        const arr_rec: any[] = received.split("@@");
+        const r_tsp: string = arr_rec[2];
+        const r_sign: string = arr_rec[3];
+
+        const mechineId = arr_rec[1] || 1;
+        const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
+        const data: string = sid + skey + r_tsp + mid;
+        const sign: string = crypto.createHash('md5').update(data).digest("hex");
+        console.log('sign:', sign);
+        const uid = this.post("id") || "uid";
+        if (r_sign == sign) {
+          // const machine_code = this.post('machine_code');
+          // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
+          const orderList = await this.model('order').where({logistics_type: 1, status: 2, machine_code: mechineId}).select();
+          if (think.isEmpty(orderList)) {
+            return this.fail(-1, '暂无数据!');
+          }
+          console.log(mechineId, 'machineId');
+          const zip = new AdmZip();
+          const zip_buffer = zip.toBuffer();
+          for (const orderInfo of orderList) {
+            const order_id = orderInfo.id;
+            const order_item = await this.model('order_item').where({ order_id }).find();
+            console.log(order_item);
+            const dst_Buffer: any = await this.getBuffer(this, order_item.design_dst_path, true);
+            zip.addFile(`${orderInfo.id}.DST`, Buffer.alloc(dst_Buffer.length, dst_Buffer), "DST FILE");
+            // 获取子级控制器实例，然后调用其方法
+            // const txt_data = await designController.getDesignInfo(order_item.design_emb_path);
+            let txt_data;
+            if (!order_item.order_txt_file_path) {
+              const designController = this.controller('designer/design');
+              // @ts-ignore
+              const res = await designController.getDesignInfo(order_item.design_emb_path);
+              if ( typeof res == 'string') {
+                return this.fail(-1, res);
+              }
+              txt_data = res.txt_str;
+            } else {
+              txt_data = await this.getBuffer(this, order_item.order_txt_file_path, true);
+            }
+            console.log(txt_data, 'txt_data');
+            zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
+          }
+          // const content_length = res.headers._headers['content-length'][0];
+          this.ctx.set({
+            // 'Content-Length': res.headers._headers['content-length'][0],
+            'Content-Type': 'multipart/form-data',
+            "Content-Disposition": "attachment; filename=" + `${think.datetime(new Date().getTime())}.zip`,
+          });
+          const PassThrough = require('stream').PassThrough;
+          await this.model('order').where({logistics_type: 1, status: 2, machine_code: mechineId}).update({_status: "下发完成, 等待发货中"});
+          this.ctx.body = zip_buffer;
+          // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+        } else {
+          return this.fail(-1, '签名错误!');
+        }
+      } else {
+        return this.fail(-1, '无效请求!');
+      }
+    } catch (e) {
+      this.dealErr(e);
+    }
+  }
+
+  /**
    * 获取DST
    */
-  async  getDstAction() {
-    const zip = new AdmZip();
-    const content = "zhangbo";
-    zip.addFile("order_no.EMB", Buffer.alloc(content.length, content), "entry comment goes here");
-    zip.addFile("order_no.DST", Buffer.alloc(content.length, content), "entry comment goes here");
-    zip.addFile("order_no.TXT", Buffer.alloc(content.length, content), "entry comment goes here");
-    // zip.addLocalFile("/home/me/some_picture.png");
-    // get everything as a buffer
-    const willSendthis = zip.toBuffer();
-    // this.ctx.attachment('order_no.zip');
-    // this.ctx.body = willSendthis;
-    // zip.writeZip(/*target file name*/"/home/me/files.zip");
-
-    const res: any = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:32/246db614-eb3e-440f-a297-9289abdac3a5.DST');
-    const content_length = res.headers._headers['content-length'][0];
-    // const res: any = await this.fetch(order_item.design_dst_path);
-    this.ctx.set({
-      // 'Content-Length': isHaveFile.size,
-      'Content-Type': 'multipart/form-data',
-      // "Content-Disposition": "attachment; filename=" + `${content}.DST`,
-    });
-    const PassThrough = require('stream').PassThrough;
-    // await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
-    // this.ctx.body = res.body;
-    this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
-  }
+  // async  getDstAction() {
+  //   const zip = new AdmZip();
+  //   const content = "zhangbo";
+  //   zip.addFile("order_no.EMB", Buffer.alloc(content.length, content), "entry comment goes here");
+  //   zip.addFile("order_no.DST", Buffer.alloc(content.length, content), "entry comment goes here");
+  //   zip.addFile("order_no.TXT", Buffer.alloc(content.length, content), "entry comment goes here");
+  //   // zip.addLocalFile("/home/me/some_picture.png");
+  //   // get everything as a buffer
+  //   const willSendthis = zip.toBuffer();
+  //   // this.ctx.attachment('order_no.zip');
+  //   // this.ctx.body = willSendthis;
+  //   // zip.writeZip(/*target file name*/"/home/me/files.zip");
+  //
+  //   const res: any = await this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/design/13/33/2020-07-03-14:09:32/246db614-eb3e-440f-a297-9289abdac3a5.DST');
+  //   const content_length = res.headers._headers['content-length'][0];
+  //   // const res: any = await this.fetch(order_item.design_dst_path);
+  //   this.ctx.set({
+  //     // 'Content-Length': isHaveFile.size,
+  //     'Content-Type': 'multipart/form-data',
+  //     // "Content-Disposition": "attachment; filename=" + `${content}.DST`,
+  //   });
+  //   const PassThrough = require('stream').PassThrough;
+  //   // await this.model('order').where({machine_code: mechineId}).update({machine_code: 0});
+  //   // this.ctx.body = res.body;
+  //   this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
+  // }
   // async getDstAction1() {
   //   // if (this.header("ops")) {
   //   //   // @ts-ignore

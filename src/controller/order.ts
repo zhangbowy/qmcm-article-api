@@ -37,6 +37,7 @@ export default class extends Base {
       const end_pay_time: number = this.post('end_pay_time');
       const receiver_phone: number = this.post('receiver_phone');
       const express_number: number = this.post('express_number');
+      const custom_template_id: number = this.post('custom_template_id');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
       if (status) {
@@ -56,6 +57,9 @@ export default class extends Base {
       }
       if (order_type) {
         where.order_type = order_type;
+      }
+      if (custom_template_id) {
+        where.custom_template_id = custom_template_id;
       }
       let orderIdList;
       let result;
@@ -733,7 +737,7 @@ export default class extends Base {
 
   /**
    * 发送机器
-   * @param {order_item_id} 子订单id
+   * @param {order_id} 子订单id
    * @param {custom_template_id} 定制分类id
    * @param {machine_id} 机器id
    */
@@ -761,7 +765,7 @@ export default class extends Base {
       if (!machine_code) {
         return this.fail(-1, '机器码不存在!');
       }
-      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', machine_code});
+      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', status: 2, machine_code});
       return this.success([], '操作成功!');
     } catch (e) {
       this.dealErr(e);
