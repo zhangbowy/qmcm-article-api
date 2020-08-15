@@ -754,9 +754,10 @@ export default class extends Base {
       const order_id = this.post('order_id');
       const custom_template_id = this.post('custom_template_id');
       const machine_id = this.post('machine_id');
-      if (!Array.isArray(order_id)) {
-        return this.fail(-1, 'order_item_id不是有效数组');
-      }
+      console.log(order_id, 'order_idorder_idorder_id');
+      // if (!Array.isArray(order_id)) {
+      //   return this.fail(-1, 'order_item_id不是有效数组');
+      // }
       const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_id: ['IN', order_id]}).select();
       if (think.isEmpty(order_item_list)) {
         return this.fail(-1, '所选订单不存在!');
