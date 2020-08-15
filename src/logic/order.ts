@@ -169,7 +169,7 @@ export default class extends base {
   sendMachineAction() {
     this.allowMethods = 'POST';
     const rules = {
-      order_item_id: {
+      order_id: {
         required: true,
         trim: true,
         method: 'post',
