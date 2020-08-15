@@ -99,7 +99,7 @@ export default class extends Base {
         if (r_sign == sign) {
           // const machine_code = this.post('machine_code');
           // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
-          const orderList = await this.model('order').where({logistics_type: 1, status: 2, machine_code: mechineId}).select();
+          const orderList = await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).select();
           if (think.isEmpty(orderList)) {
             return this.fail(-1, '暂无数据!');
           }
@@ -136,7 +136,7 @@ export default class extends Base {
             "Content-Disposition": "attachment; filename=" + `${think.datetime(new Date().getTime())}.zip`,
           });
           const PassThrough = require('stream').PassThrough;
-          await this.model('order').where({logistics_type: 1, status: 2, machine_code: mechineId}).update({_status: "下发完成, 等待发货中"});
+          await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).update({status: 2, _status: "下发完成, 等待发货中"});
           this.ctx.body = zip_buffer;
           // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
         } else {

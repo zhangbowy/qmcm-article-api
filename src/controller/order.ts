@@ -11,7 +11,7 @@ export default class extends Base {
    * 订单列表
    * @param {currentPage}
    * @param {pageSize}
-   * @param {status} 订单状态 状态 -2、已关闭/取消订单 0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9、已接单(designer_status 1、待接单 2、待指派设计师 3、设计师处理中 4、处理完成) 10、待打印
+   * @param {status} 订单状态 状态 -2、已关闭/取消订单 0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9、已接单(designer_status 1、待接单 2、待指派设计师 3、设计师处理中 4、处理完成) 10、待打印  11下发中
    * @param {order_no} 订单编号
    * @param {order_type} 订单类型  1、普通订单    2、一般定制    3 、特殊定制    4 、手绘     5、 询价
    * @param {start_time} 开始时间
@@ -37,7 +37,7 @@ export default class extends Base {
       const end_pay_time: number = this.post('end_pay_time');
       const receiver_phone: number = this.post('receiver_phone');
       const express_number: number = this.post('express_number');
-      const custom_template_id: number = this.post('custom_template_id');
+      const custom_category_id: number = this.post('custom_category_id');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
       if (status) {
@@ -58,8 +58,8 @@ export default class extends Base {
       if (order_type) {
         where.order_type = order_type;
       }
-      if (custom_template_id) {
-        where.custom_template_id = custom_template_id;
+      if (custom_category_id) {
+        where.custom_category_id = custom_category_id;
       }
       let orderIdList;
       let result;
@@ -124,6 +124,7 @@ export default class extends Base {
       const end_pay_time: number = this.post('end_pay_time');
       const receiver_phone: number = this.post('receiver_phone');
       const express_number: number = this.post('express_number');
+      const custom_category_id: number = this.post('custom_category_id');
       const where: any = {};
       where.order_no = ['like', `%${order_no}%`];
       // where.shop_id = shop_id;
@@ -142,7 +143,9 @@ export default class extends Base {
       if (order_type) {
         where.order_type = order_type;
       }
-
+      if (custom_category_id) {
+        where.custom_category_id = custom_category_id;
+      }
       /**
        * 订单状态列表 -2、已关闭/取消订单  0 全部 1、待付款 ，2、待发货 3、已发货 4、已完成  5、询价中 6、询价回复 7、待派单 8、派单中 9 设计师处理中
        */
@@ -186,6 +189,11 @@ export default class extends Base {
         {
           _status: "下发机器",
           status: 10,
+          count: 0
+        },
+        {
+          _status: "下发中",
+          status: 11,
           count: 0
         },
         {
@@ -765,7 +773,7 @@ export default class extends Base {
       if (!machine_code) {
         return this.fail(-1, '机器码不存在!');
       }
-      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', status: 2, machine_code});
+      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', status: 11, machine_code});
       return this.success([], '操作成功!');
     } catch (e) {
       this.dealErr(e);

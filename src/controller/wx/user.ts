@@ -190,6 +190,8 @@ export default class extends Base {
             expires: new Date().getTime() + 1000 * 1000 * 1000 * 1000,
             // HttpOnly:false,
             // domain:'192.168.31.181'
+            SameSite: 'None',
+            Secure: true
         });
         return this.success('登录成功!');
     }

@@ -135,6 +135,7 @@ export default class extends Base {
                 designer_id: item_info.item_list[0].designer_id,
                 designer_team_id: item_info.item_list[0].designer_team_id,
                 custom_template_id: item_info.item_list[0].custom_template_id,
+                custom_category_id: item_info.item_list[0].custom_category_id,
                 logistics_type: item_info.logistics_type,
                 _logistics_type: item_info._logistics_type
 
@@ -780,6 +781,7 @@ export default class extends Base {
                                     buy_num: cart_v.buy_num,
                                     current_price: item.current_price,
                                     category_id: item.category_id,
+                                    custom_category_id: item.custom_category_id,
                                     order_type: 1,
                                     _order_type: '普通订单'
                                 };
@@ -1130,6 +1132,7 @@ export default class extends Base {
                                             buy_num: cart_v.buy_num,
                                             current_price: sku_v.current_price,
                                             category_id: item.category_id,
+                                            custom_category_id: item.custom_category_id,
                                             order_type: 1,
                                             _order_type: '普通订单'
                                         };
