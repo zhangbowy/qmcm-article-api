@@ -758,7 +758,7 @@ export default class extends Base {
       // if (!Array.isArray(order_id)) {
       //   return this.fail(-1, 'order_item_id不是有效数组');
       // }
-      const order_list = await this.model('order_item').where({status: 10, custom_category_id, id: ['IN', order_id]}).select();
+      const order_list = await this.model('order').where({status: 10, custom_category_id, id: ['IN', order_id]}).select();
       if (think.isEmpty(order_list)) {
         return this.fail(-1, '所选订单不存在!');
       }
