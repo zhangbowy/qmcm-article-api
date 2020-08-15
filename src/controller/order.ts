@@ -764,8 +764,8 @@ export default class extends Base {
       }
       // const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_item_id: ['IN', order_item_id_list]}).select();
       if (order_id.length != order_list.length) {
-        return this.fail(-1, '只有同一定制分类的订单才能同时下发!');
-      }
+         return this.fail(-1, '请不要勾选不能下发的订单!');
+        }
       const order_item_list = await this.model('order_item').where({ order_id: ['IN', order_id]}).select();
       // const machine_info  = await this.model('machine').where({custom_category_id, machine_id}).find();
       // if (think.isEmpty(machine_info)) {
