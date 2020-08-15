@@ -751,7 +751,7 @@ export default class extends Base {
    */
   async sendMachineAction() {
     try {
-      const order_id = this.post('order_item_id');
+      const order_id = this.post('order_id');
       const custom_template_id = this.post('custom_template_id');
       const machine_id = this.post('machine_id');
       if (!Array.isArray(order_id)) {
