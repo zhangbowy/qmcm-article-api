@@ -767,15 +767,15 @@ export default class extends Base {
         return this.fail(-1, '只有同一定制分类的订单才能同时下发!');
       }
       const order_item_list = await this.model('order_item').where({ order_id: ['IN', order_id]}).select();
-      const machine_info  = await this.model('machine').where({custom_category_id, machine_id}).find();
-      if (think.isEmpty(machine_info)) {
-        return this.fail(-1, '该机器不存在');
-      }
-      const machine_code = machine_info.machine_info;
-      if (!machine_code) {
-        return this.fail(-1, '机器码不存在!');
-      }
-      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', status: 11, machine_code});
+      // const machine_info  = await this.model('machine').where({custom_category_id, machine_id}).find();
+      // if (think.isEmpty(machine_info)) {
+      //   return this.fail(-1, '该机器不存在');
+      // }
+      // const machine_code = machine_info.machine_info;
+      // if (!machine_code) {
+      //   return this.fail(-1, '机器码不存在!');
+      // }
+      await this.model('order').where({id: ['IN', order_id]}).update({_status: '等待下发', status: 11, machine_code: machine_id});
       return this.success([], '操作成功!');
     } catch (e) {
       this.dealErr(e);
