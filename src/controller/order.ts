@@ -752,21 +752,22 @@ export default class extends Base {
   async sendMachineAction() {
     try {
       const order_id = this.post('order_id');
-      const custom_template_id = this.post('custom_template_id');
+      const custom_category_id = this.post('custom_template_id');
       const machine_id = this.post('machine_id');
       console.log(order_id, 'order_idorder_idorder_id');
       // if (!Array.isArray(order_id)) {
       //   return this.fail(-1, 'order_item_id不是有效数组');
       // }
-      const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_id: ['IN', order_id]}).select();
-      if (think.isEmpty(order_item_list)) {
+      const order_list = await this.model('order_item').where({status: 10, custom_category_id, id: ['IN', order_id]}).select();
+      if (think.isEmpty(order_list)) {
         return this.fail(-1, '所选订单不存在!');
       }
       // const order_item_list = await this.model('order_item').where({item_status: 10, custom_template_id, order_item_id: ['IN', order_item_id_list]}).select();
-      if (order_id.length != order_item_list.length) {
+      if (order_id.length != order_list.length) {
         return this.fail(-1, '只有同一定制分类的订单才能同时下发!');
       }
-      const machine_info  = await this.model('machine').where({custom_template_id, machine_id}).find();
+      const order_item_list = await this.model('order_item').where({ order_id: ['IN', order_id]}).select();
+      const machine_info  = await this.model('machine').where({custom_category_id, machine_id}).find();
       if (think.isEmpty(machine_info)) {
         return this.fail(-1, '该机器不存在');
       }
