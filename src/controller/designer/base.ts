@@ -107,7 +107,8 @@ export default class extends restController {
                 for (const  v of obj) {
                     const new_v = v.toUpperCase()
                     for (const item of files) {
-                        if (item.indexOf(v) > -1) {
+                        const item1 = item.toUpperCase()
+                        if (item1.indexOf(v) > -1) {
                             const fileName = think.uuid('v4');
                             const obj1 = {
                                 Bucket: 'cos-cx-n1-1257124629', /* 桶 */
@@ -134,8 +135,8 @@ export default class extends restController {
                                 fileObj.txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
                                 fileObj.order_txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
                             }
-                            if (v === '.PNG' || '.png' ) {
-                                if (item.indexOf('-1.PNG') === -1 || item.indexOf('-1.png') === -1) {
+                            if (v === '.PNG' || v === '.png' ) {
+                                if (item.indexOf('-1.PNG') === -1 && item.indexOf('-1.png') === -1) {
                                     fileList.push(obj1);
 
                                     fileLastList.push(new_v);
