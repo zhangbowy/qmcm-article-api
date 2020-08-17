@@ -105,6 +105,7 @@ export default class extends restController {
                 }
                 const fileLastList: any = [];
                 for (const  v of obj) {
+                    const new_v = v.toUpperCase()
                     for (const item of files) {
                         if (item.indexOf(v) > -1) {
                             const fileName = think.uuid('v4');
@@ -133,24 +134,24 @@ export default class extends restController {
                                 fileObj.txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
                                 fileObj.order_txt_file_path = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + '.TXT';
                             }
-                            if (v === '.PNG' ) {
-                                if (item.indexOf('-1.PNG') === -1) {
+                            if (v === '.PNG' || '.png' ) {
+                                if (item.indexOf('-1.PNG') === -1 || item.indexOf('-1.png') === -1) {
                                     fileList.push(obj1);
 
-                                    fileLastList.push(v.toUpperCase());
-                                    fileObj[objName[v.toUpperCase()]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                                    fileLastList.push(new_v);
+                                    fileObj[objName[new_v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                                 }
                             } else {
                                 fileList.push(obj1);
-                                fileLastList.push(v.toUpperCase());
-                                fileObj[objName[v.toUpperCase()]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                                fileLastList.push(new_v);
+                                fileObj[objName[new_v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                             }
                         }
                     }
                     // if (fileLastList.includes(v)) {
                     //     return resolve(`后缀为${v}的文件重复`)
                     // }
-                    if (fileLastList.indexOf(v.toUpperCase()) == -1) {
+                    if (fileLastList.indexOf(new_v) == -1) {
                         resolve(`后缀${v}的文件不存在`);
                     }
                     // if (!files.indexOf(item)) {
