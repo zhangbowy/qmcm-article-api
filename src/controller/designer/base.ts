@@ -137,13 +137,13 @@ export default class extends restController {
                                 if (item.indexOf('-1.PNG') === -1) {
                                     fileList.push(obj1);
 
-                                    fileLastList.push(v);
-                                    fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                                    fileLastList.push(v.toUpperCase());
+                                    fileObj[objName[v.toUpperCase()]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                                 }
                             } else {
                                 fileList.push(obj1);
-                                fileLastList.push(v);
-                                fileObj[objName[v]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
+                                fileLastList.push(v.toUpperCase());
+                                fileObj[objName[v.toUpperCase()]] = 'http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com' + ossPath + fileName + v;
                             }
                         }
                     }
