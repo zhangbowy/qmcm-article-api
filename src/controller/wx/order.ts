@@ -666,7 +666,7 @@ export default class extends Base {
                         /**
                          * is_presell  是否为预售商品 是的话就不能购买
                          */
-                        if (!item.is_presell) {
+                        if (item.is_presell) {
                             return `定制商品【${item.name}】不可购买`;
                         }
                         let express_rule;
