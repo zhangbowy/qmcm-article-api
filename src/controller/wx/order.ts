@@ -663,6 +663,12 @@ export default class extends Base {
                      */
                     const item: any = await this.model('item').where({id: cart_v.item_id}).find();
                     if (item.id) {
+                        /**
+                         * is_presell  是否为预售商品 是的话就不能购买
+                         */
+                        if (!item.is_presell) {
+                            return `定制商品【${item.name}】不可购买`;
+                        }
                         let express_rule;
                         if (item.express_template_id) {
                             /**

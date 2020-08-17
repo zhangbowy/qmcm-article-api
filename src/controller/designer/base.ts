@@ -150,7 +150,7 @@ export default class extends restController {
                     // if (fileLastList.includes(v)) {
                     //     return resolve(`后缀为${v}的文件重复`)
                     // }
-                    if (fileLastList.indexOf(v) == -1) {
+                    if (fileLastList.indexOf(v.toUpperCase()) == -1) {
                         resolve(`后缀${v}的文件不存在`);
                     }
                     // if (!files.indexOf(item)) {

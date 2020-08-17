@@ -1,5 +1,6 @@
 import Base from './base.js';
 import {think} from "thinkjs";
+import cateModel from "../model/item_category";
 
 export default class extends Base {
 
@@ -125,6 +126,7 @@ export default class extends Base {
             const design_name: string = this.get('design_name') || '';
             const designer_team_id: string = this.get('designer_team_id') || 0;
             const status: number = Number(this.get('status')) || 0;
+            const design_category_id: number = this.get('design_category_id')
             /**
              * 设计师信息
              */
@@ -136,6 +138,9 @@ export default class extends Base {
              * 默认条件 查团队的花样
              */
             const where: any = {shop_id, del: 0, design_name: ['like', `%${design_name}%`]};
+            if (design_category_id) {
+                where.design_category_id = design_category_id;
+            }
             if (designer_team_id) {
                 where.designer_team_id = designer_team_id;
             }
@@ -169,8 +174,6 @@ export default class extends Base {
             const shop_id: number = admin_info.shop_id;
             // const designer_team_id: number = admin_info.designer_team_id;
             // const designer_id_own: number = admin_info.designer_id;
-
-
             const where: any = {shop_id, del: 0, design_name: ['like', `%${design_name}%`]};
             if (designer_team_id) {
                 where.designer_team_id = designer_team_id;
@@ -256,6 +259,159 @@ export default class extends Base {
             return this.success([], '操作成功!');
         } catch ($err) {
             this.dealErr($err);
+        }
+    }
+
+    /**
+     * 花样分类
+     */
+    async getCategoryAction() {
+        try {
+            const page: number = this.get('currentPage') || 1;
+            const limit: number = this.get('pageSize') || 10;
+            const catemodel = this.model('item_category') as cateModel;
+            // @ts-ignore
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const data = await this.model('design_category').where({del: 0}).page(page, limit).countSelect();
+            return this.success(data, '花样分类列表!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 添加分类
+     * @params { category_name } 分类名称
+     * @params { parent_id } 上级id
+     * @params { image_path } 分类图片路径
+     */
+    async addCategoryAction() {
+        try {
+            // @ts-ignore
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const design_category_name: number = this.post('design_category_name');
+            const parent_id: number = this.post('parent_id') || 0;
+            const image_path: number = this.post('image_path') || "";
+            const params: object = {
+                design_category_name,
+                parent_id,
+                image_path,
+                shop_id,
+            };
+            // if (parent_id != 0) {
+            //     const data = await this.model('item_category').where({id: parent_id}).find();
+            //     if (Object.keys(data).length == 0) {
+            //         return this.fail(-1, '该上级分类不存在!');
+            //     }
+            //     // @ts-ignore
+            //     const level: any = await this.model('item_category').getLevel(parent_id);
+            //     if (level >= 3) {
+            //         return this.fail(-1, '商品分类最多三级!');
+            //     }
+            //
+            // }
+            const res: any = await this.model('design_category').add(params);
+            if (res) {
+                return this.success(res, '添加成功!');
+            }
+            return this.fail(-1, '添加失败!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 编辑分类
+     * @params { design_category_id } 花样分类id
+     * @params { category_name } 分类名称
+     * @params { image_path } 分类图片路径
+     */
+    async editCategoryAction() {
+        try {
+            // @ts-ignore
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const design_category_id: number = this.post('design_category_id');
+            const category_name: number = this.post('category_name');
+            const image_path: number = this.post('image_path');
+            const params: object = {
+                category_name,
+                image_path,
+            };
+            const res: any = await this.model('design_category').where({design_category_id, shop_id}).update(params);
+            if (res) {
+                return this.success(res, '编辑成功!');
+            }
+            return this.fail(-1, '分类不存在!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 删除分类
+     * @params { design_category_id } 分类id
+     */
+    async delCategoryAction() {
+        try {
+            // @ts-ignore
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const design_category_id: number = Number(this.post('design_category_id'));
+            const category = await this.model('design_category').where({design_category_id, del: 0}).find();
+            if (think.isEmpty(category)) {
+                return this.fail(-1, '分类不存在');
+            }
+            await this.model('design').where({design_category_id}).update({design_category_id: 0});
+            await this.model('design_category').where({design_category_id, del: 0}).update({del: 1});
+            // const ids = await model.getChild(id);
+            return this.success([], '删除成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 设置分类
+     * @param {design_category_id} 花样分类id
+     * @param {design_id} 花样id 多个用,隔开
+     */
+    async setCategoryAction() {
+        try {
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const design_category_id: number = Number(this.post('design_category_id'));
+            const design_id = this.post("design_id");
+            const design_list = await this.model('design').where({design_id: ['IN', design_id]}).select();
+            if (think.isEmpty(design_list)) {
+                return this.fail(-1, '花样不存在');
+            }
+            const category = await this.model('design_category').where({del: 0, design_category_id}).find();
+            if (think.isEmpty(category) && design_category_id != 0) {
+                return this.fail(-1, '该分类不存在');
+            }
+            const res = await this.model('design').where({design_id: ['IN', design_id]}).update({design_category_id});
+            this.success([], '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 设置预售
+     * @param {is_presell} 0 不是预售 1 预售
+     * @param {design_id} 花样id 多个用,隔开
+     */
+    async setPresellAction() {
+        try {
+            const shop_id = this.ctx.state.admin_info.shop_id;
+            const is_presell: number = Number(this.post('is_presell'));
+            const design_id = this.post("design_id");
+            const design_list = await this.model('design').where({shop_id, design_id: ['IN', design_id]}).select();
+            if (think.isEmpty(design_list)) {
+                return this.fail(-1, '花样不存在');
+            }
+            const res = await this.model('design').where({shop_id, design_id: ['IN', design_id]}).update({is_presell});
+            this.success([], '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
         }
     }
 }
