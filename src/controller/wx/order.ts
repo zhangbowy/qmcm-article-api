@@ -1218,7 +1218,12 @@ export default class extends Base {
                                                             const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
                                                             item_info.design_width = meta.width / meta.height *  Number(item_info.design_height);
                                                             // }
-                                                            const sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +   Number(item_info.design_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) *  Number(item_info.design_width)
+                                                            let sqr: number
+                                                            if (item_info.custom_template_id == 2) {
+                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height)
+                                                            } else {
+                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +   Number(item_info.design_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) *  Number(item_info.design_width)
+                                                            }
                                                             const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                             item_info.design_area_sqr = sqr;
                                                             item_info.emb_template_price = price;
