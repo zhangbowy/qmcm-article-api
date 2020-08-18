@@ -170,7 +170,7 @@ export default class extends Base {
              * 设计师信息
              */
             const admin_info = this.ctx.state.admin_info;
-
+            const design_category_id: number = this.get('design_category_id');
             const shop_id: number = admin_info.shop_id;
             // const designer_team_id: number = admin_info.designer_team_id;
             // const designer_id_own: number = admin_info.designer_id;
@@ -178,7 +178,9 @@ export default class extends Base {
             if (designer_team_id) {
                 where.designer_team_id = designer_team_id;
             }
-
+            if (design_category_id) {
+                where.design_category_id = design_category_id;
+            }
             const statusList = [
                 {
                     _status: "全部",
@@ -331,10 +333,10 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const design_category_id: number = this.post('design_category_id');
-            const category_name: number = this.post('category_name');
+            const design_category_name: number = this.post('design_category_name');
             const image_path: number = this.post('image_path');
             const params: object = {
-                category_name,
+                design_category_name,
                 image_path,
             };
             const res: any = await this.model('design_category').where({design_category_id, shop_id}).update(params);

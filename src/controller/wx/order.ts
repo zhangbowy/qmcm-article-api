@@ -859,9 +859,9 @@ export default class extends Base {
 
                                                 if (item_info.custom_template_id != 1) {
                                                     const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
-                                                    item_info.design_width = meta.width / meta.height *  item_info.design_height;
+                                                    item_info.design_width = meta.width / meta.height *  Number(item_info.design_height);
                                                 }
-                                                const sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
+                                                const sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +  Number(item_info.top_font_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) * Number(item_info.bottom_font_width);
                                                 const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                 item_info.design_area_sqr = sqr;
                                                 item_info.emb_template_price = price;
@@ -877,7 +877,7 @@ export default class extends Base {
                                                 const res: any = await oss.upload(Buffer.from(custom_image_base64, 'base64'), filePath, true);
                                                 item_info.custom_image = 'http://' + res.Location;
                                             } else {
-                                                const sqr =  item_info.top_font_width * item_info.top_font_height;
+                                                const sqr =  Number(item_info.top_font_width) * Number(item_info.top_font_height);
                                                 const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                 item_info.design_area_sqr = sqr;
                                                 item_info.emb_template_price = price;
@@ -944,7 +944,7 @@ export default class extends Base {
                                         item_info.special_color_num = cart_v.design_info.special_color_num;
                                         item_info.special_custom_desc = cart_v.design_info.special_custom_desc;
                                         const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
-                                        const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
+                                        const sqr  = Number(item_info.special_custom_width) *  Number(item_info.special_custom_height);
                                         let price_template;
                                         // 多选 用多功能混合绣的价格 单选用自己
                                         if (item_info.custom_template_id.length > 1) {
@@ -988,7 +988,7 @@ export default class extends Base {
                                     item_info.custom_template_id = 2;
                                     item_info.design_width = cart_v.design_info.design_width;
                                     item_info.design_height = cart_v.design_info.design_height;
-                                    const sqr  = item_info.design_width *  item_info.design_height;
+                                    const sqr  = Number(item_info.design_width) *  Number(item_info.design_height);
                                     const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                     pay_amount += price;
                                     item_info.design_area_sqr = sqr;
@@ -1216,9 +1216,9 @@ export default class extends Base {
 
                                                             // if (item_info.custom_template_id != 1) {
                                                             const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
-                                                            item_info.design_width = meta.width / meta.height *  item_info.design_height;
+                                                            item_info.design_width = meta.width / meta.height *  Number(item_info.design_height);
                                                             // }
-                                                            const sqr  = item_info.design_width *  item_info.design_height +  item_info.top_font_width * item_info.top_font_height  +   item_info.bottom_font_height * item_info.bottom_font_width;
+                                                            const sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +  Number(item_info.top_font_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) * Number(item_info.bottom_font_width);
                                                             const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                             item_info.design_area_sqr = sqr;
                                                             item_info.emb_template_price = price;
@@ -1303,7 +1303,7 @@ export default class extends Base {
                                                 item_info.special_custom_desc = cart_v.design_info.special_custom_desc;
 
                                                 const special_custom_image_base64 = cart_v.design_info.special_custom_image.split(',')[1];
-                                                const sqr  = item_info.special_custom_width *  item_info.special_custom_height ;
+                                                const sqr  = Number(item_info.special_custom_width) *  Number(item_info.special_custom_height);
                                                 let price_template;
                                                 // 多选 用多功能混合绣的价格 单选用自己
                                                 if (item_info.custom_template_id.length > 1) {
@@ -1349,7 +1349,7 @@ export default class extends Base {
 
                                             item_info.design_width = cart_v.design_info.design_width;
                                             item_info.design_height = cart_v.design_info.design_height;
-                                            const sqr  = item_info.design_width *  item_info.design_height;
+                                            const sqr  = Number(item_info.design_width) *  Number(item_info.design_height);
                                             const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                             pay_amount += price;
                                             item_info.item_total_price += price;
