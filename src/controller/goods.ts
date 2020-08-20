@@ -130,7 +130,7 @@ export default class extends Base {
                 is_presell
             };
             if (is_custom) {
-                const custom = await this.model('custom_category').where({custom_category_id}).find();
+                const custom = await this.model('custom_category').where({custom_category_id: custom_category_id}).find();
                 if (think.isEmpty(custom)) {
                     return this.fail(-1, '定制分类不存在!');
                 }

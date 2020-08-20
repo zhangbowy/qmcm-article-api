@@ -94,6 +94,10 @@ export default class extends Base {
             this.dealErr($err);
         }
     }
+
+    /**
+     *  用户信息
+     */
     async infoAction(): Promise<void> {
         try {
             const designer_info = this.ctx.state.designer_info;
@@ -149,7 +153,6 @@ export default class extends Base {
         // captcha.svgCaptcha(text);
     }
     async editUserInfoAction() {
-
     }
 
     /**
@@ -158,19 +161,23 @@ export default class extends Base {
      * @return boolean
      */
     async sendSmsAction() {
-        const sms = think.service('sms');
-        const phone = this.post('phone');
-        // @ts-ignore
-        const phoneCaptchaTime = await this.cache(`design-${phone}-captcha-time`, undefined, 'redis');
-        if (phoneCaptchaTime) {
-            // return this.fail(-1, '一分钟之内不可再次发送');
-            return this.fail(-1, '请稍后再试!');
+        try {
+            const sms = think.service('sms');
+            const phone = this.post('phone');
+            // @ts-ignore
+            const phoneCaptchaTime = await this.cache(`design-${phone}-captcha-time`, undefined, 'redis');
+            if (phoneCaptchaTime) {
+                // return this.fail(-1, '一分钟之内不可再次发送');
+                return this.fail(-1, '请稍后再试!');
+            }
+            const code = await getCode();
+            const phone_code  = await this.session('phone_captcha');
+            const res = await sms.sendMessage(phone, code);
+            await this.session('phone_captcha', code);
+            return this.success(res, '发送成功!');
+        } catch (e) {
+            this.dealErr(e);
         }
-        const code = await getCode();
-        const phone_code  = await this.session('phone_captcha');
-        const res = await sms.sendMessage(phone, code);
-        await this.session('phone_captcha', code);
-        return this.success(res, '发送成功!');
     }
 
     /**
@@ -224,7 +231,7 @@ export default class extends Base {
      * @param {new_password}
      * @return boolean
      */
-    async  changePsdAction() {
+    async changePsdAction() {
         try {
             const designer_info = this.ctx.state.designer_info;
             const shop_id = designer_info.shop_id;

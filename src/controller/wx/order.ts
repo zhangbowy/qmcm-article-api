@@ -606,18 +606,21 @@ export default class extends Base {
                 return  '商品不能为空!';
             }
             /**
-             * 收货地址id
+             * 收货地址的id
              */
             const address_id: any = this.post('address_id') || 0;
             let address;
             /**
-             * 如果没有传收货地址id
+             * 如果没有传收货地址id的话
              */
             if (!address_id) {
                 /**
                  * 默认地址
                  */
                 address = await this.model('address').where({user_id, shop_id, is_default: 1}).find();
+                /**
+                 * 没有默认收货地址
+                 */
                 if (Object.keys(address).length == 0) {
                     address = await this.model('address').where({user_id, shop_id}).find();
                     if (think.isEmpty(address)) {
@@ -636,7 +639,6 @@ export default class extends Base {
              */
             let express_amount: any = [];
             const item_list: any = [];
-
             /**
              *  购物类型 / 订单类型
              */
@@ -654,7 +656,6 @@ export default class extends Base {
 
                         }
                     }
-
                 }
                 if (order_type != cart_v.shopping_type) {
                     const _shopping_type = getOrderType(cart_v.shopping_type);
@@ -673,11 +674,11 @@ export default class extends Base {
                         if (item.is_presell) {
                             return `定制商品【${item.name}】不可购买`;
                         }
+                        /**
+                         * 物流模板规则
+                         */
                         let express_rule;
                         if (item.express_template_id) {
-                            /**
-                             * 物流模板规则
-                             */
                             express_rule  = await this.model('express_template').where({express_template_id: item.express_template_id}).find();
                         }
                         /**
@@ -1323,7 +1324,6 @@ export default class extends Base {
                                                     price_template = 11;
                                                 } else {
                                                     price_template = item_info.custom_template_id[0];
-
                                                 }
                                                 const price = await this.getEmbPrice(sqr, price_template);
 
@@ -1341,7 +1341,6 @@ export default class extends Base {
                                                  */
                                                 const res: any = await oss.upload(Buffer.from(special_custom_image_base64, 'base64'), filePath, true);
                                                 item_info.special_custom_image = 'http://' + res.Location;
-
                                                 // item_info.design_area_image = cart_v.design_info.design_area_image;
                                                 // item_info.preview_image = cart_v.design_info.preview_image;
                                                 item_info.preview_image = item_info.special_custom_image;

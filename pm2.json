@@ -1,12 +1,12 @@
 {
   "apps": [{
-    "name": "yuncixiu-api",
+    "name": "yuncixiu-api-v3.0",
     "script": "production.js",
-    "cwd": "/root/workspace/yuncixiu-api-v3.0",
+    "cwd": "/home/wk/yuncixiu-api-v3.0",
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
-    "instances": 2,
+    "instances": 1,
     "node_args": [],
     "args": [],
     "env": {

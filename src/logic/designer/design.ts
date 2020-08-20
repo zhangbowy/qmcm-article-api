@@ -195,4 +195,7 @@ export default class extends base {
     getDesignInfoAction() {
 
     }
+    testAction() {
+
+    }
 }
