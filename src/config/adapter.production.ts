@@ -15,15 +15,15 @@ exports.model = {
     },
     mysql: {
         handle: mysql,
-        database: 'test', //数据库名
+        database: 'cxtest', //数据库名
         prefix: '',//表前缀
         encoding: 'utf8',
-        host: '129.211.65.201',//host
+        host: '172.17.0.6',//host
         // host: '127.0.0.1',//host
         port: 3306,//端口
         // user: 'root',//用户名
         user: 'root',//用户名
-        password: '1234567qm',//密码
+        password: '$%75fsdfj',//密码
         // password: 'd7DmpHNHD87PWYfR',//密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
@@ -39,9 +39,9 @@ exports.cache = {
     },
     redis: {
         handle: redisCache,
-        host: '127.0.0.1',
+        host: '172.17.32.3',
         port: '6379',
-        password: '',
+        password: 'fsf%%^^$AFDS5',
         log_connect: true
     }
 }
