@@ -404,7 +404,7 @@ export default class extends Base {
     async setPresellAction() {
         try {
             const shop_id = this.ctx.state.admin_info.shop_id;
-            const is_presell: number = Number(this.post('is_presell'));
+            const is_presell: number = this.post('is_presell') == 'true' ?  1 : 0;
             const design_id = this.post("design_id");
             const design_list = await this.model('design').where({shop_id, design_id: ['IN', design_id]}).select();
             if (think.isEmpty(design_list)) {

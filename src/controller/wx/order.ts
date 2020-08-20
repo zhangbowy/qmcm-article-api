@@ -645,18 +645,22 @@ export default class extends Base {
             let _logistics_type = '快递发货';
             for (const cart_v of cart_list) {
                 if (logistics_type && logistics_type == 2) {
-                    if (cart_v.shopping_type != 2 || cart_v.design_info.is_choose_design == 0 || cart_v.design_info.custom_template_id != 2) {
-                        return  '只有单个花样定制支持门店自提';
-                    } else {
+                    if (cart_v.is_wilcom) {
 
+                    } else {
+                        if ((cart_v.shopping_type != 2 || cart_v.design_info.is_choose_design == 0 || cart_v.design_info.custom_template_id != 2)) {
+                            return  '暂不支持自提';
+                        } else {
+
+                        }
                     }
+
                 }
                 if (order_type != cart_v.shopping_type) {
                     const _shopping_type = getOrderType(cart_v.shopping_type);
                     const _order_type = getOrderType(order_type);
                     return `【${_shopping_type}】不能与【${_order_type}】一起下单`;
                 }
-
                 if (typeof cart_v == 'object' && cart_v.item_id) {
                     /**
                      * 购物车里的每一项
@@ -1030,6 +1034,10 @@ export default class extends Base {
                                     const res: any = await oss.upload(Buffer.from(drawBuffer), filePath, true);
                                     item_info.draw_image = `http://${res.Location}`;
                                     item_info.image = item_info.preview_image;
+                                    if (logistics_type == 2 && !cart_v.is_wilcom) {
+                                        _logistics_type  = '门店自提';
+                                        item_info._logistics_type = '门店自提';
+                                    }
                                 }
 
                                 if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {
@@ -1402,6 +1410,11 @@ export default class extends Base {
                                              * 订单预览图变成设计预览图
                                              */
                                             item_info.image = item_info.preview_image;
+
+                                            if (logistics_type == 2 && !cart_v.is_wilcom) {
+                                                _logistics_type  = '门店自提';
+                                                item_info._logistics_type = '门店自提';
+                                            }
                                         }
 
                                         if (cart_v.shopping_type == 3 && cart_v.design_info.is_only_design) {

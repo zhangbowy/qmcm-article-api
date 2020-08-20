@@ -66,6 +66,7 @@ export default class extends Base {
             const is_custom = this.post('is_custom');
             const custom_category_id = this.post('custom_category_id');
             const express_type = this.post('express_type');
+            const is_presell = this.post('is_presell');
             /**
              * 查询商品分类是否存在
              */
@@ -125,7 +126,8 @@ export default class extends Base {
                 express_fee,
                 express_template_id,
                 is_custom,
-                express_type
+                express_type,
+                is_presell
             };
             if (is_custom) {
                 const custom = await this.model('custom_category').where({custom_category_id}).find();
@@ -208,6 +210,7 @@ export default class extends Base {
             const is_custom = this.post('is_custom');
             const custom_category_id = this.post('custom_category_id');
             const express_type = this.post('express_type');
+            const is_presell = this.post('is_presell');
             /**
              * 查询商品分类是否存在
              */
@@ -257,7 +260,8 @@ export default class extends Base {
                 express_fee,
                 express_template_id,
                 is_custom,
-                express_type
+                express_type,
+                is_presell
             };
             if (is_custom) {
                 const custom = await this.model('custom_category').where({custom_category_id}).find();
@@ -302,7 +306,7 @@ export default class extends Base {
         try {
             const id: number = this.post('id');
             const status: number = Number(this.post('status'));
-            const statusList = [1, 2, 3];
+            const statusList = [1, 2, 3, 4];
             if (!statusList.includes(status)) {
                 return this.fail(-1, '该商品状态不存在!');
             }
@@ -381,6 +385,12 @@ export default class extends Base {
             this.dealErr(e);
         }
     }
+
+    /**
+     * 获取等级
+     * @param parent_id
+     * @param timer
+     */
     async getLevel(parent_id: number, timer: number) {
         const res = await this.model('item_category').where({id: parent_id}).find();
         ++ timer;

@@ -20,6 +20,7 @@ export default class extends Base {
             const status = 3;
             const name: string = this.post('name') || "";
             const category_id: number = Number(this.post('category_id') || 0) ;
+            // tslint:disable-next-line:prefer-const
             let categorys: any;
             if (category_id != 0) {
                 const categoryItem: object = await  this.model('item_category').where({id: category_id});

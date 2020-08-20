@@ -30,7 +30,7 @@ export default class extends think.Model {
         const offset: number = (page - 1) * limit;
         // @ts-ignore
         // return this.setRelation(false).fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).countSelect();
-        return this.fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).page(page, limit).select();
+        return this.fieldReverse('del').order({created_at: 'DESC'}).where({del: 0, shop_id: $data.shop_id}).select();
         // return this.order({created_at: 'DESC'}).where({del: 0}).field('shop_id,shop_name,logo,system_end_time,created_at').page(page, limit).countSelect();
     }
 

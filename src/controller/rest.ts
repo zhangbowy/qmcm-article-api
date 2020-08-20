@@ -37,12 +37,16 @@ export default class extends think.Controller {
         return this.fail(-1, $errMsg, $data);
     }
 
+    /**
+     * 删除
+     * @param path
+     */
     deleteFolder(path: any) {
         let files = [];
         if (fs.existsSync(path)) {
             files = fs.readdirSync(path);
-            // tslint:disable-next-line:only-arrow-functions
             const _this = this;
+            // tslint:disable-next-line:only-arrow-functions
             files.forEach(function(file: any, index: any) {
                 const curPath = path + "/" + file;
                 if (fs.statSync(curPath).isDirectory()) {

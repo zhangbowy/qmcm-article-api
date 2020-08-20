@@ -2,6 +2,11 @@ import { think } from 'thinkjs';
 import {ancestorWhere} from "tslint";
 import restController from './rest';
 export default class extends restController {
+
+  /**
+   * 控制器前置方法
+   * @private
+   */
   async __before() {
     try {
       // await think.timeout(800);
@@ -37,8 +42,8 @@ export default class extends restController {
         }
         const now = new Date().getTime();
         const shop_info = await this.model('shops').where({shop_id: admin_info.shop_id}).find();
-        const endTime = new Date(shop_info.system_end_time).getTime();
-        if (now > endTime) {
+        const systemEndTime = new Date(shop_info.system_end_time).getTime();
+        if (now > systemEndTime) {
           return this.fail(-1, '店铺已过期,请联系平台!');
         }
         // if (!await this.session('token')) {
@@ -74,24 +79,28 @@ export default class extends restController {
   /**
    * 检查是否有权限
    */
-  async checkAuth(aminInfo: any) {
+  async checkAuth(adminInfo: any) {
     /**
      * id == 1 是平台
      */
-    if (aminInfo.id == 1) {
+    if (adminInfo.id == 1) {
       return true;
     }
 
     /**
      * role_type == 2 or 1 是店铺 和 平台
      */
-    if (aminInfo.role_type == 1 || aminInfo.role_type == 2) {
+    if (adminInfo.role_type == 1 || adminInfo.role_type == 2) {
       return true;
     }
-
-    const role = await this.model('admin_role').where({admin_role_id: aminInfo.role_id}).find();
-
-    if (!role.admin_role_id) {
+    /**
+     * 查找后台角色
+     */
+    const role = await this.model('admin_role').where({admin_role_id: adminInfo.role_id}).find();
+    /**
+     * 不存在当前角色
+     */
+    if (think.isEmpty(role)) {
       return false;
     }
     const auth_api = this.ctx.request.url;
@@ -101,11 +110,11 @@ export default class extends restController {
     //   auth_type = 2;
     // }
     /**
-     *  访问中台的路由
+     *  访问中台api的路由
      */
     const api = this.ctx.request.url.indexOf('?') > -1 ? this.ctx.request.url.split('?')[0] : this.ctx.request.url;
     /**
-     * 检查权限
+     * 检查权限 (匹配当前用户的权限列表)
      */
     // @ts-ignore
     const res = await this.model('auth_give').checkAuth(role.admin_role_id, api);
@@ -127,6 +136,10 @@ export default class extends restController {
     });
   }
 
+  /**
+   * 控制器Action找不到进这里
+   * @private
+   */
   __call() {
     return this.display('error/404.html');
   }

@@ -46,7 +46,7 @@ export default class extends think.Model {
             // where.status = $data.status;
         }
         // @ts-ignore
-        return this.setRelation(false).field('is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
+        return this.setRelation(false).field('is_presell,is_custom,sale_num,created_at,updated_at,status,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,desc,pv').order({created_at: 'DESC'}).where(where).page(page, limit).countSelect();
         // return this.order({created_at: 'DESC'}).where({del: 0}).field('shop_id,shop_name,logo,system_end_time,created_at').page(page, limit).countSelect();
     }
     async addGoods($data: AddGoodsParams) {
@@ -81,7 +81,7 @@ export default class extends think.Model {
         // const sku_show = JSON.stringify(this.post('sku_show'));
         // const sku_list = JSON.stringify(this.post('sku_list'));
         // const detail = this.post('detail');
-        return this.field('shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,sku_list,sku_show,detail,desc,express_fee,express_template_id,custom_category_id,is_custom,express_type,sale_num,pv').where({id: $id, shop_id}).find();
+        return this.field('is_presell,shop_id,id,name,category_id,old_price,current_price,weight,sum_stock,min_buy,max_buy,images,thumb_image_path,sku_list,sku_show,detail,desc,express_fee,express_template_id,custom_category_id,is_custom,express_type,sale_num,pv').where({id: $id, shop_id}).find();
     }
     async deleteGoods($id: number) {
         return this.where({id: $id}).update({del: 1});

@@ -777,6 +777,7 @@ export default class extends Base {
             // 如果只有三位的值，需变成六位，如：#fff => #ffffff
             if (color.length === 4) {
                 let colorNew = "#";
+                // tslint:disable-next-line:no-shadowed-variable
                 for (let i = 1; i < 4; i += 1) {
                     colorNew += color.slice(i, i + 1).concat(color.slice(i, i + 1));
                 }
@@ -785,7 +786,7 @@ export default class extends Base {
             // 处理六位的颜色值，转为RGB
             // tslint:disable-next-line:prefer-const
             let colorChange = [];
-            for (var i = 1; i < 7; i += 2) {
+            for (let i = 1; i < 7; i += 2) {
                 // tslint:disable-next-line:radix
                 colorChange.push( parseInt("0x" + color.slice(i, i + 2)) );
             }
@@ -836,48 +837,5 @@ export default class extends Base {
         // this.download('1.PNG', fileName + _name);
         this.ctx.body = res.body;
     }
-
-}
-
-/**
- * 獲取遠程圖片內容
- * @param $this
- * @param $filePath url
- * @param $buffer  output tpye of 1 buffer 0 base64
- */
-async function getBuffer($this: any, $filePath: any, $buffer?: boolean) {
-
-    const { Writable } = require('stream');
-    // const res = await $this.fetch('http://cos-cx-n1-1257124629.cos.ap-guangzhou.myqcloud.com/gallary/15/2020-04-22/6ca6e51d-028a-43d7-89a2-3537ccfe1adf.png');
-    const res = await $this.fetch($filePath);
-    const chunks: any = [];
-    let size = 0;
-    return new Promise((resolve, reject) => {
-        /**
-         * 创建可写流
-         */
-        const outStream = new Writable({
-            write(chunk: Buffer, encoding: string, callback: any) {
-                chunks.push(chunk);
-                console.log(chunk);
-                size += chunk.length;
-                callback();
-            },
-            final() {
-                /**
-                 * 拼接Buffer
-                 */
-                const newBuffer = Buffer.concat(chunks, size);
-                // @ts-ignore
-                const img = 'data:image/png;base64,' + Buffer.from(newBuffer, 'utf8').toString('base64');
-                if ($buffer) {
-                    resolve(newBuffer);
-                } else {
-                    resolve(img);
-                }
-            }
-        });
-        res.body.pipe(outStream);
-    });
 
 }

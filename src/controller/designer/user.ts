@@ -27,7 +27,7 @@ export default class extends Base {
                 return  this.fail(-1, "用户名或密码不能为空!", []);
             }
             designer_password = think.md5(designer_password);
-            const res = await this.model('designer').where({designer_phone}).find();
+            const res = await this.model('designer').where({designer_phone, del: 0}).find();
             if (!think.isEmpty(res)) {
                 if ( res.designer_password == designer_password) {
                     if (res.is_active) {

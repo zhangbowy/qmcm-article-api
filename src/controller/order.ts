@@ -551,14 +551,13 @@ export default class extends Base {
       if (orderItem.item_status == 1 || !orderItem.item_status) {
         return this.fail(-1, '该商品未发货!');
       }
+
       if (!express_id) {
         return this.fail(-1, '快递公司未选择');
       }
-
       if (think.isEmpty(express_number)) {
         return this.fail(-1, '快递单号未填写');
       }
-
       /**
        * 快递列表
        */
@@ -569,7 +568,6 @@ export default class extends Base {
       const express_code = express_info.express_code;
       const express = think.service('express');
       const res = await express.queryExpress(express_code, express_number);
-
       const result: object = {
         order_id: orderItem.order_id,
         order_item_id,
