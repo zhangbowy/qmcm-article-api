@@ -25,7 +25,6 @@ export default class extends base {
                 required: true,
                 method: 'post'
             },
-
         };
         const msgs: object = {
             required: '{name}不能为空'

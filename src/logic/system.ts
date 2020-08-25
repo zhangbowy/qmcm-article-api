@@ -761,4 +761,153 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
+
+    itemPriceTempAction() {
+
+    }
+    addItemPriceTempAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_template_name: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    editItemPriceTempAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_template_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            item_price_template_name: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    delItemPriceTempAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_template_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    addItemPriceAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_template_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            price: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            item_number: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+
+    editItemPriceAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_template_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            item_price_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            price: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            item_number: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+    delItemPriceAction() {
+        this.allowMethods = 'POST';
+        const rules = {
+            item_price_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+            item_price_template_id: {
+                required: true,
+                trim: true,
+                method: 'post'
+            },
+
+        };
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
 }

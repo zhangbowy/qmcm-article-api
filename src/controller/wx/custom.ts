@@ -117,7 +117,7 @@ export default class extends Base {
                 shop_id
             };
             if (design_category_id) {
-                where.design_category_id = design_category_id
+                where.design_category_id = design_category_id;
             }
             const res = await this.model('design').field('design_id,designer_id,designer_team_id,prev_png_path,price,design_name').page(page, limit).where(where).countSelect();
             return this.success(res, '花样列表!');
@@ -296,7 +296,7 @@ export default class extends Base {
                 let drawBuffer;
                 const setting = await this.model('setting').where({key: 'is_request_wilcom', value: 1}).find();
                 if (!think.isEmpty(setting)) {
-                    is_wilcom = 1
+                    is_wilcom = 1;
                     const wilcom = think.service('wilcom');
                     const embPng =  await wilcom.getEmbByImg(baseData, 100, 100);
                     drawBuffer = Buffer.from(embPng, 'base64');
@@ -771,6 +771,9 @@ export default class extends Base {
         this.download('1.PNG');
     }
 
+    /**
+     * 上传图片
+     */
     async uploadImgAction() {
         const file = this.file('image');
         let currentPath;
@@ -799,8 +802,47 @@ export default class extends Base {
         }
     }
 
+    /**
+     * 去除背景/底色
+     */
+    async removeBgAction() {
+        try {
+            const file = this.file("image");
+            const data = await sharp(file.path).ensureAlpha().flatten({background: {r: 0,
+                b: 0,
+                g: 0,
+                    alpha: 1}}).png().toBuffer();
+            const res = await replaceColor(file.path);
+            this.ctx.type = 'image/png';
+            this.ctx.body = res;
+
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
 }
 
+function replaceColor($path: string) {
+    // tslint:disable-next-line:no-shadowed-variable
+    const replaceColor = require('replace-color');
+    return new Promise(async (res, rej) => {
+        replaceColor({
+            image: $path,
+            colors: {
+                type: 'hex',
+                targetColor: '#FFFFFF',
+                replaceColor: '#00FFFFFF'
+            },
+            deltaE: 10
+        }).then(async (jimpObject: any) => {
+                const data =  await jimpObject.getBufferAsync('image/png');
+                res(data);
+            })
+            .catch((err: any) => {
+                console.log(err);
+            });
+    });
+}
 function getIndex(arr: any, num: number) {
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] > num) {

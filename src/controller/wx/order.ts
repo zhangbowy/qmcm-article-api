@@ -778,6 +778,22 @@ export default class extends Base {
                                     express_amount.push(0);
                                 }
                                 const sku_name = "";
+                                let item_price_template;
+                                let is_price_template = 0;
+                                let final_price = item.current_price;
+                                try {
+                                    item_price_template  =  JSON.parse(item.item_price_template);
+                                    if (Array.isArray(item_price_template) && item_price_template.length > 0) {
+                                        final_price = await this.getTemplatePrice(item_price_template, cart_v.buy_num);
+                                        if (!final_price) {
+                                            final_price = item.current_price;
+                                        } else {
+                                            is_price_template = 1;
+                                        }
+                                    }
+                                } catch (e) {
+                                    // item_price_template  =  JSON.parse(item.item_price_template);
+                                }
 
                                 /**
                                  * order_type为1 默认普通商品 的商品数据 baseData 只要里面的商品都会有的
@@ -790,9 +806,13 @@ export default class extends Base {
                                     sku_name,
                                     sku_id: cart_v.sku_id || 0,
                                     buy_num: cart_v.buy_num,
+                                    is_price_template,
+                                    final_price,
+                                    _final_price: '最终单价!',
                                     current_price: item.current_price,
                                     category_id: item.category_id,
                                     custom_category_id: item.custom_category_id,
+                                    item_price_template: item.item_price_template,
                                     order_type: 1,
                                     _order_type: '普通订单'
                                 };
@@ -801,6 +821,7 @@ export default class extends Base {
                                  * 单个商品总金额 商品价格 花样价格
                                  */
                                 item_info.item_total_price = 0;
+                                item_info.final_item_total_price = 0;
 
                                 /**
                                  * order_type为 2 一般定制 在普通商品基础上增加的数据
@@ -837,6 +858,7 @@ export default class extends Base {
                                             item_info.design_txt_file_path = design.txt_file_path;
                                             pay_amount += design_price;
                                             item_info.item_total_price += design_price;
+                                            item_info.final_item_total_price += design_price;
                                         }
 
                                         item_info.custom_template_id = cart_v.design_info.custom_template_id;
@@ -859,7 +881,7 @@ export default class extends Base {
 
                                         if (item_info.is_choose_design != 1) {
 
-                                            if (item_info.custom_template_id == 2 || 3) {
+                                            if (item_info.custom_template_id == 2 || item_info.custom_template_id == 3) {
                                                 const custom_image_base64 = cart_v.design_info.custom_image.split(',')[1];
 
                                                 if (item_info.custom_template_id != 1) {
@@ -872,6 +894,7 @@ export default class extends Base {
                                                 item_info.emb_template_price = price;
                                                 pay_amount += price;
                                                 item_info.item_total_price += price;
+                                                item_info.final_item_total_price += price;
                                                 const oss = await think.service('oss');
                                                 const fileName = think.uuid('v4');
                                                 const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
@@ -887,6 +910,8 @@ export default class extends Base {
                                                 item_info.design_area_sqr = sqr;
                                                 item_info.emb_template_price = price;
                                                 pay_amount += price;
+                                                item_info.item_total_price += price;
+                                                item_info.final_item_total_price += price;
                                             }
                                             // item_info.custom_image = cart_v.design_info.custom_image;
                                         } else {
@@ -898,7 +923,6 @@ export default class extends Base {
                                             }
                                             item_info.custom_image = cart_v.design_info.custom_image;
                                         }
-
                                         if ($from) {
                                             const design_area_image_buffer = await this.getBuffer(this, cart_v.design_info.design_area_image, true);
                                             const preview_image_buffer = await this.getBuffer(this,  cart_v.design_info.preview_image, true);
@@ -925,7 +949,6 @@ export default class extends Base {
                                         item_info.order_type = 2;
                                         item_info.image = item_info.preview_image;
                                         item_info._order_type = getOrderType(item_info.order_type);
-
                                     } else {
                                         return  'design_info of empty';
                                     }
@@ -963,7 +986,8 @@ export default class extends Base {
                                         item_info.special_custom_price = price;
                                         pay_amount += price;
                                         item_info.item_total_price += price;
-                                        item_info.special_base_price = price + item.current_price * cart_v.buy_num;
+                                        item_info.final_item_total_price += price;
+                                        item_info.special_base_price = price + item_info.final_price * cart_v.buy_num;
                                         const oss = await think.service('oss');
                                         const fileName = think.uuid('v4');
                                         const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
@@ -999,6 +1023,7 @@ export default class extends Base {
                                     item_info.design_area_sqr = sqr;
                                     item_info.emb_template_price = price;
                                     item_info.item_total_price += price;
+                                    item_info.final_item_total_price += price;
                                     item_info.order_type = 4;
                                     item_info._order_type = getOrderType(item_info.order_type);
 
@@ -1048,7 +1073,8 @@ export default class extends Base {
 
                                 } else {
                                      item_info.item_total_price += item.current_price * cart_v.buy_num;
-                                     pay_amount += item.current_price * cart_v.buy_num;
+                                     item_info.final_item_total_price += item_info.final_price * cart_v.buy_num;
+                                     pay_amount += item_info.final_price * cart_v.buy_num;
                                  }
 
                                 item_list.push(item_info);
@@ -1137,6 +1163,23 @@ export default class extends Base {
                                                 sku_name += `${skus_v.k}:${skus_v.v}; `;
                                             }
                                         }
+                                        let item_price_template;
+                                        let is_price_template = 0;
+                                        let final_price = sku_v.current_price;
+                                        try {
+                                            item_price_template  =  JSON.parse(item.item_price_template);
+                                            if (Array.isArray(item_price_template) && item_price_template.length > 0) {
+                                                is_price_template = 1;
+                                                final_price = await this.getTemplatePrice(item_price_template, cart_v.buy_num);
+                                                if (!final_price) {
+                                                    final_price = sku_v.current_price;
+                                                } else {
+                                                    is_price_template  = 1;
+                                                }
+                                            }
+                                        } catch (e) {
+                                            // item_price_template  =  JSON.parse(item.item_price_template);
+                                        }
                                         const item_info: any = {
                                             item_id: item.id,
                                             name: item.name,
@@ -1146,8 +1189,12 @@ export default class extends Base {
                                             sku_id: cart_v.sku_id,
                                             buy_num: cart_v.buy_num,
                                             current_price: sku_v.current_price,
+                                            is_price_template,
+                                            final_price,
+                                            _final_price: '最终单价!',
                                             category_id: item.category_id,
                                             custom_category_id: item.custom_category_id,
+                                            item_price_template: item.item_price_template,
                                             order_type: 1,
                                             _order_type: '普通订单'
                                         };
@@ -1156,6 +1203,7 @@ export default class extends Base {
                                          * 单个商品总金额 商品价格 花样价格
                                          */
                                         item_info.item_total_price = 0;
+                                        item_info.final_item_total_price = 0;
 
                                         /**
                                          * order_type为 2 一般定制 在普通商品基础上增加的数据
@@ -1199,6 +1247,7 @@ export default class extends Base {
                                                         item_info.design_txt_file_path = design.txt_file_path;
                                                         pay_amount += design_price;
                                                         item_info.item_total_price += design_price;
+                                                        item_info.final_item_total_price += design_price;
                                                     }
 
                                                     item_info.custom_template_id = cart_v.design_info.custom_template_id;
@@ -1227,17 +1276,18 @@ export default class extends Base {
                                                             const meta  = await sharp(Buffer.from(custom_image_base64, 'base64')).metadata();
                                                             item_info.design_width = meta.width / meta.height *  Number(item_info.design_height);
                                                             // }
-                                                            let sqr: number
+                                                            let sqr: number;
                                                             if (item_info.custom_template_id == 2) {
-                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height)
+                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height);
                                                             } else {
-                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +   Number(item_info.design_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) *  Number(item_info.design_width)
+                                                                sqr  = Number(item_info.design_width) *  Number(item_info.design_height) +   Number(item_info.design_width) * Number(item_info.top_font_height)  +   Number(item_info.bottom_font_height) *  Number(item_info.design_width);
                                                             }
                                                             const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                                             item_info.design_area_sqr = sqr;
                                                             item_info.emb_template_price = price;
                                                             pay_amount += price;
                                                             item_info.item_total_price += price;
+                                                            item_info.final_item_total_price += price;
                                                             const oss = await think.service('oss');
                                                             const fileName = think.uuid('v4');
                                                             const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
@@ -1259,7 +1309,7 @@ export default class extends Base {
                                                         if (item_info.custom_template_id == 2) {
                                                             if (logistics_type == 2) {
                                                                 _logistics_type  = '门店自提';
-                                                                item_info._logistics_type = '门店自提';
+                                                                item_info._logistics_type = '门店自提'
                                                             }
                                                         }
                                                         item_info.custom_image = cart_v.design_info.custom_image;
@@ -1331,7 +1381,8 @@ export default class extends Base {
                                                 item_info.special_custom_price = price;
                                                 pay_amount += price;
                                                 item_info.item_total_price += price;
-                                                item_info.special_base_price = price + sku_v.current_price * cart_v.buy_num;
+                                                item_info.final_item_total_price += price;
+                                                item_info.special_base_price = price + item_info.final_price * cart_v.buy_num;
                                                 const oss = await think.service('oss');
                                                 const fileName = think.uuid('v4');
                                                 const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
@@ -1365,6 +1416,7 @@ export default class extends Base {
                                             const price = await this.getEmbPrice(sqr, item_info.custom_template_id);
                                             pay_amount += price;
                                             item_info.item_total_price += price;
+                                            item_info.final_item_total_price += price;
                                             item_info.design_area_sqr = sqr;
                                             item_info.emb_template_price = price;
                                             item_info.order_type = 4;
@@ -1422,8 +1474,9 @@ export default class extends Base {
                                             item_info.is_only_design = 1;
                                             pay_amount += 0;
                                         } else {
-                                            item_info.item_total_price += item.current_price * cart_v.buy_num;
-                                            pay_amount += item.current_price * cart_v.buy_num;
+                                            item_info.item_total_price += sku_v.current_price * cart_v.buy_num;
+                                            item_info.final_item_total_price += item_info.final_price * cart_v.buy_num;
+                                            pay_amount += item_info.final_price * cart_v.buy_num;
                                         }
                                         item_list.push(item_info);
                                     }
@@ -1797,6 +1850,7 @@ export default class extends Base {
                 const r_sign: string = arr_rec[3];
 
                 const mechineId = arr_rec[1] || 1;
+
                 const [sid, skey, mid] = ['own_one', 'nh7k9&u', mechineId];
                 const data: string = sid + skey + r_tsp + mid;
                 const sign: string = crypto.createHash('md5').update(data).digest("hex");
@@ -1906,16 +1960,49 @@ export default class extends Base {
         }
     }
 
+    async getTemplatePrice($pirceList: any, $buy_num: any) {
+        const priceObj = {};
+        for (const v of $pirceList) {
+            if (!priceObj[v.number]) {
+                priceObj[v.number] = v.price;
+            } else {
+                if (priceObj[v.number] < v.price) {
+                    priceObj[v.number] = v.price;
+                }
+            }
+        }
+        const areaList = Object.keys(priceObj);
+        // @ts-ignore
+        // tslint:disable-next-line:only-arrow-functions
+        areaList.sort(function(a: number, b: number) {
+            return a - b;
+        });
+        if (areaList[0] > $buy_num) {
+            return 0;
+        }
+        console.log(areaList);
+        const index: any = getIndex(areaList, $buy_num, true);
+        const  price = priceObj[areaList[index]] || 0;
+        return  Number(price);
+    }
+
 }
 
-function getIndex(arr: any, num: number) {
+function getIndex(arr: any, num: number, $is_item?: boolean) {
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] >= num) {
             if (i == 0) {
                 return i;
             }
-            // return i - 1;
-            return i ;
+            if ($is_item) {
+                if (arr[i] == num) {
+                    return i;
+                } else {
+                    return i - 1;
+                }
+            } else {
+                return i ;
+            }
         }
     }
     // if (num < arr[0]) {

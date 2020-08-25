@@ -67,6 +67,7 @@ export default class extends Base {
             const custom_category_id = this.post('custom_category_id');
             const express_type = this.post('express_type');
             const is_presell = this.post('is_presell');
+            const item_price_template = this.post('item_price_template');
             /**
              * 查询商品分类是否存在
              */
@@ -127,7 +128,8 @@ export default class extends Base {
                 express_template_id,
                 is_custom,
                 express_type,
-                is_presell
+                is_presell,
+                item_price_template
             };
             if (is_custom) {
                 const custom = await this.model('custom_category').where({custom_category_id: custom_category_id}).find();
@@ -150,6 +152,7 @@ export default class extends Base {
     /**
      * 商品详情
      * @params { id } 商品id
+     * @return {object} 商品详情
      */
     async goodsDetailAction() {
         try {
@@ -211,6 +214,7 @@ export default class extends Base {
             const custom_category_id = this.post('custom_category_id');
             const express_type = this.post('express_type');
             const is_presell = this.post('is_presell');
+            const item_price_template = this.post('item_price_template');
             /**
              * 查询商品分类是否存在
              */
@@ -261,7 +265,8 @@ export default class extends Base {
                 express_template_id,
                 is_custom,
                 express_type,
-                is_presell
+                is_presell,
+                item_price_template
             };
             if (is_custom) {
                 const custom = await this.model('custom_category').where({custom_category_id}).find();
@@ -323,6 +328,8 @@ export default class extends Base {
 
     /**
      * 商品分类列表
+     * @param {currentPage} 页码
+     * @param {pageSize} 每页数量
      */
     async getCategoryAction() {
         try {
@@ -374,7 +381,6 @@ export default class extends Base {
                 if (level >= 3) {
                     return this.fail(-1, '商品分类最多三级!');
                 }
-
             }
             const res: any = await this.model('item_category').add(params);
             if (res) {
@@ -447,7 +453,7 @@ export default class extends Base {
             // @ts-ignore
             const shop_id = this.ctx.state.admin_info.shop_id;
             const id: number = Number(this.post('id'));
-            const category = await this.model('item_category').where({id}).find();
+            const category = await this.model('item_category').where({shop_id, id}).find();
             if (think.isEmpty(category)) {
                 return this.fail(-1, '分类不存在');
             }

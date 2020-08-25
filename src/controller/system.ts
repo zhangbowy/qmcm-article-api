@@ -558,7 +558,6 @@ export default class extends Base {
             const design_bg = this.post('design_bg');
             const design_bg_width = this.post('design_bg_width');
             const design_bg_height = this.post('design_bg_height');
-
             const params = {
                 custom_category_name,
                 design_width,
@@ -954,6 +953,158 @@ export default class extends Base {
         try {
            const res = await this.model('authority_category').select();
            return this.success(res, '权限列表');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 商品价格模板
+     */
+    async itemPriceTempAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const page: number = this.get('currentPage') || 1;
+            const limit: number = this.get('pageSize') || 10;
+            const res = await this.model('item_price_template').where({shop_id}).page(page, limit).countSelect();
+            return this.success(res, '商品价格模板');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 添加价格模板
+     */
+    async addItemPriceTempAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const item_price_template_name: number = this.post('item_price_template_name')
+            const res = await this.model('item_price_template').add({
+                item_price_template_name,
+                shop_id
+            });
+            // @ts-ignore
+            return this.success(res, '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 编辑价格模板
+     */
+    async editItemPriceTempAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const item_price_template_id: number = this.post('item_price_template_id');
+            const item_price_template_name: number = this.post('item_price_template_name');
+            const res: any = await this.model('item_price_template').where({shop_id, item_price_template_id}).update({
+                item_price_template_name
+            });
+            if (!res) {
+                return this.fail(-1, '该模板不存在')
+            }
+            // @ts-ignore
+            return this.success(res, '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 删除价格模板
+     */
+    async delItemPriceTempAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const item_price_template_id: number = this.post('item_price_template_id');
+            const res: any = await this.model('item_price_template').where({shop_id, item_price_template_id}).delete();
+            if (!res) {
+                return this.fail(-1, '该模板不存在!');
+            }
+            // @ts-ignore
+            return this.success(res, '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 添加商品价格
+     * @param {price} 价格
+     * @param {item_number} 购买数量
+     */
+    async addItemPriceAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const price: number = this.post('price');
+            const item_price_template_id: number = this.post('item_price_template_id');
+            const item_number: number = this.post('item_number');
+            const template = await this.model('item_price_template').where({item_price_template_id}).find();
+            if (think.isEmpty(template)) {
+                return this.fail(-1, '该模板不存在');
+            }
+            const item_price = await this.model('item_price').where({item_price_template_id, shop_id, item_number}).find();
+            if (!think.isEmpty(item_price)) {
+                return this.fail(-1, '该购买数量的价格已存在');
+            }
+            const res: any = await this.model('item_price').add({
+                price,
+                item_number,
+                shop_id,
+                item_price_template_id
+            });
+            return this.success(res, '添加成功');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 编辑商品价格
+     * @param {item_price_id} 商品价格id
+     * @param {price} 价格
+     * @param {item_number} 购买数量
+     */
+    async editItemPriceAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const item_price_id: number = this.post('item_price_id');
+            const price: number = this.post('price');
+            const item_number: number = this.post('item_number');
+            const item_price_template_id: number = this.post('item_price_template_id');
+            const item_price = await this.model('item_price').where({item_price_id:['NOTIN', item_price_id ],  shop_id, item_number}).find();
+            if (!think.isEmpty(item_price)) {
+                return this.fail(-1, '该购买数量的价格已存在');
+            }
+            const res: any = await this.model('item_price').where({item_price_template_id, shop_id, item_price_id}).update({
+                price,
+                item_number
+            });
+            if (!res) {
+                return this.fail(-1, '该价格不存在');
+            }
+            return this.success([], '操作成功!');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
+
+    /**
+     * 删除商品价格
+     * @param {item_price_id} 商品价格id
+     */
+    async delItemPriceAction(): Promise<void> {
+        try {
+            const shop_id: number = this.ctx.state.admin_info.shop_id;
+            const item_price_id: number = this.post('item_price_id');
+            const item_price_template_id: number = this.post('item_price_template_id');
+            const res: any = await this.model('item_price').where({item_price_template_id, shop_id, item_price_id}).delete();
+            if (!res) {
+                return this.fail(-1, '该价格不存在');
+            }
+            return this.success([], '操作成功!');
         } catch (e) {
             this.dealErr(e);
         }

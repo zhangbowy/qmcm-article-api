@@ -838,4 +838,18 @@ export default class extends Base {
         this.ctx.body = res.body;
     }
 
+    /**
+     * 测试接口
+     */
+    async testAction() {
+        try {
+            // const xmlData = await fs.readFileSync('1.xml');
+            const xmlData = await fs.readFileSync('Design8 Print.xml');
+            const xmlStr = xmlData.toString();
+            const res: any = await this.parseXML(xmlStr);
+            return this.success(res.Worksheet.Table.Row.slice(2, 60));
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
 }
