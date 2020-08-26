@@ -107,7 +107,6 @@ export default class extends Base {
           }
           console.log(mechineId, 'machineId');
           const zip = new AdmZip();
-          const zip_buffer = zip.toBuffer();
           for (const orderInfo of orderList) {
             const order_id = orderInfo.id;
             const order_item = await this.model('order_item').where({ order_id }).find();
@@ -131,6 +130,7 @@ export default class extends Base {
             console.log(txt_data, 'txt_data');
             zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
           }
+          const zip_buffer = zip.toBuffer();
           // const content_length = res.headers._headers['content-length'][0];
           this.ctx.set({
             // 'Content-Length': res.headers._headers['content-length'][0],
