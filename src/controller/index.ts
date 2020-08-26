@@ -133,7 +133,7 @@ export default class extends Base {
           const zip_buffer = zip.toBuffer();
           // const content_length = res.headers._headers['content-length'][0];
           this.ctx.set({
-            // 'Content-Length': res.headers._headers['content-length'][0],
+            'Content-Length': zip_buffer.length,
             'Content-Type': 'multipart/form-data',
             "Content-Disposition": "attachment; filename=" + `${think.datetime(new Date().getTime())}.zip`,
           });
