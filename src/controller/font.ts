@@ -19,7 +19,8 @@ export default class extends Base {
             if (font_type) {
                 where.font_type = font_type;
             }
-            const res = await this.model('fonts').where(where).page(page, limit).select();
+            // const res = await this.model('fonts').where(where).page(page, limit).select();
+            const res = await this.model('fonts').where(where).select();
             for (const item of res) {
                 item.font_content = JSON.parse(item.font_content);
             }

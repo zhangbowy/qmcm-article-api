@@ -66,6 +66,7 @@ export default class extends Base {
       */
     async getFontAction() {
         try {
+            const font_type = this.get('font_type');
             const font_id = this.get('font_id');
             const color = this.get('color') || '#4bff00';
             const colors = Color(color);

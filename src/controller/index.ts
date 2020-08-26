@@ -141,7 +141,7 @@ export default class extends Base {
           });
           console.log('SET_HEADER');
           const PassThrough = require('stream').PassThrough;
-          await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).update({status: 2, _status: "下发完成, 等待发货中"});
+          // await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).update({status: 2, _status: "下发完成, 等待发货中"});
           console.log('updat_order');
           this.ctx.body = zip_buffer;
           // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
