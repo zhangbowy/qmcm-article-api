@@ -137,7 +137,7 @@ export default class extends Base {
             'Content-Length': zip_buffer.length,
             'Content-Type': 'multipart/form-data',
             // "Content-Disposition": "attachment; filename=" + `下发${orderList.length}个订单于${think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss')}.zip`,
-            "Content-Disposition": "attachment; filename=" + `${orderList.length}个订单.zip`
+            "Content-Disposition": "attachment; filename=" + `${orderList.length}-orders.zip`
           });
           console.log('SET_HEADER');
           const PassThrough = require('stream').PassThrough;
