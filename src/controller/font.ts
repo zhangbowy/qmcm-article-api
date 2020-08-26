@@ -22,7 +22,12 @@ export default class extends Base {
             // const res = await this.model('fonts').where(where).page(page, limit).select();
             const res = await this.model('fonts').where(where).select();
             for (const item of res) {
-                item.font_content = JSON.parse(item.font_content);
+                try {
+                    item.font_content = JSON.parse(item.font_content);
+
+                } catch (e) {
+                    item.font_content = [];
+                }
             }
             return this.success(res, "字体列表!");
         } catch (e) {
@@ -73,14 +78,14 @@ export default class extends Base {
                     return this.fail(-1, '导入文件格式必须为zip');
                 }
             } else if (font_type == 2) {
-                const ttfFile = this.file('ttf');
+                const ttfFile = this.file('font');
                 if (!ttfFile || !ttfFile.type) {
                     return this.fail(-1, 'ttf不能为空');
                 }
                 const fileName = think.uuid('v4');
                 const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
-                const extname = path.extname(this.file('ttf').path);
-                if (extname != "ttf" && extname != "TTF") {
+                const extname = path.extname(this.file('font').path);
+                if (extname != ".ttf" && extname != ".TTF") {
                     return this.fail(-1, '必须是TTF文件');
                 }
                 const filePath = `/font/chinese/${day}/${fileName}${extname}`;
