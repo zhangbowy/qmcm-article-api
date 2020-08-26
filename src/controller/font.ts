@@ -7,10 +7,19 @@ export default class extends Base {
     /**
      * 上传oss
      * 字体列表
+     * @param {font_type} 字体类型 1、英文 2、中文
+     * @return font_List
      */
     async fontListAction() {
         try {
-            const res = await this.model('fonts').select();
+            const page: number = this.post('currentPage') || 1;
+            const limit: number = this.post('pageSize') || 10;
+            const font_type = this.post('font_type') || 0;
+            const where: any = {};
+            if (font_type) {
+                where.font_type = font_type;
+            }
+            const res = await this.model('fonts').where(where).page(page, limit).select();
             for (const item of res) {
                 item.font_content = JSON.parse(item.font_content);
             }
@@ -33,11 +42,10 @@ export default class extends Base {
             const max_height = this.post('max_height');
             const preview_image = this.post('preview_image');
             const font_type = this.post('font_type');
-
-            if (!file || !file.type) {
-                return this.fail(-1, '导入文件不能为空', []);
-            }
             if (font_type == 1) {
+                if (!file || !file.type) {
+                    return this.fail(-1, '导入文件不能为空', []);
+                }
                 const filepath = path.join(think.ROOT_PATH, 'www/static/demo');
                 if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
                     const res1: any = await exportFile(file.path);
@@ -63,10 +71,37 @@ export default class extends Base {
                 } else {
                     return this.fail(-1, '导入文件格式必须为zip');
                 }
+            } else if (font_type == 2) {
+                const ttfFile = this.file('ttf');
+                if (!ttfFile || !ttfFile.type) {
+                    return this.fail(-1, 'ttf不能为空');
+                }
+                const fileName = think.uuid('v4');
+                const day = think.datetime(new Date().getTime(), 'YYYY-MM-DD');
+                const extname = path.extname(this.file('ttf').path);
+                if (extname != "ttf" && extname != "TTF") {
+                    return this.fail(-1, '必须是TTF文件');
+                }
+                const filePath = `/font/chinese/${day}/${fileName}${extname}`;
+                /**
+                 * 上传到腾讯OSS
+                 */
+                const oss = think.service('oss');
+                const res: any = await oss.upload(ttfFile.path, filePath);
+                const ttf = 'http://' + res.Location;
+                const params = {
+                    font_name,
+                    max_height,
+                    min_height,
+                    preview_image,
+                    ttf,
+                    font_type: 2
+                };
+                const data = await this.model('fonts').add(params);
+                return this.success([], "导入中文字体成功!");
             } else {
-
+                return this.fail(-1, '不存在的font_type');
             }
-
         } catch ($err) {
             this.dealErr($err);
         }

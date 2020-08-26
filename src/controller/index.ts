@@ -131,15 +131,18 @@ export default class extends Base {
             zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
           }
           const zip_buffer = await zip.toBuffer();
+          console.log('zip_buffer');
           // const content_length = res.headers._headers['content-length'][0];
           this.ctx.set({
             'Content-Length': zip_buffer.length,
             'Content-Type': 'multipart/form-data',
             // "Content-Disposition": "attachment; filename=" + `下发${orderList.length}个订单于${think.datetime(new Date().getTime(), 'YYYY-MM-DD-HH:mm:ss')}.zip`,
-            "Content-Disposition": "attachment; filename=" + `${orderList.length}个订单.zip`,
+            "Content-Disposition": "attachment; filename=" + `${orderList.length}个订单.zip`
           });
+          console.log('SET_HEADER');
           const PassThrough = require('stream').PassThrough;
           await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).update({status: 2, _status: "下发完成, 等待发货中"});
+          console.log('updat_order');
           this.ctx.body = zip_buffer;
           // this.ctx.body = res.body.on('error',  this.ctx.onerror).pipe(PassThrough());
         } else {
@@ -149,6 +152,7 @@ export default class extends Base {
         return this.fail(-1, '无效请求!');
       }
     } catch (e) {
+      console.log(e, 'error');
       this.dealErr(e);
     }
   }

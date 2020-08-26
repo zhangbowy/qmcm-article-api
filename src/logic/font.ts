@@ -66,6 +66,10 @@ export default class extends base {
                 required: true,
                 method: 'post'
             },
+            font_type: {
+                required: true,
+                method: 'post'
+            },
         };
         const preview_image: number = this.post('preview_image');
         const msgs: object = {
