@@ -32,35 +32,41 @@ export default class extends Base {
             const min_height = this.post('min_height');
             const max_height = this.post('max_height');
             const preview_image = this.post('preview_image');
+            const font_type = this.post('font_type');
 
             if (!file || !file.type) {
                 return this.fail(-1, '导入文件不能为空', []);
             }
-            const filepath = path.join(think.ROOT_PATH, 'www/static/demo');
-            if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
-                const res1: any = await exportFile(file.path);
-                if (typeof res1 == 'string') {
+            if (font_type == 1) {
+                const filepath = path.join(think.ROOT_PATH, 'www/static/demo');
+                if (file && (file.type === 'application/zip' || file.type === 'application/x-zip-compressed')) {
+                    const res1: any = await exportFile(file.path);
+                    if (typeof res1 == 'string') {
+                        this.deleteFolder(filepath);
+                        return this.fail(-1, res1);
+                    }
+                    const oss = await think.service('oss');
+                    /**
+                     * 上传到腾讯OSS
+                     */
+                    const res: any = await oss.uploadFiles(res1.fileList);
+                    const params = {
+                        font_name,
+                        max_height,
+                        min_height,
+                        preview_image,
+                        font_content: JSON.stringify(res1.fileObj)
+                    };
+                    const data = await this.model('fonts').add(params);
                     this.deleteFolder(filepath);
-                    return this.fail(-1, res1);
+                    return this.success([], "导入成功!");
+                } else {
+                    return this.fail(-1, '导入文件格式必须为zip');
                 }
-                const oss = await think.service('oss');
-                /**
-                 * 上传到腾讯OSS
-                 */
-                const res: any = await oss.uploadFiles(res1.fileList);
-                const params = {
-                    font_name,
-                    max_height,
-                    min_height,
-                    preview_image,
-                    font_content: JSON.stringify(res1.fileObj)
-                };
-                const data = await this.model('fonts').add(params);
-                this.deleteFolder(filepath);
-                return this.success([], "导入成功!");
             } else {
-                return this.fail(-1, '导入文件格式必须为zip');
+
             }
+
         } catch ($err) {
             this.dealErr($err);
         }
