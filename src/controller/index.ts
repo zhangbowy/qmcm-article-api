@@ -130,7 +130,7 @@ export default class extends Base {
             console.log(txt_data, 'txt_data');
             zip.addFile(`${orderInfo.id}.TXT`, Buffer.alloc(txt_data.length, txt_data), "TXT");
           }
-          const zip_buffer = zip.toBuffer();
+          const zip_buffer = await zip.toBuffer();
           // const content_length = res.headers._headers['content-length'][0];
           this.ctx.set({
             'Content-Length': zip_buffer.length,
