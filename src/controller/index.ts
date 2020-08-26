@@ -95,12 +95,14 @@ export default class extends Base {
         const data: string = sid + skey + r_tsp + mid;
         const sign: string = crypto.createHash('md5').update(data).digest("hex");
         console.log('sign:', sign);
+        console.log('mechineId:', mechineId);
         const uid = this.post("id") || "uid";
         if (r_sign == sign) {
           // const machine_code = this.post('machine_code');
           // const orderInfo = await this.model('order').where({order_no: 20200617100743490543558}).find();
           const orderList = await this.model('order').where({logistics_type: 1, status: 11, machine_code: mechineId}).select();
           if (think.isEmpty(orderList)) {
+            console.log('没找到')
             return this.fail(-1, '暂无数据!');
           }
           console.log(mechineId, 'machineId');

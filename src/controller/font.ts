@@ -219,7 +219,7 @@ function exportFile($file: any, $filePath?: any) {
             for (const item of obj) {
               if (!files.includes(item)) {
                   // str+=item+','
-                  resolve(`文件${item}不存在!`);
+                  // resolve(`文件${item}不存在!`);
               } else {
                   let k;
                   if (item.indexOf('-') > -1) {
