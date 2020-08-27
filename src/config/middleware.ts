@@ -51,7 +51,7 @@ export = [
     options: {
       uploadDir: path.join(think.RUNTIME_PATH, '_tmp'),
       keepExtensions: true,
-      limit: '20mb',
+      limit: '100mb',
     }
   },
   {
