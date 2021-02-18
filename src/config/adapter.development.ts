@@ -18,8 +18,8 @@ exports.model = {
         database: 'qm_micro_admin', // 数据库名
         prefix: '', // 表前缀
         encoding: 'utf8',
-        // host: '129.211.65.201',//host
-        host: '49.234.117.97', // host
+        host: '127.0.0.1',//host
+        // host: '49.234.117.97', // host
         port: 3306, // 端口
         // user: 'yuncixiu',//用户名
         user: 'root', // 用户名
