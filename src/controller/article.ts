@@ -39,7 +39,7 @@ export default class extends Base {
     /**
      * 添加文章
      */
-    addArticleAction() {
+    async addArticleAction() {
         try {
             const title = this.post('title');
             const content = this.post('content');
