@@ -33,17 +33,17 @@ exports.model = {
     }
 };
 
-exports.cache = {
-    type: 'redis',
-    common: {
-        timeout: 24 * 3600 * 1000 // millisecond
-    },
-    redis: {
-        handle: redisCache,
-        // host: '127.0.0.1',
-        host: '192.168.31.3',
-        port: '6379',
-        password: '',
-        log_connect: true
-    }
-};
+// exports.cache = {
+//     type: 'redis',
+//     common: {
+//         timeout: 24 * 3600 * 1000 // millisecond
+//     },
+//     redis: {
+//         handle: redisCache,
+//         // host: '127.0.0.1',
+//         host: '192.168.31.3',
+//         port: '6379',
+//         password: '',
+//         log_connect: true
+//     }
+// };
