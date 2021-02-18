@@ -1,4 +1,4 @@
-// import {think} from 'thinkjs';
+import {think} from 'thinkjs';
 const rp = require('request-promise')
 const fs = require("fs");
 export default class extends think.Controller {
