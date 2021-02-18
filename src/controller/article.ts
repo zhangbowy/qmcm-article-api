@@ -1,6 +1,6 @@
 import Base from './base';
 import {ancestorWhere} from "tslint";
-// import {think} from "thinkjs";
+import {think} from "thinkjs";
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
