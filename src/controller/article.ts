@@ -24,18 +24,53 @@ export default class extends Base {
     }
 
     /**
+     * 文章列表接口
+     */
+    async articleListAction() {
+        // @ts-ignore
+        const page: number = this.get('currentPage') || 1;
+        const limit: number = this.get('pageSize') || 10;
+        // const status: number = Number(this.get('status') || -1);
+        // const title: string = this.get('title') || '';
+        const res = await think.model('article').page(page, limit).countSelect();
+        this.success(res,'文章列表');
+    }
+
+    /**
      * 添加文章
      */
     addArticleAction() {
         try {
             const title = this.post('title');
-            const title = this.post('title');
-            const title = this.post('title');
-            const title = this.post('title');
-            const title = this.post('title');
-            const title = this.post('title');
+            const content = this.post('content');
+            const cover_image = this.post('cover_image');
+            const author = this.post('author');
+            const category_id = this.post('category_id');
+            const seo_title = this.post('seo_title');
+            const seo_desc = this.post('seo_desc');
+            const seo_keywords = this.post('seo_keywords');
+            const summary = content.substr(1, 100);  // 摘要
+            const project_id = 1;  // 摘要
+            const article_no = think.datetime(new Date().getTime(), 'YYMMDDHHMMSS') +  Math.round(Math.random() * 10);
+            const result = think.model('article').add({
+                title,
+                content,
+                cover_image,
+                author,
+                category_id,
+                seo_title,
+                seo_desc,
+                seo_keywords,
+                summary,
+                project_id,
+                article_no,
+            });
+            if (!result) {
+                this.fail(-1, '添加失败');
+            }
+            this.success([], '操作成功');
         } catch ($err) {
-
+            this.dealErr($err);
         }
     }
 
