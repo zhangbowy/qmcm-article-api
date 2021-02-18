@@ -15,16 +15,16 @@ exports.model = {
     mysql: {
         handle: mysql,
         // database: 'yuncixiu', //数据库名
-        database: 'yuncixiu_v3', // 数据库名
+        database: 'qm_micro_admin', // 数据库名
         prefix: '', // 表前缀
         encoding: 'utf8',
         // host: '129.211.65.201',//host
-        host: '192.168.31.4', // host
+        host: '49.234.117.97', // host
         port: 3306, // 端口
         // user: 'yuncixiu',//用户名
-        user: 'cx03', // 用户名
+        user: 'root', // 用户名
         // password: 'PCSXsX2HCJnfCYEb',//密码
-        password: 'yuncixiu03', // 密码
+        password: 'xmt@qm1688', // 密码
         dateStrings: true,
         // acquireWaitTimeout: 3000,
         debounce: false,
