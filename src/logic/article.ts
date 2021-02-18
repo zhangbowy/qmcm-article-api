@@ -5,6 +5,10 @@ export default class extends base {
     fontListAction() {
 
     }
+
+    articleListAction() {
+
+    }
     addArticleAction() {
         const rules = {
             title: {
