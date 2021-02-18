@@ -33,7 +33,7 @@ export default class extends Base {
         // const status: number = Number(this.get('status') || -1);
         // const title: string = this.get('title') || '';
         const res = await think.model('article').page(page, limit).countSelect();
-        this.success(res,'文章列表');
+        this.success(res, '文章列表');
     }
 
     /**
