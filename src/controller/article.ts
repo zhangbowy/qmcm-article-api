@@ -41,7 +41,43 @@ export default class extends Base {
             if (status) {
                 where.status = status;
             }
-            const res = await think.model('article').page(page, limit).order('created_at DESC').countSelect();
+
+
+            const res = await think.model('article').where(where).page(page, limit).order('created_at DESC').countSelect();
+
+
+            const statusList = [
+                {
+                    _status: "全部",
+                    status: 0,
+                    count: 0
+                },
+                {
+                    _status: "草稿箱",
+                    status: 1,
+                    count: 0
+                },
+                {
+                    _status: "已发布",
+                    status: 5,
+                    count: 0
+                },
+                {
+                    _status: "废纸篓",
+                    status: 6,
+                    count: 0
+                },
+            ];
+            delete where.status;
+            const counts = await think.model('article').field('status, count(*) as count').where(where).group('status').select();
+            for (const item of statusList) {
+                for (const count_item of counts) {
+                    if (item.status == count_item.status) {
+                        item.count = count_item.count;
+                    }
+                }
+            }
+            res.counts = statusList;
             this.success(res, '文章列表');
         } catch (e) {
             this.dealErr(e);
