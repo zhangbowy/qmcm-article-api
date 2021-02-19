@@ -71,10 +71,10 @@ export default class extends Base {
                 for (const count_item of counts) {
                     if (item.status == count_item.status) {
                         item.count = count_item.count;
+                        statusList[0].count += count_item.count;
                     }
                 }
             }
-            statusList[0].count = res.count;
             res.counts = statusList;
             this.success(res, '文章列表');
         } catch (e) {
@@ -198,7 +198,7 @@ export default class extends Base {
             const result = await think.model('article').where({del: 0, article_id}).update({
                 status
             });
-            if (!think.isEmpty(result)) {
+            if (think.isEmpty(result)) {
                 return this.fail(-1, '操作失败');
             }
             this.success([], '操作成功');
