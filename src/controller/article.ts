@@ -31,9 +31,17 @@ export default class extends Base {
             // @ts-ignore
             const page: number = this.get('currentPage') || 1;
             const limit: number = this.get('pageSize') || 10;
-            // const status: number = Number(this.get('status') || -1);
-            // const title: string = this.get('title') || '';
-            const res = await think.model('article').page(page, limit).countSelect();
+            const status: number = Number(this.get('status') || 0);
+            const title: string = this.get('title') || '';
+            const where: any = {};
+
+            if (!think.isEmpty(title)) {
+                where.title = ['like', `%${title}%`];
+            }
+            if (status) {
+                where.status = status;
+            }
+            const res = await think.model('article').page(page, limit).order('created_at DESC').countSelect();
             this.success(res, '文章列表');
         } catch (e) {
             this.dealErr(e);
@@ -55,7 +63,7 @@ export default class extends Base {
             const seo_keywords = this.post('seo_keywords');
             const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
-            const article_no = think.datetime(new Date().getTime(), 'YYMMDDHHmmss') +  Math.round(Math.random() * 10);
+            const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
 
             const result = think.model('article').add({
@@ -98,7 +106,7 @@ export default class extends Base {
             const seo_keywords = this.post('seo_keywords');
             const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
-            const article_no = think.datetime(new Date().getTime(), 'yyyyMMDDhhmmss') +  Math.round(Math.random() * 10);
+            const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
             const result = think.model('article').where({article_id}).update({
                 title,
