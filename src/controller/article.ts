@@ -51,7 +51,9 @@ export default class extends Base {
             const seo_keywords = this.post('seo_keywords');
             const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
-            const article_no = think.datetime(new Date().getTime(), 'YYMMDDHHMMSS') +  Math.round(Math.random() * 10);
+            const article_no = think.datetime(new Date().getTime(), 'yyMMDDHHMMSS') +  Math.round(Math.random() * 10);
+            const full_path = `https://test.qmycm.com/news/${article_no}.html`;
+
             const result = think.model('article').add({
                 title,
                 content,
@@ -64,6 +66,7 @@ export default class extends Base {
                 summary,
                 project_id,
                 article_no,
+                full_path
             });
             if (!result) {
                 this.fail(-1, '添加失败');
