@@ -32,7 +32,6 @@ export default class extends base {
                 method: 'post'
             },
             category_id: {
-                string: true,
                 required: true,
                 method: 'post'
             }
@@ -46,10 +45,9 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
-    deleteFontAction() {
+    delArticleAction() {
         const rules = {
-            font_id: {
-                string: true,
+            article_id: {
                 required: true,
                 method: 'post'
             },
@@ -63,39 +61,54 @@ export default class extends base {
             return this.fail(-1, msg);
         }
     }
-    editFontAction() {
+    editArticleAction() {
         const rules = {
-            font_id: {
+            article_id: {
+                required: true,
+                method: 'post'
+            },
+            title: {
                 string: true,
                 required: true,
                 method: 'post'
             },
-            font_name: {
+            content: {
                 string: true,
                 required: true,
                 method: 'post'
             },
-            min_height: {
+            cover_image: {
                 string: true,
                 required: true,
                 method: 'post'
             },
-            max_height: {
+            author: {
                 string: true,
                 required: true,
                 method: 'post'
             },
-            preview_image: {
-                string: true,
+            category_id: {
                 required: true,
                 method: 'post'
-            },
-            font_type: {
-                required: true,
-                method: 'post'
-            },
+            }
         };
-        const preview_image: number = this.post('preview_image');
+        const msgs: object = {
+            required: '{name}不能为空'
+        };
+        if (!this.validate(rules, msgs)) { // 校验不通过
+            const keys: string[] = Object.keys(this.validateErrors);
+            const msg: string = this.validateErrors[keys[0]];
+            return this.fail(-1, msg);
+        }
+    }
+
+    getDetailAction() {
+        const rules = {
+            article_id: {
+                required: true,
+                method: 'get'
+            }
+        };
         const msgs: object = {
             required: '{name}不能为空'
         };
