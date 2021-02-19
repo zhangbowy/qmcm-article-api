@@ -144,7 +144,7 @@ export default class extends Base {
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
-            const result = await hink.model('article').where({article_id}).update({
+            const result = await think.model('article').where({article_id}).update({
                 title,
                 content,
                 cover_image,
@@ -230,39 +230,48 @@ export default class extends Base {
      */
     async seoAction() {
         try {
-            // content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
-            // function pushUrl (content) {
-            //     // 需要推送的网站链接
-            //     var path = '/urls?site=www.vuexx.com&token=提交秘钥'
-            //     //对应配置post推送的接口说明
-            //     var options = {
-            //         host: "data.zz.baidu.com",
-            //         path: path,//接口的调用地址
-            //         method: "post",
-            //         "User-Agent": "curl/7.12.1",
-            //         headers: {
-            //             "Content-Type": "text/plain",
-            //             "Content-Length": content.length
-            //         }
-            //     };
-            //     var req = http.request(options, function (res) {
-            //         res.setEncoding("utf8");
-            //         res.on("data", function (data) {
-            //             console.log("data:", data); //返回的数据
-            //         });
-            //         res.on('end', (resp) => {
-            //             console.log('end' ,resp)
-            //         })
-            //         console.log(res.statusCode)
-            //     });
-            //     req.on('error', (e) => {
-            //         console.log(`error: ${e}`);
-            //     });
-            //     req.write(content);
-            //     req.end;
-            // }
+            const res = await pushUrl('http://zb.qinkeji.cn/1.html');
+            this.success(res);
         } catch (e) {
-
+            this.dealErr(e);
         }
     }
+}
+
+//content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
+function pushUrl(content: any) {
+    // 需要推送的网站链接
+    var path = '/urls?site=zb.qinkeji.com&token=22';
+    //对应配置post推送的接口说明
+    // tslint:disable-next-line:prefer-const
+    var options = {
+        host: "data.zz.baidu.com",
+        path: path,//接口的调用地址
+        method: "post",
+        "User-Agent": "curl/7.12.1",
+        headers: {
+            "Content-Type": "text/plain",
+            "Content-Length": content.length
+        }
+    };
+    const http = require('http');
+    return new Promise((res, rej) => {
+        // tslint:disable-next-line:prefer-const
+        var req = http.request(options, function (res) {
+            res.setEncoding("utf8");
+            res.on("data", function (data) {
+                console.log("data:", data); //返回的数据
+            });
+            res.on('end', (resp) => {
+                console.log('end' ,resp)
+                res(resp);
+            })
+            console.log(res.statusCode)
+        });
+        req.on('error', (e) => {
+            console.log(`error: ${e}`);
+        });
+        req.write(content);
+        req.end;
+    })
 }
