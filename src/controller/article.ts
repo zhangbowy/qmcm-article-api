@@ -128,7 +128,7 @@ export default class extends Base {
      * 编辑文章
      * @param {article_id} 文章id
      */
-    editArticleAction() {
+    async editArticleAction() {
         try {
             const article_id = this.post('article_id');
             const title = this.post('title');
@@ -144,7 +144,7 @@ export default class extends Base {
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
-            const result = think.model('article').where({article_id}).update({
+            const result = await hink.model('article').where({article_id}).update({
                 title,
                 content,
                 cover_image,
@@ -171,10 +171,10 @@ export default class extends Base {
      * 获取详情
      * @param {article_id} 文章id
      */
-    getDetailAction() {
+    async getDetailAction() {
         try {
             const article_id = this.get('article');
-            const result = think.model('article').where({article_id}).find();
+            const result = await think.model('article').where({article_id}).find();
             if (think.isEmpty(result)) {
                 return this.fail(-1, '改文章不存在');
             }
@@ -184,6 +184,28 @@ export default class extends Base {
         }
     }
 
+    /**
+     * 发布
+     */
+    async publishAction() {
+        try {
+            const status = this.post('status');
+            const article_id = this.post('article_id');
+            const statusList = [1, 2, 3];
+            if (!statusList.includes(status)) {
+                return this.fail(-1, '状态不存在');
+            }
+            const result = await think.model('article').where({del: 0, article_id}).update({
+                status
+            });
+            if (!think.isEmpty(result)) {
+                return this.fail(-1, '操作失败');
+            }
+            this.success([], '操作成功');
+        } catch (e) {
+            this.dealErr(e);
+        }
+    }
     /**
      * 删除文章
      * @param {article_id} 文章id
@@ -200,6 +222,47 @@ export default class extends Base {
             this.success(result, '操作成功');
         } catch (e) {
             this.dealErr(e);
+        }
+    }
+
+    /**
+     * seo接口
+     */
+    async seoAction() {
+        try {
+            // content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
+            // function pushUrl (content) {
+            //     // 需要推送的网站链接
+            //     var path = '/urls?site=www.vuexx.com&token=提交秘钥'
+            //     //对应配置post推送的接口说明
+            //     var options = {
+            //         host: "data.zz.baidu.com",
+            //         path: path,//接口的调用地址
+            //         method: "post",
+            //         "User-Agent": "curl/7.12.1",
+            //         headers: {
+            //             "Content-Type": "text/plain",
+            //             "Content-Length": content.length
+            //         }
+            //     };
+            //     var req = http.request(options, function (res) {
+            //         res.setEncoding("utf8");
+            //         res.on("data", function (data) {
+            //             console.log("data:", data); //返回的数据
+            //         });
+            //         res.on('end', (resp) => {
+            //             console.log('end' ,resp)
+            //         })
+            //         console.log(res.statusCode)
+            //     });
+            //     req.on('error', (e) => {
+            //         console.log(`error: ${e}`);
+            //     });
+            //     req.write(content);
+            //     req.end;
+            // }
+        } catch (e) {
+
         }
     }
 }

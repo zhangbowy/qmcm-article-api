@@ -6,6 +6,9 @@ const crypto = require('crypto');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
 export default class extends think.Controller {
+    /**
+     * 默认控制器
+     */
     async indexAction() {
         try {
             const article_no = this.get('article_id');
@@ -19,11 +22,13 @@ export default class extends think.Controller {
                  */
                 return  this.display();
             }
-            const result = await think.model('article').where({article_no}).find();
+            /**
+             * 当前文章
+             */
+            const result = await think.model('article').where({del: 0 , status: 2, article_no}).find();
             if (think.isEmpty(result)) {
                 return  this.redirect('/news');
             }
-
             /**
              * 详情
              */
