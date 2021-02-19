@@ -56,12 +56,12 @@ export default class extends Base {
                 },
                 {
                     _status: "已发布",
-                    status: 5,
+                    status: 2,
                     count: 0
                 },
                 {
                     _status: "废纸篓",
-                    status: 6,
+                    status: 3,
                     count: 0
                 },
             ];
