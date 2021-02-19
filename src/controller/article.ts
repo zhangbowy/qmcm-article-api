@@ -255,7 +255,7 @@ function pushUrl(content: any) {
         }
     };
     const http = require('http');
-    return new Promise((res, rej) => {
+    return new Promise((reslove, rej) => {
         // tslint:disable-next-line:prefer-const
         var req = http.request(options, function (res) {
             res.setEncoding("utf8");
@@ -264,7 +264,7 @@ function pushUrl(content: any) {
             });
             res.on('end', (resp) => {
                 console.log('end' ,resp)
-                res(resp);
+                reslove(resp);
             })
             console.log(res.statusCode)
         });
