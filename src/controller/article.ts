@@ -192,7 +192,7 @@ export default class extends Base {
             const status = this.post('status');
             const article_id = this.post('article_id');
             const statusList = [1, 2, 3];
-            if (!statusList.includes(status)) {
+            if (statusList.indexOf(status) == -1) {
                 return this.fail(-1, '状态不存在');
             }
             const result = await think.model('article').where({del: 0, article_id}).update({
@@ -214,7 +214,7 @@ export default class extends Base {
         try {
             const article_id = this.post('article_id');
             const result = await think.model('article').where({article_id}).update({
-                del: 1
+                del: 1, status: 3
             });
             if (think.isEmpty(result)) {
                 return this.fail(-1, '改文章不存在');
