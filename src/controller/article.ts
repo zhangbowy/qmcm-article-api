@@ -192,7 +192,7 @@ export default class extends Base {
             const status = this.post('status');
             const article_id = this.post('article_id');
             const statusList = [1, 2, 3];
-            if (statusList.indexOf(status) == -1) {
+            if (statusList.indexOf(Number(status)) == -1) {
                 return this.fail(-1, '状态不存在');
             }
             const result = await think.model('article').where({del: 0, article_id}).update({
