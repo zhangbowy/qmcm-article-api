@@ -42,10 +42,7 @@ export default class extends Base {
                 where.status = status;
             }
 
-
             const res = await think.model('article').where(where).page(page, limit).order('created_at DESC').countSelect();
-
-
             const statusList = [
                 {
                     _status: "全部",
@@ -77,6 +74,7 @@ export default class extends Base {
                     }
                 }
             }
+            statusList[0].count = res.count;
             res.counts = statusList;
             this.success(res, '文章列表');
         } catch (e) {
@@ -97,7 +95,8 @@ export default class extends Base {
             const seo_title = this.post('seo_title');
             const seo_desc = this.post('seo_desc');
             const seo_keywords = this.post('seo_keywords');
-            const summary = content.substr(1, 100);  // 摘要
+            const summary = this.post('summary');
+            // const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
@@ -140,7 +139,8 @@ export default class extends Base {
             const seo_title = this.post('seo_title');
             const seo_desc = this.post('seo_desc');
             const seo_keywords = this.post('seo_keywords');
-            const summary = content.substr(1, 100);  // 摘要
+            const summary = this.post('summary');
+            // const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
