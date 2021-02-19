@@ -173,7 +173,7 @@ export default class extends Base {
      */
     async getDetailAction() {
         try {
-            const article_id = this.get('article');
+            const article_id = this.get('article_id');
             const result = await think.model('article').where({article_id}).find();
             if (think.isEmpty(result)) {
                 return this.fail(-1, '改文章不存在');
