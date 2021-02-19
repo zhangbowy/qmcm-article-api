@@ -12,10 +12,16 @@ export default class extends think.Controller {
             // const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
             // const res = await this.fetch('http://www.wkdao.com/hangye/504.html#').then($res => $res.text())
             // return this.ctx.body = res;
-            const article_id = this.get('article_id');
-            const result = await think.model('article').where({article_id}).find();
+            const article_no = this.get('article_id');
+            if (think.isEmpty(article_no)) {
+                return  this.display();
+            }
+            const result = await think.model('article').where({article_no}).find();
+            if (think.isEmpty(result)) {
+                return  this.redirect('/news');
+            }
             this.assign('current_article', result);
-            return this.display();
+            return this.display('news_detail');
             // return this.success(result, "请求成功!");
         } catch ($err) {
             // this.dealErr($err)
