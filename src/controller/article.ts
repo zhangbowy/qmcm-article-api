@@ -227,12 +227,57 @@ export default class extends Base {
 
     /**
      * seo接口
+     * @param {article_id} 文章id
+     * @return boolean
      */
     async seoAction() {
         try {
-            const url = 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=site%3Aqinkeji.cn&oq=1&rsv_pq=9e13c3fd0000f03d&rsv_t=452es9NwrMtlG18OYprzHlUEqzRM4SiTwRbb9rsYzh3PbKgkjL3z5FFj4us&rqlang=cn&rsv_enter=1&rsv_dl=tb&rsv_sug3=17&rsv_sug1=9&rsv_sug7=100&rsv_sug2=0&rsv_btype=t&inputT=4033&rsv_sug4=4578'
-            const data = await this.fetch(url).then(res => res.text())
-            this.ctx.body = data;return
+            const article_id = this.post('article_id');
+            const full_path = await think.model('article').where({article_id, del: 0}).getField('full_path');
+            if (think.isEmpty(full_path)) {
+                this.fail(-1, '链接不全!');
+            }
+            const res: unknown = await pushUrl('qinkeji.cn');
+            const result = JSON.parse(res);
+            if (think.isEmpty(result)) {
+               this.fail(-1, '未知错误');
+            }
+            /**
+             * 百度接口的错误
+             */
+            if (result.error) {
+                this.fail(-1, result.message);
+            }
+            const msg = `成功${result.success},当日剩余推送次数${result.remain}`;
+            return this.success(result, msg);
+        } catch ($err) {
+            this.dealErr($err);
+        }
+    }
+
+    /**
+     * test
+     */
+    async seo1Action() {
+        try {
+            // const url = 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=site%3Aqinkeji.cn&oq=1&rsv_pq=9e13c3fd0000f03d&rsv_t=452es9NwrMtlG18OYprzHlUEqzRM4SiTwRbb9rsYzh3PbKgkjL3z5FFj4us&rqlang=cn&rsv_enter=1&rsv_dl=tb&rsv_sug3=17&rsv_sug1=9&rsv_sug7=100&rsv_sug2=0&rsv_btype=t&inputT=4033&rsv_sug4=4578'
+            const url = 'https://m.baidu.com/pu=sz%401321_480/s?word=site%3Aqinkeji.cn&sa=tb&rsv_t=2200EoMMe0fGnSJlPp31BzdhXgtECk49uGgnBRiBi%2FpjUrB5vzi8';
+            const data = await this.fetch(url).then(res => res.text());
+            // const data1 = data.replace(/\n/g, '');
+            const reg1 = /<a class="result_title" href="(.*?)">/g;
+            const res1 = data.match(reg1);
+            let list = [];
+            for (const item of res1) {
+                const child = /href="(.*)">/.exec(item);
+                list.push(child[1]);
+            }
+
+            // const res2 = reg1.exec(data1);
+            // const res2 = reg1.test(data);
+
+            // this.redirect(list[0])
+            return this.success(list);
+            // return this.success(res1);
             const res = await pushUrl('http://zb.qinkeji.cn/1.html');
             this.success(res);
         } catch (e) {
@@ -276,5 +321,5 @@ function pushUrl(content: any) {
         });
         req.write(content);
         req.end;
-    })
+    });
 }
