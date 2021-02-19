@@ -33,7 +33,7 @@ export default class extends Base {
             const limit: number = this.get('pageSize') || 10;
             const status: number = Number(this.get('status') || 0);
             const title: string = this.get('title') || '';
-            const where: any = {};
+            const where: any = {del: 0};
 
             if (!think.isEmpty(title)) {
                 where.title = ['like', `%${title}%`];
@@ -230,6 +230,9 @@ export default class extends Base {
      */
     async seoAction() {
         try {
+            const url = 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=site%3Aqinkeji.cn&oq=1&rsv_pq=9e13c3fd0000f03d&rsv_t=452es9NwrMtlG18OYprzHlUEqzRM4SiTwRbb9rsYzh3PbKgkjL3z5FFj4us&rqlang=cn&rsv_enter=1&rsv_dl=tb&rsv_sug3=17&rsv_sug1=9&rsv_sug7=100&rsv_sug2=0&rsv_btype=t&inputT=4033&rsv_sug4=4578'
+            const data = await this.fetch(url).then(res => res.text())
+            this.ctx.body = data;return
             const res = await pushUrl('http://zb.qinkeji.cn/1.html');
             this.success(res);
         } catch (e) {
@@ -241,7 +244,7 @@ export default class extends Base {
 //content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
 function pushUrl(content: any) {
     // 需要推送的网站链接
-    var path = '/urls?site=zb.qinkeji.com&token=22';
+    var path = '/urls?site=zb.qinkeji.cn&token=LgOExpuWuWbmzceo';
     //对应配置post推送的接口说明
     // tslint:disable-next-line:prefer-const
     var options = {
@@ -261,10 +264,10 @@ function pushUrl(content: any) {
             res.setEncoding("utf8");
             res.on("data", function (data) {
                 console.log("data:", data); //返回的数据
+                reslove(data);
             });
             res.on('end', (resp) => {
                 console.log('end' ,resp)
-                reslove(resp);
             })
             console.log(res.statusCode)
         });
