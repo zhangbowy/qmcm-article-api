@@ -38,7 +38,6 @@ export default class extends think.Controller {
             await think.model('article').where({article_no}).increment('real_pv', 1);
             return this.display('news_detail');
         } catch ($err) {
-            // this.dealErr($err)
         }
     }
 }
