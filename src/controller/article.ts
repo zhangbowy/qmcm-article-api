@@ -258,12 +258,12 @@ export default class extends Base {
                 options[item.key] = item.value;
             }
             if (think.isEmpty(options.baidu_seo_token)) {
-                this.fail(-1, '请先配置百度seo token');
+                return this.fail(-1, '请先配置百度seo token');
             }
             const res: unknown = await pushUrl(article.full_path, options);
             const result = JSON.parse(res);
             if (think.isEmpty(result)) {
-               this.fail(-1, '未知错误');
+               return this.fail(-1, '未知错误');
             }
             /**
              * 百度接口的错误
