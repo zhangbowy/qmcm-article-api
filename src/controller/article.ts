@@ -256,6 +256,12 @@ export default class extends Base {
             if (result.error) {
                 this.fail(-1, result.message);
             }
+            if (result.success > 0) {
+                await think.model('article').where({article_id}).update({
+                    is_push_success: 1
+                });
+                await think.model('article').where({article_id}).increment('push_success_count', 1);
+            }
             const msg = `成功${result.success},当日剩余推送次数${result.remain}`;
             return this.success(result, msg);
         } catch ($err) {
