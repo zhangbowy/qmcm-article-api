@@ -269,7 +269,7 @@ export default class extends Base {
              * 百度接口的错误
              */
             if (result.error) {
-                this.fail(-1, result.message);
+                return this.fail(-1, result.message);
             }
             if (result.success > 0) {
                 await think.model('article').where({article_id}).update({
@@ -293,7 +293,7 @@ export default class extends Base {
             const url = 'https://m.baidu.com/pu=sz%401321_480/s?word=site%3Aqinkeji.cn&sa=tb&rsv_t=2200EoMMe0fGnSJlPp31BzdhXgtECk49uGgnBRiBi%2FpjUrB5vzi8';
             const data = await this.fetch(url).then(res => res.text());
             // const data1 = data.replace(/\n/g, '');
-            const reg1 = /<a class="result_title" href="(.*?)">/g;
+            const reg1 = /<a class  ="result_title" href="(.*?)">/g;
             const res1 = data.match(reg1);
             let list = [];
             for (const item of res1) {
