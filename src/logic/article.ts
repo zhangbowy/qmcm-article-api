@@ -143,4 +143,7 @@ export default class extends base {
     seoAction() {
 
     }
+    optionsAction() {
+
+    }
 }
