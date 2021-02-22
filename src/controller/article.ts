@@ -100,7 +100,13 @@ export default class extends Base {
             // const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
-            const full_path = `https://test.qmycm.com/news/${article_no}.html`;
+
+            const options = await think.model('options').where({key: 'site_url'}).find();
+            const site_url = options.value;
+            if (think.isEmpty(site_url)) {
+               return this.fail(-1, '网站域名未配置');
+            }
+            const full_path = `${site_url}/news/${article_no}.html`;
 
             const params: any = {
                 title,
@@ -245,7 +251,16 @@ export default class extends Base {
             if (think.isEmpty(article.full_path)) {
                 return this.fail(-1, '链接不全!');
             }
-            const res: unknown = await pushUrl(article.full_path);
+            const list = await think.model('options').select();
+            const options: any = {};
+            for (const item of list) {
+                // tslint:disable-next-line:no-unused-expression
+                options[item.key] = item.value;
+            }
+            if (think.isEmpty(options.baidu_seo_token)) {
+                this.fail(-1, '请先配置百度seo token');
+            }
+            const res: unknown = await pushUrl(article.full_path, options);
             const result = JSON.parse(res);
             if (think.isEmpty(result)) {
                this.fail(-1, '未知错误');
@@ -322,9 +337,9 @@ export default class extends Base {
 }
 
 //content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
-function pushUrl(content: any) {
+function pushUrl(content: any, $config: any) {
     // 需要推送的网站链接
-    var path = '/urls?site=zb.qinkeji.cn&token=LgOExpuWuWbmzceo';
+    var path = `/urls?site=${$config.site_url}&token=${$config.baidu_seo_token}`;
     //对应配置post推送的接口说明
     // tslint:disable-next-line:prefer-const
     var options = {
