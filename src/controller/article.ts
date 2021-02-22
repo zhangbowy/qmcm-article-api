@@ -96,11 +96,30 @@ export default class extends Base {
             const seo_desc = this.post('seo_desc');
             const seo_keywords = this.post('seo_keywords');
             const summary = this.post('summary');
+            const is_publish = this.post('is_publish');
             // const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
 
+            const params: any = {
+                title,
+                content,
+                cover_image,
+                author,
+                category_id,
+                seo_title,
+                seo_desc,
+                seo_keywords,
+                summary,
+                project_id,
+                article_no,
+                full_path,
+            };
+            // 直接发布
+            if (is_publish) {
+                params.status = 2;
+            }
             const result = think.model('article').add({
                 title,
                 content,
@@ -113,7 +132,7 @@ export default class extends Base {
                 summary,
                 project_id,
                 article_no,
-                full_path
+                full_path,
             });
             if (!result) {
                 this.fail(-1, '添加失败');
