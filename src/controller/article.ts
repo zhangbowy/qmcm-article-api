@@ -298,6 +298,27 @@ export default class extends Base {
             this.dealErr(e);
         }
     }
+
+    async optionsAction() {
+        if (this.ctx.isMethod('get')) {
+            const list = await think.model('options').select();
+            const obj: any = {};
+            for (const item of list) {
+                // tslint:disable-next-line:no-unused-expression
+                obj[item.key] = item.value;
+            }
+            this.success(obj);
+        } else {
+            const parmas = this.post();
+            // tslint:disable-next-line:forin
+            for (const item in parmas) {
+                await think.model('options').where({key: item}).update({
+                    value: parmas[item]
+                });
+            }
+            return this.success([], '操作成功');
+        }
+    }
 }
 
 //content 是url 地址，一个字符串，一个或多个链接，中间使用\n分割
