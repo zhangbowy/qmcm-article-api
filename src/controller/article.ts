@@ -159,10 +159,25 @@ export default class extends Base {
             const seo_desc = this.post('seo_desc');
             const seo_keywords = this.post('seo_keywords');
             const summary = this.post('summary');
+            const is_publish = this.post('is_publish');
             // const summary = content.substr(1, 100);  // 摘要
             const project_id = 1;  // 摘要
             const article_no = think.datetime(new Date().getTime(), 'YYYYMMDDHHmmss') +  Math.round(Math.random() * 10);
             const full_path = `https://test.qmycm.com/news/${article_no}.html`;
+            const params: any =  {
+                title,
+                content,
+                cover_image,
+                author,
+                category_id,
+                seo_title,
+                seo_desc,
+                seo_keywords,
+                summary
+            };
+            if (is_publish) {
+                params.status = 2;
+            }
             const result = await think.model('article').where({article_id}).update({
                 title,
                 content,
