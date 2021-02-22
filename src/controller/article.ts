@@ -120,20 +120,7 @@ export default class extends Base {
             if (is_publish) {
                 params.status = 2;
             }
-            const result = think.model('article').add({
-                title,
-                content,
-                cover_image,
-                author,
-                category_id,
-                seo_title,
-                seo_desc,
-                seo_keywords,
-                summary,
-                project_id,
-                article_no,
-                full_path,
-            });
+            const result = think.model('article').add(params);
             if (!result) {
                 this.fail(-1, '添加失败');
             }
@@ -178,20 +165,7 @@ export default class extends Base {
             if (is_publish) {
                 params.status = 2;
             }
-            const result = await think.model('article').where({article_id}).update({
-                title,
-                content,
-                cover_image,
-                author,
-                category_id,
-                seo_title,
-                seo_desc,
-                seo_keywords,
-                summary,
-                // project_id,
-                // article_no,
-                // full_path
-            });
+            const result = await think.model('article').where({article_id}).update(params);
             if (!result) {
                 this.fail(-1, '修改失败');
             }
