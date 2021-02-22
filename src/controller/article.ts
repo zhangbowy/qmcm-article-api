@@ -233,11 +233,11 @@ export default class extends Base {
     async seoAction() {
         try {
             const article_id = this.post('article_id');
-            const full_path = await think.model('article').where({article_id, del: 0}).getField('full_path');
-            if (think.isEmpty(full_path)) {
-                this.fail(-1, '链接不全!');
+            const article = await think.model('article').where({article_id, del: 0}).find();
+            if (think.isEmpty(article.full_path)) {
+                return this.fail(-1, '链接不全!');
             }
-            const res: unknown = await pushUrl('qinkeji.cn');
+            const res: unknown = await pushUrl(article.full_path);
             const result = JSON.parse(res);
             if (think.isEmpty(result)) {
                this.fail(-1, '未知错误');
