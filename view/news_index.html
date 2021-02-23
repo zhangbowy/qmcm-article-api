@@ -202,7 +202,7 @@
         <div class="contact_us-scancode-img">
           <!-- 最热 -->
           <ul class="new-pmd-list new-pmd-list_active">
-            {% for item in current_list %}
+            {% for item in hot_list %}
             <li>
               <span>0{{loop.index}}</span>
               <p>{{item.title}}</p>
@@ -221,6 +221,7 @@
         </div>
       </div>
     </div>
+    {% include "footer.html" %}
     <link rel="stylesheet" href="/static/page/page.css">
     <script src="/static/page/page.js"></script>
     <script type="text/javascript">
