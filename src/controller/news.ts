@@ -100,7 +100,7 @@ export default class extends think.Controller {
                     new_item.seo_keywords = [];
                 }
             }
-            const count = await think.model('article').cache('count', {timeout: 30 * 1000}).where({del: 0, status: 2, category_id: cate_id  }).count('*');
+            const count = await think.model('article').where({del: 0, status: 2, category_id: cate_id  }).count('*');
             this.assign({
                 hot_list,
                 newest_list,
