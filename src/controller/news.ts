@@ -12,12 +12,9 @@ export default class extends think.Controller {
     async indexAction() {
         try {
             const article_no = this.get('article_id');
-            const hot_list = await think.model('article').where({del: 0, status: 2}).order('pv DESC').page(1, 10).select();
-            const newest_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
-            const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
-
-            this.assign('hot_list', hot_list);
-            this.assign('newest_list', newest_list);
+            const hot_list = await think.model('article').field('article_id,full_path,title').where({del: 0, status: 2}).order('pv DESC').page(1, 10).select();
+            const newest_list = await think.model('article').field('article_id,full_path,title').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
+            // const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
             if (think.isEmpty(article_no)) {
                 /**
                  * 列表
@@ -26,6 +23,8 @@ export default class extends think.Controller {
                 // return this.success({newest_list, hot_list});
                 this.redirect('/news/cate/45.html');
             }
+            this.assign('hot_list', hot_list);
+            this.assign('newest_list', newest_list);
             /**
              * 当前文章
              */
@@ -33,15 +32,18 @@ export default class extends think.Controller {
             if (think.isEmpty(result)) {
                 return  this.redirect('/news');
             }
-            /**
-             * 详情
-             */
+            const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
+            const current_cate = await think.model('item_category').field('id as category_id,category_name').where({id: result.category_id,del: 0}).select();
+            this.assign('current_cate', current_cate);
+            this.assign('category', category);
             this.assign('current_article', result);
+            // return this.success({newest_list, hot_list , current_cate, category, current_article: result});
             // 增加阅读
             await think.model('article').where({article_no}).increment('pv', 1);
             await think.model('article').where({article_no}).increment('real_pv', 1);
             return this.display('news_detail');
         } catch ($err) {
+            this.fail(-1, $err.stack);
         }
     }
 
