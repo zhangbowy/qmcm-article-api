@@ -543,24 +543,8 @@
           </li>
         </ul>
       </div>
-      <!-- <div id="app">
-        <div class="page" v-show="show">
-          <div class="pagelist">
-            <span class="jump" :class="{disabled:starts}" @click="{current_page--}">上一页</span>
-            <span v-show="current_page>5" class="jump" @click="jumpPage(1)">1</span>
-            <span class="ellipsis" v-show="efont">...</span>
-            <span class="jump" v-for="num in indexs" :class="{bgprimary:current_page==num}" @click="jumpPage(num)">{{num}}</span>
-            <span class="ellipsis" v-show="ebehind">...</span>
-            <span v-show="current_page<pages-4" class="jump" @click="jumpPage(pages)">{{pages}}</span>
-            <span :class="{disabled:ends}" class="jump" @click="{current_page++}">下一页</span>
-            <span class="jumppoint">前往：</span>
-            <span class="jumpinp"><input type="text" v-model="changePage"></span>
-            <span class="jump gobtn" @click="jumpPage(changePage)">GO</span>
-          </div>
-          <span class="pageNum">第{{current_page||1}}页/共{{pages}}页</span>
-        </div>
-      </div> -->
     </div>
+  </div>
     <!-- <script>
       var newlist = new Vue({
         el: '#app',
