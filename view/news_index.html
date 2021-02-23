@@ -215,7 +215,7 @@
             {% for item in hot_list %}
             <li>
               <span>0{{loop.index}}</span>
-              <p>{{item.title}}</p>
+              <p><a href="{{item.full_path}}">{{item.title}}</a></p>
             </li>
             {% endfor %}
           </ul>
@@ -224,7 +224,7 @@
             {% for item in newest_list %}
             <li>
               <span>0{{loop.index}}</span>
-              <p>{{item.title}}</p>
+              <p><a href="{{item.full_path}}">{{item.title}}</a></p>
             </li>
             {% endfor %}
           </ul>
