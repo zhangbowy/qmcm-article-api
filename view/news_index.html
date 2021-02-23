@@ -107,7 +107,7 @@
           <li><a href="/Home/Media/index">微信推广</a></li>
           <!--<li><a href="/Home/Media/upfans">公众号阅读量</a></li>-->
           <li><a href="/Home/Media/xiang">媒体接单</a></li>
-          <li><a href="/Home/Media/xiang">新闻动态</a></li>
+          <li><a href="/news">新闻动态</a></li>
           <li><a href="/Home/Enlist/index">招商加盟</a></li>
           <li><a href="/Home/Media/help">帮助中心</a></li>
         </ul>
@@ -156,7 +156,7 @@
         <div class="content_left-item">
           <img src="{{item.cover_image}}" alt="" class="c-img">
           <div class="content_details">
-            <a class="link" href="{{item.full_path}}" target="_blank" rel="noopener noreferrer">{{item.seo_title}}</a>
+            <a class="link" href="{{item.full_path}}" target="_blank" rel="noopener noreferrer">{{item.title}}</a>
             <div class="time">
               <i class="iconfont iconshijian"></i>
               <span><a href="{{item.full_path}}">{{item.created_at}}</a></span>
@@ -164,12 +164,12 @@
               <span><a href="{{item.full_path}}">{{item.pv}}</a></span>
             </div>
             <div class="content_left_details">
-              <a href="{{item.full_path}}">{{item.seo_desc}}</a>
+              <a href="{{item.full_path}}">{{item.summary}}</a>
             </div>
             <ul class="content_label">
-              <li>产品介绍</li>
-              <li>教育培训</li>
-              <li>AI</li>
+              {% for item in seo_keywords %}
+              <li>{{item}}</li>
+              {% endfor %}
             </ul>
           </div>
         </div>
@@ -202,7 +202,7 @@
         <div class="contact_us-scancode-img">
           <!-- 最热 -->
           <ul class="new-pmd-list new-pmd-list_active">
-            {% for item in current_list %}
+            {% for item in hot_list %}
             <li>
               <span>0{{loop.index}}</span>
               <p>{{item.title}}</p>
