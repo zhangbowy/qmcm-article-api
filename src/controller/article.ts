@@ -37,7 +37,7 @@ export default class extends Base {
             const where: any = {del: 0};
 
             if (category_id) {
-                where.category = category_id;
+                where.category_id = category_id;
             }
             if (!think.isEmpty(title)) {
                 where.title = ['like', `%${title}%`];
