@@ -45,11 +45,11 @@ export default class extends think.Controller {
             const current_cate = await think.model('item_category').field('id as category_id,category_name').where({
                 id: result.category_id,
                 del: 0
-            }).select();
+            }).find();
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
-            // return this.success({newest_list, hot_list , current_cate, category, current_article: result});
+            return this.success({newest_list, hot_list , current_cate, category, current_article: result});
             // 增加阅读
             await think.model('article').where({article_no}).increment('pv', 1);
             await think.model('article').where({article_no}).increment('real_pv', 1);
