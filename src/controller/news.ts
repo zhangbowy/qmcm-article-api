@@ -51,6 +51,8 @@ export default class extends think.Controller {
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
+            this.assign('next_article', next_article);
+            this.assign('prev_article', prev_article);
             // return this.success({newest_list, hot_list , next_article, prev_article, current_cate, category, current_article: result});
             // 增加阅读
             await think.model('article').where({article_no}).increment('pv', 1);
