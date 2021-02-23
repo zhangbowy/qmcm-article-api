@@ -83,8 +83,7 @@ export default class extends think.Controller {
                 del: 0,
                 status: 2
             }).cache('current_list', {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
-            const count = await think.model('article').where({del: 0, status: 2}).count('*');
-
+            const count = await think.model('article').cache('count', {timeout: 30 * 1000}).where({del: 0, status: 2}).count('*');
             this.assign({
                 hot_list,
                 newest_list,
@@ -97,9 +96,8 @@ export default class extends think.Controller {
             });
             await this.display('news_index');
             // this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
-
         } catch ($err) {
-            const a = $err;
+            this.fail(-1, $err.stack);
         }
     }
 }
