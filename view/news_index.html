@@ -21,6 +21,7 @@
   <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/iconFont/iconfont.css"> -->
   <link rel="stylesheet" href="https://test.qmycm.com/NewCss/animate.css-master/animate.min.css?v=20200327">
   <link rel="stylesheet" type="text/css" href="/static/css/news_index.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/empty.css">
   <!-- 矢量图库地址 -->
   <link rel="stylesheet" href="https://test.qmycm.com/css/IconFont.css" />
   <script type="text/javascript" src="https://test.qmycm.com/homejs/Jquery-2.0.3.min.js"></script>
@@ -152,6 +153,7 @@
     </div>
     <div class="feed_wrapper">
       <div class="content_left">
+        {% if count %}
         {% for item in current_list %}
         <div class="content_left-item">
           <img src="{{item.cover_image}}" alt="" class="c-img">
@@ -189,6 +191,14 @@
           </div>
           <div class="spage-skip">跳至&nbsp;<input type="text" value="1">&nbsp;页&nbsp;&nbsp;<button data-page="go">确定</button></div>
         </div>
+        {% else %}
+        <div class="empty-block">
+          <div class="empty-block__img">
+            <img src="https://www.qmycm.com/new_images/common/kongkong.png" alt="">
+          </div>
+          <div class="empty-block__hint">这里啥也没有 ￣△ ￣</div>
+        </div>
+        {% endif %}
       </div>
       <div class="content_right">
         <ul class="content_right-choose">
@@ -262,27 +272,27 @@
             window.location.href = getUrl(page)
           }
         });
-        // 示例2
-        $("#myPage1").sPage({
-          page: 1,
-          pageSize: 10,
-          total: 150,
-          prevPage: "←",
-          nextPage: "→",
-          backFun: function(page) {
-            $("#pNum1").text(page);
-          }
-        });
-        // 示例3
-        $("#myPage2").sPage({
-          page: 1,
-          pageSize: 10,
-          total: 150,
-          showPN: false,
-          backFun: function(page) {
-            $("#pNum2").text(page);
-          }
-        });
+        // // 示例2
+        // $("#myPage1").sPage({
+        //   page: 1,
+        //   pageSize: 10,
+        //   total: 150,
+        //   prevPage: "←",
+        //   nextPage: "→",
+        //   backFun: function(page) {
+        //     $("#pNum1").text(page);
+        //   }
+        // });
+        // // 示例3
+        // $("#myPage2").sPage({
+        //   page: 1,
+        //   pageSize: 10,
+        //   total: 150,
+        //   showPN: false,
+        //   backFun: function(page) {
+        //     $("#pNum2").text(page);
+        //   }
+        // });
       });
 
       function getUrl(no) {

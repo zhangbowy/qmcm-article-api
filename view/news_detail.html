@@ -172,15 +172,24 @@
         <ul class="internet_options">
           <li>
             <span>上一篇：</span>
-            <a href="">
-              人民日报：扫码点餐不该是唯一选择
+            {% if prev_article.title %}
+            <a href="{{prev_article .full_path}}">
+              {{prev_article.title}}
             </a>
+            {% else %}
+            没有了
+            {% endif %}
           </li>
+
           <li>
             <span>下一篇：</span>
-            <a href="">
-              App精准推荐，是手机被监听了吗？该如何“避坑”？
+            {% if next_article.title  %}
+            <a href="{{next_article .full_path}}">
+              {{next_article.title}}
             </a>
+            {% else %}
+            没有了
+            {% endif %}
           </li>
         </ul>
       </div>
