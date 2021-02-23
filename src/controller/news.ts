@@ -88,7 +88,7 @@ export default class extends think.Controller {
                 category_id: current_cate.category_id,
                 del: 0,
                 status: 2
-            }).cache('current_list', {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
+            }).cache('current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
             const count = await think.model('article').cache('count', {timeout: 30 * 1000}).where({del: 0, status: 2}).count('*');
             this.assign({
                 hot_list,
