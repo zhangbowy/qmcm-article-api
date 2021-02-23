@@ -15,11 +15,11 @@ export default class extends think.Controller {
             const hot_list = await think.model('article').field('article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).order('pv DESC').page(1, 10).select();
+            }).cache('hot_list', {timeout: 2 * 60 * 1000}).order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').field('article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).order('created_at DESC').page(1, 10).select();
+            }).cache('newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 10).select();
             // const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
             if (think.isEmpty(article_no)) {
                 /**
