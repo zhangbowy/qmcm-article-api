@@ -40,7 +40,7 @@ export default class extends think.Controller {
             }
             const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
             for (const item of category) {
-                category.url = `/news/cate/${item.category_id}.html`;
+                item.url = `/news/cate/${item.category_id}.html`;
             }
             const current_cate = await think.model('item_category').field('id as category_id,category_name').where({
                 id: result.category_id,
