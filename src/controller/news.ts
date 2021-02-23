@@ -39,16 +39,16 @@ export default class extends think.Controller {
                 return this.redirect('/news');
             }
             const category = await think.model('item_category').field('id as category_id,category_name')
-                .cache('category', {timeout: 2 * 60 * 1000}).where({del: 0}).select();
+                .cache('category', {timeout: 5 * 60 * 1000}).where({del: 0}).select();
             for (const item of category) {
                 item.url = `/news/cate/${item.category_id}.html`;
             }
             const current_cate = await think.model('item_category').field('id as category_id,category_name').where({
                 id: result.category_id,
                 del: 0
-            }).find();
-            const next_article = await think.model('article').where({del: 0, category_id: result.category_id, article_id: ['in', result.article_id]}).find();
-            const prev_article = await think.model('article').field('max(article_id),title,full_path').order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).group('article_id').find();
+            }).cache(`cate_id${result.category_id}`, {timeout: 5 * 60 * 1000}).find();
+            const next_article = await think.model('article').cache(`article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).where({del: 0, category_id: result.category_id, article_id: ['in', result.article_id]}).find();
+            const prev_article = await think.model('article').cache(`article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).field('max(article_id),title,full_path').order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).group('article_id').find();
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
