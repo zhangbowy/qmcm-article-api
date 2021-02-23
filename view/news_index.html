@@ -146,7 +146,7 @@
       {% if item.category_id==current_cate.category_id %}
       <a class="industry" href="{{item.url}}">{{item.category_name}}</a>
       {% else %}
-      <a href="">{{item.category_name}}</a>
+      <a href="{{item.url}}">{{item.category_name}}</a>
       {% endif %}
       {% endfor %}
     </div>
@@ -159,12 +159,12 @@
             <a class="link" href="{{item.full_path}}" target="_blank" rel="noopener noreferrer">{{item.seo_title}}</a>
             <div class="time">
               <i class="iconfont iconshijian"></i>
-              <span><a href="">{{item.created_at}}</a></span>
+              <span><a href="{{item.full_path}}">{{item.created_at}}</a></span>
               <i class="iconfont iconyanjing-yueduliang"></i>
-              <span><a href="">{{item.pv}}</a></span>
+              <span><a href="{{item.full_path}}">{{item.pv}}</a></span>
             </div>
             <div class="content_left_details">
-              <a href="">{{item.seo_desc}}</a>
+              <a href="{{item.full_path}}">{{item.seo_desc}}</a>
             </div>
             <ul class="content_label">
               <li>产品介绍</li>
