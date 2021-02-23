@@ -46,10 +46,12 @@ export default class extends think.Controller {
                 id: result.category_id,
                 del: 0
             }).find();
+            const next_article = await think.model('article').where({del: 0, category_id: result.category_id, article_id: ['in', result.article_id]}).find();
+            const prev_article = await think.model('article').field('max(article_id),title,full_path').order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).group('article_id').find();
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
-            // return this.success({newest_list, hot_list , current_cate, category, current_article: result});
+            return this.success({newest_list, hot_list , next_article, prev_article, current_cate, category, current_article: result});
             // 增加阅读
             await think.model('article').where({article_no}).increment('pv', 1);
             await think.model('article').where({article_no}).increment('real_pv', 1);
