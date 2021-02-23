@@ -1,24 +1,631 @@
-<html><head><title>404 Not Found</title></head>
-<body>
-<center><h1>404 Not Found</h1></center>
-<hr><center>技术支持: 杭州千盟网络科技有限公司</center>
-<br>{{title}}
-<!--<center>我们的网站：<a href="http://www.wkdao.com/dingzhi.html">传送门!</a></center>-->
-<center>咨询热线：13346157195</center>
-<p>文章id :{{current_article.article_id}}</p>
-<p>title :{{current_article.title}}</p>
-<p>seo_kw :{{current_article.seo_keywords}}</p>
-<p>seo_desc :{{current_article.seo_desc}}</p>
-<p>content :{{current_article.content}}</p>
-<p>seo_desc :{{current_article.seo_desc}}</p>
-<p></p>
-<p></p>
-<p></p>
+<!doctype html>
+<html>
 
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-</body></html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html" ; charset="utf-8">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=1200">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <title>千盟传媒-微信公众号接单、公众号广告投放平台，微信营销与变现平台</title>
+  <meta name="keywords" content="千盟传媒,微信公众号接单平台,微信公众号广告,微信营销,微信变现" />
+  <meta name="description" content="千盟传媒，专门为媒体主提供微信公众号接单,为广告主提供公众号广告的新媒体广告平台，采用阅读/点击计费广告的方式,是一家靠谱的微信公众号变现与营销平台。" />
+  <link rel="shortcut icon" href="https://test.qmycm.com/images/media/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/homecss/Reset.css">
+  <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/homecss/Index.css"> -->
+  <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/css/ShareStyle.css">
+  <link href="https://test.qmycm.com/homecss/jquery.bxslider.css?v=20190528" rel="stylesheet" type="text/css">
+  <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/NewCss/home/newHome.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/iconFont/iconfont.css"> -->
+  <link rel="stylesheet" href="https://test.qmycm.com/NewCss/animate.css-master/animate.min.css?v=20200327">
+  <!-- 矢量图库地址 -->
+  <link rel="stylesheet" href="https://test.qmycm.com/css/IconFont.css" />
+  <script type="text/javascript" src="https://test.qmycm.com/homejs/Jquery-2.0.3.min.js"></script>
+  <script type="text/javascript" src="https://test.qmycm.com/homejs/Alljquery.js"></script>
+  <script type="text/javascript" src="https://test.qmycm.com/homejs/Highcharts (2).js"></script>
+  <script language="javascript" src="https://test.qmycm.com/js/newjs.js"></script>
+  <script type="text/javascript" src="https://test.qmycm.com/homejs/jquery.bxslider.js"></script>
+  <script type="text/javascript" src="https://test.qmycm.com/homejs/index.js"></script>
+  <script language="javascript" src="https://test.qmycm.com/js/common.js"></script>
+  <!--
+    <script type="text/javascript">var pvs={}; var pvm={}; </script>
+<script>
+    pvs[{$ms.0.id}]={$data1|array_to_number|json_encode};
+    pvs[{$ms.1.id}]={$data2|array_to_number|json_encode};
+    pvm[{$ms.0.id}]={$data1|array_to_number|max};
+    pvm[{$ms.1.id}]={$data2|array_to_number|max};
+</script>
+-->
+  <!-- 备注 -->
+</head>
+<style>
+  .new_menu li:nth-child(5) a {
+    color: #FF0000
+  }
+
+  .bg-c {
+    background: #F7F7F7;
+  }
+
+  .BannerNews {
+    background: url(http://img.wkdao.com/image/46/2021/02/19/931f3d51373dad482401de4a0abf72d1.png) no-repeat center center;
+    background-size: 1920px 500px;
+    position: relative;
+    width: 100%;
+    height: 500px;
+    margin-top: 80px;
+    overflow: hidden;
+  }
+
+  .news_option {
+    width: 100%;
+    height: 66px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .news_option p {
+    font-size: 18px;
+    font-weight: 400;
+    margin: 0 33px;
+  }
+
+  .industry {
+    width: 108px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: #367AFF;
+    position: relative;
+    border-radius: 3px;
+    color: #FFFFFF;
+  }
+
+  .industry::before {
+    content: "";
+    display: block;
+    z-index: 9;
+    position: absolute;
+    width: 0;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 0;
+    transition-duration: 0.3s;
+    border-top: 5px solid #4D78EA;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+  }
+
+  .feed_wrapper {
+    width: 1200px;
+    margin: 0 auto;
+    margin-top: 20px;
+    display: flex;
+    margin-bottom: 30px;
+  }
+
+  .content_left {
+    width: 900px;
+    background: #FFFFFF;
+    padding: 30px;
+    box-sizing: border-box;
+    padding-top: 0;
+  }
+
+  .content_right {
+    width: 280px;
+    height: 548px;
+    margin-left: 20px;
+    background: #FFFFFF;
+    box-sizing: border-box;
+    padding: 30px 15px 25px 30px;
+  }
+
+  .content_left .c-img {
+    width: 246px;
+    height: 176px;
+  }
+
+  .content_left .link {
+    font-size: 18px;
+    font-weight: 400;
+    color: #333333;
+    line-height: 0;
+  }
+
+  .content_details {
+    width: 582px;
+    margin-left: 30px;
+    padding-top: 10px;
+  }
+
+  .time {
+    margin-top: 20px;
+    line-height: 0;
+  }
+
+  .time .iconshijian,
+  .time .iconyanjing-yueduliang {
+    color: #999999;
+  }
+
+  .time .iconshijian {
+    width: 14px;
+    height: 14px;
+  }
+
+  .time .iconyanjing-yueduliang {
+    width: 16px;
+    height: 11px;
+    margin-left: 28px;
+  }
+
+  .time span {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999999;
+  }
+
+  .content_left_details {
+    margin-top: 20px;
+    font-size: 12px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #999999;
+  }
+
+  .content_label {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+  }
+
+  .content_label li {
+    font-size: 14px;
+    font-weight: 400;
+    color: #367AFF;
+    margin-left: 20px;
+  }
+
+  .content_left-item {
+    display: flex;
+    border-bottom: 1px solid #E9E9E9;
+    padding-bottom: 30px;
+    padding-top: 30px;
+  }
+
+  .content_right-choose {
+    display: flex;
+  }
+
+  .content_right-choose li {
+    font-size: 18px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    margin-right: 30px;
+  }
+
+  .content_right-choose .right_active {
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333333;
+  }
+
+  .new-pmd-list li {
+    margin: 20px 0;
+    display: flex;
+  }
+
+  .new-pmd-list li P {
+    width: 202px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+  }
+
+  .new-pmd-list li span {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    background-color: #CDCDCD;
+    color: #FFFFFF;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 9px;
+    flex-shrink: 0;
+  }
+
+  .new-pmd-list li:nth-child(1) span {
+    background-color: #FF4F64;
+  }
+
+  .new-pmd-list li:nth-child(2) span {
+    background-color: #FF7050;
+  }
+
+  .new-pmd-list li:nth-child(3) span {
+    background-color: #FE964F;
+  }
+
+</style>
+<!-- 分页 -->
+<!-- <style>
+  .page {
+    display: inline-block;
+    margin: 50px;
+  }
+
+  .pagelist {
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .pagelist span {
+    font-size: 20px;
+    color: rgba(51, 51, 51, 1);
+  }
+
+  .pagelist .jump {
+    padding: 6px 14px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 30px;
+    width: 40px;
+    height: 40px;
+    background: rgba(204, 204, 204, 0.3);
+    border-radius: 6px;
+  }
+
+  .pagelist .bgprimary {
+    cursor: default;
+    color: #fff;
+    background: rgba(255, 30, 27, 1);
+    border-radius: 6px;
+  }
+
+  .jumpinp input {
+    width: 55px;
+    height: 26px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .ellipsis {
+    padding: 0px 8px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 30px;
+    width: 40px;
+    height: 40px;
+    background: rgba(204, 204, 204, 0);
+    border-radius: 6px;
+  }
+
+  .bgprimary {
+    cursor: default;
+    color: #fff;
+    background: rgba(255, 30, 27, 1);
+    border-radius: 6px;
+  }
+
+  .pagelist .jump.disabled {
+    pointer-events: none;
+    color: rgba(153, 153, 153, 1);
+  }
+
+  .jumppoint {
+    margin-left: 30px;
+  }
+
+  .pagelist .gobtn {
+    font-size: 18px;
+  }
+
+  .pageNum {
+    display: inline-block;
+    height: 28px;
+    font-size: 16px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: rgba(102, 102, 102, 1);
+    line-height: 28px;
+  }
+
+</style> -->
+
+<body>
+
+  <div id="NewHome_Main">
+    <div class="body_all">
+      <div class="frame_right">
+        <div class="contact bg-01">
+          <!-- <php>
+                    $xiao_qqs=D('user')->where(['role_id'=>8,'online'=>1])->getField('qq',true);
+                    $max=count($xiao_qqs)-1;
+                    $position=rand(0,$max);
+                    $xiao_qq=$xiao_qqs[$position];
+                </php>
+                <a class="oveHidden" onclick="Adv_Consult({$xiao_qq})"> -->
+          <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=2467117047&amp;site=qq&amp;menu=yes" target="_blank">
+            <img width="40px" height="40px" src="https://test.qmycm.com/home_images/QQ_Icon.png?v=20190528" alt="">
+            <span class="contact-content">广告主咨询</span>
+          </a>
+        </div>
+      </div>
+      <div class="frame_right">
+        <div class="contact bg-02">
+          <!-- <php>
+                    $mei_qqs=D('user')->where(['role_id'=>9,'online'=>1])->getField('qq',true);
+                    $max1=count($mei_qqs)-1;
+                    $position1=rand(0,$max1);
+                    $mei_qq=$mei_qqs[$position1];
+                </php>
+                <a class="oveHidden" onclick="Media_Consult({$mei_qq})"> -->
+          <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=959296310&amp;site=qq&amp;menu=yes" target="_blank">
+            <img width="40px" height="40px" src="https://test.qmycm.com/home_images/QQ_Icon.png?v=20190528" alt="">
+            <span class="contact-content">媒体主咨询</span>
+          </a>
+        </div>
+      </div>
+      <div class="frame_right">
+        <div class="contact bg-03"><a class="oveHidden"><img width="40px" height="40px" class="fLeft" src="https://test.qmycm.com/home_images/Tel_Icon.png?v=20190528" alt="">
+            <span class="contact-content">13346157195</span></a></div>
+      </div>
+      <div class="frame_right ercodeShow">
+        <div class="contact bg-04 "><a><span class="contact-content" style="padding-left:0;">
+              <img width="40px" height="40px" src="https://test.qmycm.com/home_images/wechat_Icon.png?v=20120528" alt=""></span></a>
+          <div class="erCodeBox"><img src="https://test.qmycm.com/home_images/QR_code.jpg" alt=""></div>
+        </div>
+      </div>
+      <div class="frame_right">
+        <div class="contact bg-04">
+          <a href="javascript:goTop();">
+            <span class="contact-content" style="padding-left:0;">
+              <img width="40px" height="40px" src="https://test.qmycm.com/home_images/Return_Icon.png?v=20190528" alt="">
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!--导航-->
+    <header class="NavHeader oveHidden">
+      <div class="Widauto boxPadding oveHidden g-flex g-align-items-center g-header-height">
+        <div class="Logo_main oveHidden fLeft"><a class="Logo BgImg_bai fLeft" href="/"></a><span class="fLeft"></span>
+        </div>
+        <ul class="new_menu menu_label">
+          <li><a href="/">首页</a></li>
+          <li><a href="{:U('/Home/Media/shotMedia')}">短视频</a></li>
+          <li><a href="{:U('/Home/Media/index')}">微信推广</a></li>
+          <!--<li><a href="{:U('/Home/Media/upfans')}">公众号阅读量</a></li>-->
+          <li><a href="{:U('/Home/Media/xiang')}">媒体接单</a></li>
+          <li><a href="{:U('/Home/Media/xiang')}">新闻动态</a></li>
+          <li><a href="{:U('/Home/Enlist/index')}">招商加盟</a></li>
+          <li><a href="{:U('/Home/Media/help')}">帮助中心</a></li>
+        </ul>
+        <div class="login_main fr oveHidden">
+          <!-- <?php
+                $aid = session("aid");
+                $mid = session('mid');
+                if (!empty($aid)) {
+                    $login = M("advertising")->where('id = '.$aid)->getField('phone');
+                    $href = "/ad.html";
+
+                  } else if (!empty($mid)) {
+                    $login = M('media')->where('id = '.$mid)->getField('phone');
+                    $href = "/Media.html";
+                  } else {
+                    $login = '登录';
+                    $href = "/ad.html";
+                  }
+            ?> -->
+          <if condition="$login eq 登录">
+            <div class="login_register_new" id="login_register">
+              <!-- <a href={$href} rel="nofollow">{$login}</a>
+              <a href="/Home/User/register.html" rel="nofollow">注册</a> -->
+              <a href="" rel="nofollow">登录</a>
+              <a href="/Home/User/register.html" rel="nofollow">注册</a>
+            </div>
+            <!-- <else /> -->
+            <!-- <a class="login_user login_number fLeft" href={$href} rel="nofollow"><i class="Personal"></i>{$login}</a> -->
+          </if>
+        </div>
+      </div>
+    </header>
+    <div class="BannerNews"></div>
+    <div class="news_option">
+      <p>最新资讯</p>
+      <p class="industry">行业动态</p>
+      <p>公司动态</p>
+    </div>
+    <div class="feed_wrapper">
+      <div class="content_left">
+        <div class="content_left-item">
+          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
+          <div class="content_details">
+            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
+            <div class="time">
+              <i class="iconfont iconshijian"></i>
+              <span>2021-01-29</span>
+              <i class="iconfont iconyanjing-yueduliang"></i>
+              <span>1861</span>
+            </div>
+            <div class="content_left_details">
+              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
+            </div>
+            <ul class="content_label">
+              <li>产品介绍</li>
+              <li>教育培训</li>
+              <li>AI</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content_left-item">
+          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
+          <div class="content_details">
+            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
+            <div class="time">
+              <i class="iconfont iconshijian"></i>
+              <span>2021-01-29</span>
+              <i class="iconfont iconyanjing-yueduliang"></i>
+              <span>1861</span>
+            </div>
+            <div class="content_left_details">
+              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
+            </div>
+            <ul class="content_label">
+              <li>产品介绍</li>
+              <li>教育培训</li>
+              <li>AI</li>
+            </ul>
+          </div>
+        </div>
+        <div class="content_left-item">
+          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
+          <div class="content_details">
+            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
+            <div class="time">
+              <i class="iconfont iconshijian"></i>
+              <span>2021-01-29</span>
+              <i class="iconfont iconyanjing-yueduliang"></i>
+              <span>1861</span>
+            </div>
+            <div class="content_left_details">
+              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
+            </div>
+            <ul class="content_label">
+              <li>产品介绍</li>
+              <li>教育培训</li>
+              <li>AI</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="content_right">
+        <ul class="content_right-choose">
+          <li class="right_active">
+            最新
+          </li>
+          <li>
+            最热
+          </li>
+        </ul>
+        <ul class="new-pmd-list">
+          <li>
+            <span>01</span>
+            <p> 盲盒为何会成瘾？这项小白...</p>
+          </li>
+          <li>
+            <span>02</span>
+            <p>如何安装Python 3.9.1？ </p>
+          </li>
+          <li>
+            <span>03</span>
+            <p>总额超60亿！春节未至红包</p>
+          </li>
+          <li>
+            <span>04</span>
+            <p>美团杀入电商市场，市值暴...</p>
+          </li>
+        </ul>
+      </div>
+      <!-- <div id="app">
+        <div class="page" v-show="show">
+          <div class="pagelist">
+            <span class="jump" :class="{disabled:starts}" @click="{current_page--}">上一页</span>
+            <span v-show="current_page>5" class="jump" @click="jumpPage(1)">1</span>
+            <span class="ellipsis" v-show="efont">...</span>
+            <span class="jump" v-for="num in indexs" :class="{bgprimary:current_page==num}" @click="jumpPage(num)">{{num}}</span>
+            <span class="ellipsis" v-show="ebehind">...</span>
+            <span v-show="current_page<pages-4" class="jump" @click="jumpPage(pages)">{{pages}}</span>
+            <span :class="{disabled:ends}" class="jump" @click="{current_page++}">下一页</span>
+            <span class="jumppoint">前往：</span>
+            <span class="jumpinp"><input type="text" v-model="changePage"></span>
+            <span class="jump gobtn" @click="jumpPage(changePage)">GO</span>
+          </div>
+          <span class="pageNum">第{{current_page||1}}页/共{{pages}}页</span>
+        </div>
+      </div> -->
+    </div>
+    <!-- <script>
+      var newlist = new Vue({
+        el: '#app',
+        data: {
+          current_page: 1, //当前页
+          pages: 50, //总页数
+          changePage: '', //跳转页
+          nowIndex: 0
+        },
+        computed: {
+          // ...是否禁用上一页
+          show: function() {
+            return this.pages && this.pages != 1
+          },
+          // 开始
+          starts: function() {
+            return this.current_page == 1;
+          },
+          ends: function() {
+            return this.current_page == this.pages;
+          },
+          // ...
+          efont: function() {
+            if (this.pages <= 7) return false;
+            return this.current_page > 5
+          },
+          // 是否大于7
+          ebehind: function() {
+            if (this.pages <= 7) return false;
+            var nowAy = this.indexs;
+            return nowAy[nowAy.length - 1] != this.pages;
+          },
+          indexs: function() {
+            var left = 1,
+              right = this.pages,
+              ar = [];
+            if (this.pages >= 7) {
+              if (this.current_page > 5 && this.current_page < this.pages - 4) {
+                left = Number(this.current_page) - 2;
+                right = Number(this.current_page) + 2;
+              } else {
+                if (this.current_page <= 5) {
+                  left = 1;
+                  right = 7;
+                } else {
+                  right = this.pages;
+                  left = this.pages - 6;
+                }
+              }
+            }
+            while (left <= right) {
+              ar.push(left);
+              left++;
+            }
+            return ar;
+          },
+        },
+        methods: {
+          jumpPage: function(id) {
+            this.current_page = id;
+          },
+        },
+      })
+
+    </script> -->
+</body>
+
+</html>
