@@ -91,6 +91,13 @@ export default class extends think.Controller {
                 del: 0,
                 status: 2
             }).cache('current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
+            for (const new_item of current_list) {
+                if (!think.isEmpty(new_item.seo_keywords)) {
+                    new_item.seo_keywords = new_item.seo_keywords.split(',');
+                } else {
+                    new_item.seo_keywords = [];
+                }
+            }
             const count = await think.model('article').cache('count', {timeout: 30 * 1000}).where({del: 0, status: 2}).count('*');
             this.assign({
                 hot_list,
@@ -102,8 +109,8 @@ export default class extends think.Controller {
                 current_cate,
                 category
             });
-            await this.display('news_index');
-            // this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
+            // await this.display('news_index');
+            this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
         } catch ($err) {
             this.fail(-1, $err.stack);
         }
