@@ -33,8 +33,12 @@ export default class extends Base {
             const limit: number = this.get('pageSize') || 10;
             const status: number = Number(this.get('status') || 0);
             const title: string = this.get('title') || '';
+            const category_id = this.get('category_id') || 0;
             const where: any = {del: 0};
 
+            if (category_id) {
+                where.category = category_id;
+            }
             if (!think.isEmpty(title)) {
                 where.title = ['like', `%${title}%`];
             }
@@ -42,7 +46,8 @@ export default class extends Base {
                 where.status = status;
             }
 
-            const res = await think.model('article').where(where).page(page, limit).order('created_at DESC').countSelect();
+            const res = await think.model('article').where(where).page(page, limit)
+                .order('created_at DESC').countSelect();
             const statusList = [
                 {
                     _status: "全部",
