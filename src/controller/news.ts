@@ -100,8 +100,8 @@ export default class extends think.Controller {
                 current_cate,
                 category
             });
-            // await this.display('news_index');
-            this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
+            await this.display('news_index');
+            // this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
         } catch ($err) {
             this.fail(-1, $err.stack);
         }
