@@ -38,7 +38,8 @@ export default class extends think.Controller {
             if (think.isEmpty(result)) {
                 return this.redirect('/news');
             }
-            const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
+            const category = await think.model('item_category').field('id as category_id,category_name')
+                .cache('category', {timeout: 2 * 60 * 1000}).where({del: 0}).select();
             for (const item of category) {
                 item.url = `/news/cate/${item.category_id}.html`;
             }
