@@ -56,8 +56,8 @@ export default class extends think.Controller {
             this.assign('prev_article', prev_article);
             // return this.success({newest_list, hot_list , next_article, prev_article, current_cate, category, current_article: result});
             // 增加阅读
-            await think.model('article').where({article_no}).increment('pv', 1);
-            await think.model('article').where({article_no}).increment('real_pv', 1);
+            think.model('article').where({article_no}).increment('pv', 1);
+            think.model('article').where({article_no}).increment('real_pv', 1);
             return this.display('news_detail');
         } catch ($err) {
             this.fail(-1, $err.stack);
