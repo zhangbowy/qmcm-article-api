@@ -107,7 +107,7 @@
           <li><a href="/Home/Media/index">微信推广</a></li>
           <!--<li><a href="/Home/Media/upfans">公众号阅读量</a></li>-->
           <li><a href="/Home/Media/xiang">媒体接单</a></li>
-          <li><a href="/Home/Media/xiang">新闻动态</a></li>
+          <li><a href="/news">新闻动态</a></li>
           <li><a href="/Home/Enlist/index">招商加盟</a></li>
           <li><a href="/Home/Media/help">帮助中心</a></li>
         </ul>
@@ -141,14 +141,25 @@
       </div>
     </header>
     <div class="BannerNews"></div>
-    <div class="news_option">
-      {% for item in category %}
-      {% if item.category_id==current_cate.category_id %}
-      <a class="industry" href="{{item.url}}">{{item.category_name}}</a>
-      {% else %}
-      <a href="{{item.url}}">{{item.category_name}}</a>
-      {% endif %}
-      {% endfor %}
+    <div class="news_option news_option_detaile">
+      <div class="news_option_detaile—warpeer">
+        <div class="news_option-left">
+          <p>
+            <a href="/">首页</a><span>></span>
+            <a href="/news">新闻动态</a><span>></span>
+            <a href="javascript:0;">{{current_cate.category_name}}</a>
+          </p>
+        </div>
+        <div class="news_option-right">
+          {% for item in category %}
+          {% if item.category_id==current_cate.category_id %}
+          <a class="industry" href="{{item.url}}">{{item.category_name}}</a>
+          {% else %}
+          <a href="{{item.url}}">{{item.category_name}}</a>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
     </div>
     <div class="feed_wrapper">
       <div class="content_left">
