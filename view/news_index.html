@@ -20,6 +20,7 @@
   <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/NewCss/home/newHome.css"> -->
   <!-- <link rel="stylesheet" type="text/css" href="https://test.qmycm.com/iconFont/iconfont.css"> -->
   <link rel="stylesheet" href="https://test.qmycm.com/NewCss/animate.css-master/animate.min.css?v=20200327">
+  <link rel="stylesheet" type="text/css" href="/static/css/news_index.css">
   <!-- 矢量图库地址 -->
   <link rel="stylesheet" href="https://test.qmycm.com/css/IconFont.css" />
   <script type="text/javascript" src="https://test.qmycm.com/homejs/Jquery-2.0.3.min.js"></script>
@@ -40,313 +41,6 @@
 -->
   <!-- 备注 -->
 </head>
-<style>
-  .new_menu li:nth-child(5) a {
-    color: #FF0000
-  }
-
-  .bg-c {
-    background: #F7F7F7;
-  }
-
-  .BannerNews {
-    background: url(http://img.wkdao.com/image/46/2021/02/19/931f3d51373dad482401de4a0abf72d1.png) no-repeat center center;
-    background-size: 1920px 500px;
-    position: relative;
-    width: 100%;
-    height: 500px;
-    margin-top: 80px;
-    overflow: hidden;
-  }
-
-  .news_option {
-    width: 100%;
-    height: 66px;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .news_option p {
-    font-size: 18px;
-    font-weight: 400;
-    margin: 0 33px;
-  }
-
-  .industry {
-    width: 108px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    background: #367AFF;
-    position: relative;
-    border-radius: 3px;
-    color: #FFFFFF;
-  }
-
-  .industry::before {
-    content: "";
-    display: block;
-    z-index: 9;
-    position: absolute;
-    width: 0;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 0;
-    transition-duration: 0.3s;
-    border-top: 5px solid #4D78EA;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-  }
-
-  .feed_wrapper {
-    width: 1200px;
-    margin: 0 auto;
-    margin-top: 20px;
-    display: flex;
-    margin-bottom: 30px;
-  }
-
-  .content_left {
-    width: 900px;
-    background: #FFFFFF;
-    padding: 30px;
-    box-sizing: border-box;
-    padding-top: 0;
-  }
-
-  .content_right {
-    width: 280px;
-    height: 548px;
-    margin-left: 20px;
-    background: #FFFFFF;
-    box-sizing: border-box;
-    padding: 30px 15px 25px 30px;
-  }
-
-  .content_left .c-img {
-    width: 246px;
-    height: 176px;
-  }
-
-  .content_left .link {
-    font-size: 18px;
-    font-weight: 400;
-    color: #333333;
-    line-height: 0;
-  }
-
-  .content_details {
-    width: 582px;
-    margin-left: 30px;
-    padding-top: 10px;
-  }
-
-  .time {
-    margin-top: 20px;
-    line-height: 0;
-  }
-
-  .time .iconshijian,
-  .time .iconyanjing-yueduliang {
-    color: #999999;
-  }
-
-  .time .iconshijian {
-    width: 14px;
-    height: 14px;
-  }
-
-  .time .iconyanjing-yueduliang {
-    width: 16px;
-    height: 11px;
-    margin-left: 28px;
-  }
-
-  .time span {
-    font-size: 14px;
-    font-weight: 400;
-    color: #999999;
-  }
-
-  .content_left_details {
-    margin-top: 20px;
-    font-size: 12px;
-    font-family: Microsoft YaHei;
-    font-weight: 400;
-    color: #999999;
-  }
-
-  .content_label {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 30px;
-  }
-
-  .content_label li {
-    font-size: 14px;
-    font-weight: 400;
-    color: #367AFF;
-    margin-left: 20px;
-  }
-
-  .content_left-item {
-    display: flex;
-    border-bottom: 1px solid #E9E9E9;
-    padding-bottom: 30px;
-    padding-top: 30px;
-  }
-
-  .content_right-choose {
-    display: flex;
-  }
-
-  .content_right-choose li {
-    font-size: 18px;
-    font-family: Microsoft YaHei;
-    font-weight: 400;
-    margin-right: 30px;
-  }
-
-  .content_right-choose .right_active {
-    padding-bottom: 10px;
-    border-bottom: 2px solid #333333;
-  }
-
-  .new-pmd-list li {
-    margin: 20px 0;
-    display: flex;
-  }
-
-  .new-pmd-list li P {
-    width: 202px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-  }
-
-  .new-pmd-list li span {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
-    font-family: Microsoft YaHei;
-    font-weight: 400;
-    background-color: #CDCDCD;
-    color: #FFFFFF;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 9px;
-    flex-shrink: 0;
-  }
-
-  .new-pmd-list li:nth-child(1) span {
-    background-color: #FF4F64;
-  }
-
-  .new-pmd-list li:nth-child(2) span {
-    background-color: #FF7050;
-  }
-
-  .new-pmd-list li:nth-child(3) span {
-    background-color: #FE964F;
-  }
-
-</style>
-<!-- 分页 -->
-<!-- <style>
-  .page {
-    display: inline-block;
-    margin: 50px;
-  }
-
-  .pagelist {
-    display: inline-block;
-    height: 40px;
-    line-height: 40px;
-  }
-
-  .pagelist span {
-    font-size: 20px;
-    color: rgba(51, 51, 51, 1);
-  }
-
-  .pagelist .jump {
-    padding: 6px 14px;
-    text-align: center;
-    cursor: pointer;
-    margin-left: 30px;
-    width: 40px;
-    height: 40px;
-    background: rgba(204, 204, 204, 0.3);
-    border-radius: 6px;
-  }
-
-  .pagelist .bgprimary {
-    cursor: default;
-    color: #fff;
-    background: rgba(255, 30, 27, 1);
-    border-radius: 6px;
-  }
-
-  .jumpinp input {
-    width: 55px;
-    height: 26px;
-    font-size: 13px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
-  }
-
-  .ellipsis {
-    padding: 0px 8px;
-    text-align: center;
-    cursor: pointer;
-    margin-left: 30px;
-    width: 40px;
-    height: 40px;
-    background: rgba(204, 204, 204, 0);
-    border-radius: 6px;
-  }
-
-  .bgprimary {
-    cursor: default;
-    color: #fff;
-    background: rgba(255, 30, 27, 1);
-    border-radius: 6px;
-  }
-
-  .pagelist .jump.disabled {
-    pointer-events: none;
-    color: rgba(153, 153, 153, 1);
-  }
-
-  .jumppoint {
-    margin-left: 30px;
-  }
-
-  .pagelist .gobtn {
-    font-size: 18px;
-  }
-
-  .pageNum {
-    display: inline-block;
-    height: 28px;
-    font-size: 16px;
-    font-family: PingFangSC-Regular, PingFang SC;
-    font-weight: 400;
-    color: rgba(102, 102, 102, 1);
-    line-height: 28px;
-  }
-
-</style> -->
 
 <body>
 
@@ -409,13 +103,13 @@
         </div>
         <ul class="new_menu menu_label">
           <li><a href="/">首页</a></li>
-          <li><a href="{:U('/Home/Media/shotMedia')}">短视频</a></li>
-          <li><a href="{:U('/Home/Media/index')}">微信推广</a></li>
-          <!--<li><a href="{:U('/Home/Media/upfans')}">公众号阅读量</a></li>-->
-          <li><a href="{:U('/Home/Media/xiang')}">媒体接单</a></li>
-          <li><a href="{:U('/Home/Media/xiang')}">新闻动态</a></li>
-          <li><a href="{:U('/Home/Enlist/index')}">招商加盟</a></li>
-          <li><a href="{:U('/Home/Media/help')}">帮助中心</a></li>
+          <li><a href="/Home/Media/shotMedia">短视频</a></li>
+          <li><a href="/Home/Media/index">微信推广</a></li>
+          <!--<li><a href="/Home/Media/upfans">公众号阅读量</a></li>-->
+          <li><a href="/Home/Media/xiang">媒体接单</a></li>
+          <li><a href="/Home/Media/xiang">新闻动态</a></li>
+          <li><a href="/Home/Enlist/index">招商加盟</a></li>
+          <li><a href="/Home/Media/help">帮助中心</a></li>
         </ul>
         <div class="login_main fr oveHidden">
           <!-- <?php
@@ -448,24 +142,29 @@
     </header>
     <div class="BannerNews"></div>
     <div class="news_option">
-      <p>最新资讯</p>
-      <p class="industry">行业动态</p>
-      <p>公司动态</p>
+      {% for item in category %}
+      {% if item.category_id==current_cate.category_id %}
+      <a class="industry" href="{{item.url}}">{{item.category_name}}</a>
+      {% else %}
+      <a href="{{item.url}}">{{item.category_name}}</a>
+      {% endif %}
+      {% endfor %}
     </div>
     <div class="feed_wrapper">
       <div class="content_left">
+        {% for item in current_list %}
         <div class="content_left-item">
-          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
+          <img src="{{item.cover_image}}" alt="" class="c-img">
           <div class="content_details">
-            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
+            <a class="link" href="{{item.full_path}}" target="_blank" rel="noopener noreferrer">{{item.seo_title}}</a>
             <div class="time">
               <i class="iconfont iconshijian"></i>
-              <span>2021-01-29</span>
+              <span><a href="{{item.full_path}}">{{item.created_at}}</a></span>
               <i class="iconfont iconyanjing-yueduliang"></i>
-              <span>1861</span>
+              <span><a href="{{item.full_path}}">{{item.pv}}</a></span>
             </div>
             <div class="content_left_details">
-              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
+              <a href="{{item.full_path}}">{{item.seo_desc}}</a>
             </div>
             <ul class="content_label">
               <li>产品介绍</li>
@@ -474,45 +173,21 @@
             </ul>
           </div>
         </div>
-        <div class="content_left-item">
-          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
-          <div class="content_details">
-            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
-            <div class="time">
-              <i class="iconfont iconshijian"></i>
-              <span>2021-01-29</span>
-              <i class="iconfont iconyanjing-yueduliang"></i>
-              <span>1861</span>
-            </div>
-            <div class="content_left_details">
-              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
-            </div>
-            <ul class="content_label">
-              <li>产品介绍</li>
-              <li>教育培训</li>
-              <li>AI</li>
-            </ul>
+        {% endfor %}
+        <div id="myPage" class="demo" data-page="{{page}}" data-total="{{count}}" data-page_size="{{pageSize}}">
+          <!-- <div class="spage-total">共150条</div> -->
+          <div class="spage-number">
+            <button class="button-disabled" data-page="prev">上一页</button>
+            <button class="active" data-page="1">1</button>
+            <button data-page="2">2</button>
+            <button data-page="3">3</button>
+            <button data-page="4">4</button>
+            <button data-page="5">5</button>
+            <button data-page="after" class="spage-after">...</button>
+            <button data-page="15">15</button>
+            <button data-page="next">下一页</button>
           </div>
-        </div>
-        <div class="content_left-item">
-          <img src="http://img.wkdao.com/image/65/2021/02/23/6dd92ad19950148043b6a9c171ff986a.png" alt="" class="c-img">
-          <div class="content_details">
-            <a class="link" href="/group/6931322520549360141/" target="_blank" rel="noopener noreferrer">消息称京东物流计划本月提交香港IPO申请 京东港股午后短线拉升</a>
-            <div class="time">
-              <i class="iconfont iconshijian"></i>
-              <span>2021-01-29</span>
-              <i class="iconfont iconyanjing-yueduliang"></i>
-              <span>1861</span>
-            </div>
-            <div class="content_left_details">
-              腾讯科技讯 消息称京东物流计划本月提交香港IPO申请。受此消息影响，京东午后短线拉升，现涨超5%。此前报道称，京东物流已经挑选了美国银行和高盛为其筹备今年香港IPO事宜此消息影响，京东午后短...
-            </div>
-            <ul class="content_label">
-              <li>产品介绍</li>
-              <li>教育培训</li>
-              <li>AI</li>
-            </ul>
-          </div>
+          <div class="spage-skip">跳至&nbsp;<input type="text" value="1">&nbsp;页&nbsp;&nbsp;<button data-page="go">确定</button></div>
         </div>
       </div>
       <div class="content_right">
@@ -524,92 +199,124 @@
             最热
           </li>
         </ul>
-        <ul class="new-pmd-list">
-          <li>
-            <span>01</span>
-            <p> 盲盒为何会成瘾？这项小白...</p>
-          </li>
-          <li>
-            <span>02</span>
-            <p>如何安装Python 3.9.1？ </p>
-          </li>
-          <li>
-            <span>03</span>
-            <p>总额超60亿！春节未至红包</p>
-          </li>
-          <li>
-            <span>04</span>
-            <p>美团杀入电商市场，市值暴...</p>
-          </li>
-        </ul>
+        <div class="contact_us-scancode-img">
+          <!-- 最热 -->
+          <ul class="new-pmd-list new-pmd-list_active">
+            {% for item in current_list %}
+            <li>
+              <span>0{{loop.index}}</span>
+              <p>{{item.title}}</p>
+            </li>
+            {% endfor %}
+          </ul>
+          <!-- 最新 -->
+          <ul class="new-pmd-list ">
+            {% for item in newest_list %}
+            <li>
+              <span>0{{loop.index}}</span>
+              <p>{{item.title}}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-    <!-- <script>
-      var newlist = new Vue({
-        el: '#app',
-        data: {
-          current_page: 1, //当前页
-          pages: 50, //总页数
-          changePage: '', //跳转页
-          nowIndex: 0
-        },
-        computed: {
-          // ...是否禁用上一页
-          show: function() {
-            return this.pages && this.pages != 1
-          },
-          // 开始
-          starts: function() {
-            return this.current_page == 1;
-          },
-          ends: function() {
-            return this.current_page == this.pages;
-          },
-          // ...
-          efont: function() {
-            if (this.pages <= 7) return false;
-            return this.current_page > 5
-          },
-          // 是否大于7
-          ebehind: function() {
-            if (this.pages <= 7) return false;
-            var nowAy = this.indexs;
-            return nowAy[nowAy.length - 1] != this.pages;
-          },
-          indexs: function() {
-            var left = 1,
-              right = this.pages,
-              ar = [];
-            if (this.pages >= 7) {
-              if (this.current_page > 5 && this.current_page < this.pages - 4) {
-                left = Number(this.current_page) - 2;
-                right = Number(this.current_page) + 2;
-              } else {
-                if (this.current_page <= 5) {
-                  left = 1;
-                  right = 7;
-                } else {
-                  right = this.pages;
-                  left = this.pages - 6;
-                }
-              }
-            }
-            while (left <= right) {
-              ar.push(left);
-              left++;
-            }
-            return ar;
-          },
-        },
-        methods: {
-          jumpPage: function(id) {
-            this.current_page = id;
-          },
-        },
-      })
+    <link rel="stylesheet" href="/static/page/page.css">
+    <script src="/static/page/page.js"></script>
+    <script type="text/javascript">
+      function tabs(tabTit, on, tabCon) {
+        $(tabCon).each(function() {
+          $(this).children().eq(0).show();
 
-    </script> -->
+        });
+        $(tabTit).each(function() {
+          $(this).children().eq(0).addClass(on);
+        });
+        $(tabTit).children().click(function() {
+          $(this).addClass(on).siblings().removeClass(on);
+          var index = $(tabTit).children().index(this);
+          $(tabCon).children().eq(index).show().siblings().hide();
+        });
+      }
+      tabs(".content_right-choose", "right_active", ".contact_us-scancode-img");
+      $(function() {
+        let page = $("#myPage").data('page');
+        let total = $("#myPage").data('total');
+        let pageSize = $("#myPage").data('page_size');
+        // 示例1
+        $("#myPage").sPage({
+          page: page, //当前页码，必填
+          total: total, //数据总条数，必填
+          pageSize: pageSize, //每页显示多少条数据，默认10条
+          showTotal: false, //是否显示总条数，默认关闭：false
+          totalTxt: "共{total}条", //数据总条数文字描述，{total}为占位符，默认"共{total}条"
+          noData: false, //没有数据时是否显示分页，默认false不显示，true显示第一页
+          showSkip: true, //是否显示跳页，默认关闭：false
+          showPN: true, //是否显示上下翻页，默认开启：true
+          prevPage: "上一页", //上翻页文字描述，默认“上一页”
+          nextPage: "下一页", //下翻页文字描述，默认“下一页”
+          fastForward: 5, //快进快退页数，默认0表示不开启快进快退
+          backFun: function(page) {
+            //点击分页按钮回调函数，返回当前页码
+            $("#pNum").text(page);
+            window.location.href = getUrl(page)
+          }
+        });
+        // 示例2
+        $("#myPage1").sPage({
+          page: 1,
+          pageSize: 10,
+          total: 150,
+          prevPage: "←",
+          nextPage: "→",
+          backFun: function(page) {
+            $("#pNum1").text(page);
+          }
+        });
+        // 示例3
+        $("#myPage2").sPage({
+          page: 1,
+          pageSize: 10,
+          total: 150,
+          showPN: false,
+          backFun: function(page) {
+            $("#pNum2").text(page);
+          }
+        });
+      });
+
+      function getUrl(no) {
+        var str = window.location.href
+        var search = window.location.search
+        var parmasUrl = '?'
+        var parmasJson = getJson()
+        parmasJson.page = no
+        for (var i in parmasJson) {
+          parmasUrl += i + '=' + parmasJson[i] + '&'
+        }
+        var endstr = ''
+        if (search == '') {
+          endstr = str + parmasUrl
+        } else {
+          endstr = str.replace(search, parmasUrl)
+        }
+        return endstr.substr(0, endstr.length - 1)
+      }
+
+      function getJson() {
+        var url = decodeURI(location.search);
+        var res = {}
+        if (url.indexOf("?") != -1) {
+          var str = url.substr(1);
+          var strs = str.split("&");
+          for (var i = 0; i < strs.length; i++) {
+            res[strs[i].split("=")[0]] = strs[i].split("=")[1]
+          }
+        }
+        return res
+      }
+
+    </script>
 </body>
 
 </html>
