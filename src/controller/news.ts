@@ -64,7 +64,7 @@ export default class extends think.Controller {
                 id: cate_id,
                 del: 0
             }).find();
-            const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
+            const category = await think.model('item_category').cache('category', {timeout: 2 * 60 * 1000}).field('id as category_id,category_name').where({del: 0}).select();
             if (think.isEmpty(current_cate)) {
                 current_cate = category[0];
             } else {
@@ -73,16 +73,16 @@ export default class extends think.Controller {
             const hot_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
+            }).cache('hot_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
+            }).cache('newest_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
             const current_list = await think.model('article').where({
                 category_id: current_cate.category_id,
                 del: 0,
                 status: 2
-            }).order('created_at DESC').page(page, 5).select();
+            }).cache('current_list', {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
             const count = await think.model('article').where({del: 0, status: 2}).count('*');
 
             this.assign({
