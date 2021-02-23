@@ -14,13 +14,17 @@ export default class extends think.Controller {
             const article_no = this.get('article_id');
             const hot_list = await think.model('article').where({del: 0, status: 2}).order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
+            const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
+
             this.assign('hot_list', hot_list);
             this.assign('newest_list', newest_list);
             if (think.isEmpty(article_no)) {
                 /**
                  * 列表
                  */
-                return  this.display();
+                // return  this.display();
+                // return this.success({newest_list, hot_list});
+                this.redirect('/news/cate/45.html');
             }
             /**
              * 当前文章
@@ -39,5 +43,34 @@ export default class extends think.Controller {
             return this.display('news_detail');
         } catch ($err) {
         }
+    }
+
+    async cateAction() {
+        const cate_id = this.get('cate_id');
+        const page = this.get('page') || 1;
+        let current_cate = await think.model('item_category').field('id as category_id,category_name').where({id: cate_id, del: 0}).find();
+        const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
+        if (think.isEmpty(current_cate)) {
+            current_cate = category[0];
+        } else {
+            // current_cate = current_cate.category_id;
+        }
+        const hot_list = await think.model('article').where({del: 0, status: 2}).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
+        const newest_list = await think.model('article').where({del: 0, status: 2}).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
+        const current_list = await think.model('article').where({category_id: current_cate.category_id, del: 0, status: 2}).order('created_at DESC').page(page, 5).select();
+        const count = await think.model('article').where({del: 0, status: 2}).count('*');
+
+        this.assign({
+            hot_list,
+            newest_list,
+            current_list,
+            count,
+            page,
+            pageSize: 5,
+            current_cate,
+            category
+        });
+        return  this.display('news_index');
+        this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
     }
 }
