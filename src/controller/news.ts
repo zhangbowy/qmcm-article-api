@@ -39,6 +39,9 @@ export default class extends think.Controller {
                 return this.redirect('/news');
             }
             const category = await think.model('item_category').field('id as category_id,category_name').where({del: 0}).select();
+            for (const item of category) {
+                category.url = `/news/cate/${item.category_id}.html`;
+            }
             const current_cate = await think.model('item_category').field('id as category_id,category_name').where({
                 id: result.category_id,
                 del: 0
@@ -70,6 +73,9 @@ export default class extends think.Controller {
             } else {
                 // current_cate = current_cate.category_id;
             }
+            for (const item of category) {
+                item.url = `/news/cate/${item.category_id}.html`;
+            }
             const hot_list = await think.model('article').where({
                 del: 0,
                 status: 2
@@ -94,8 +100,8 @@ export default class extends think.Controller {
                 current_cate,
                 category
             });
-            await this.display('news_index');
-            // this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
+            // await this.display('news_index');
+            this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
         } catch ($err) {
             this.fail(-1, $err.stack);
         }
