@@ -34,7 +34,7 @@ export default class extends think.Controller {
             /**
              * 当前文章
              */
-            const result = await think.model('article').where({del: 0, status: 2, article_no}).find();
+            const result = await think.model('article').cache(`article_no${article_no}`, {timeout: 1000 * 60}).where({del: 0, status: 2, article_no}).find();
             if (think.isEmpty(result)) {
                 return this.redirect('/news');
             }
