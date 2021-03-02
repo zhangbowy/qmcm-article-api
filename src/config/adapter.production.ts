@@ -3,7 +3,6 @@ import path from 'path';
 const mysql = require('think-model-mysql');
 const redisCache = require('think-cache-redis');
 import { think } from "thinkjs";
-exports.port = 8003;
 /**
  * 正式环境数据库配置
  */
