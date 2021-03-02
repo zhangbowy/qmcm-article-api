@@ -207,7 +207,13 @@
           <ul class="new-pmd-list new-pmd-list_active">
             {% for item in hot_list %}
             <li>
-              <span>0{{loop.index}}</span>
+              <span>
+                {% if 10>loop.index %}
+                0{{loop.index}}
+                {% else %}
+                {{loop.index}}
+                {% endif %}
+              </span>
               <p><a href="{{item.full_path}}">{{item.title}}</a></p>
             </li>
             {% endfor %}
