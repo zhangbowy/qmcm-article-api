@@ -196,6 +196,10 @@ export default class extends base {
     }
   }
   exportExcelAction() {
+    try {
 
+    } catch (e) {
+
+    }
   }
 }
