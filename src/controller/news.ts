@@ -64,6 +64,10 @@ export default class extends think.Controller {
         }
     }
 
+
+    /**
+     * 文章分类
+     */
     async cateAction() {
         try {
             const cate_id = this.get('cate_id');
