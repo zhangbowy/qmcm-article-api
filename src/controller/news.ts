@@ -1,5 +1,6 @@
 import Base from './base';
 import {ancestorWhere} from "tslint";
+import {think} from "thinkjs";
 // import {think} from "thinkjs";
 const path = require('path');
 const crypto = require('crypto');
@@ -49,6 +50,13 @@ export default class extends think.Controller {
             }).cache(`cate_id${result.category_id}`, {timeout: 5 * 60 * 1000}).find();
             const next_article = await think.model('article').cache(`article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).where({del: 0, category_id: result.category_id, article_id: ['in', result.article_id]}).find();
             const prev_article = await think.model('article').cache(`article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).field('max(article_id),title,full_path').order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).group('article_id').find();
+            const list = await think.model('options').cache(`article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).select();
+            const options: any = {};
+            for (const item of list) {
+                // tslint:disable-next-line:no-unused-expression
+                options[item.key] = item.value;
+            }
+            this.assign('options', options);
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
