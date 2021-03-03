@@ -49,8 +49,8 @@ export default class extends think.Controller {
                 id: result.category_id,
                 del: 0
             }).cache(`cate_id${result.category_id}`, {timeout: 5 * 60 * 1000}).find();
-            const next_article = await think.model('article').cache(env + `article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).find();
-            const prev_article = await think.model('article').cache(env + `article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).order('created_at ASC').where({del: 0, category_id: result.category_id, article_id: ['>', result.article_id]}).group('article_id').find();
+            const next_article = await think.model('article').cache(env + `article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).order('created_at DESC').where({status: 2, del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).find();
+            const prev_article = await think.model('article').cache(env + `article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).order('created_at ASC').where({status: 2, del: 0, category_id: result.category_id, article_id: ['>', result.article_id]}).group('article_id').find();
             const list = await think.model('options').cache(env + `optionss`, {timeout: 2 * 60 * 1000}).select();
             const options: any = {};
             for (const item of list) {
