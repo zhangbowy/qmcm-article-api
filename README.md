@@ -1,6 +1,6 @@
-# yuncixiu-api-v3.0
+# chuanmei-api-v1.0
 
-yuncixiu api with Thinkjs (Typescript)   
+chuanmei api with Thinkjs (Typescript)   
 
 ## Install dependencies
 

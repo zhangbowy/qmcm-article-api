@@ -322,7 +322,7 @@ export default class extends Base {
    */
   async confirmPaymentAction() {
     try {
-      const order_id: any = this.post('order_id');
+      const order_id: number = this.post('order_id');
       // @ts-ignore
       const shop_id = this.ctx.state.admin_info.shop_id;
 

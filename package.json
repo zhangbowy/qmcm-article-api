@@ -1,6 +1,6 @@
 {
-  "name": "yuncixiu-api-v3",
-  "description": "云刺綉Api",
+  "name": "chuanmei-api-v1",
+  "description": "传媒Api",
   "version": "1.0.0",
   "author": "杭州千盟网络科技有限公司",
   "scripts": {
@@ -19,6 +19,7 @@
     "node-pinyin": "^0.2.3",
     "node-xlsx": "^0.15.0",
     "qcloudsms_js": "^0.1.1",
+    "qr-image": "^3.2.0",
     "replace-color": "^2.3.0",
     "request-promise": "^4.2.5",
     "sha1": "^1.1.1",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "typescript": "^2.5.3",
     "@types/koa": "*",
+    "@types/node": "14.6.0",
     "node-notifier": "^5.0.2",
     "think-watcher": "^3.0.0",
     "think-inspect": "0.0.2",
@@ -62,11 +64,11 @@
   "readmeFilename": "README.md",
   "thinkjs": {
     "metadata": {
-      "name": "yuncixiu-api-v3",
-      "description": "云刺綉Api",
+      "name": "chuanmei-api-v1",
+      "description": "chuanmeiApi",
       "author": "杭州千盟网络科技有限公司"
     },
-    "projectName": "yuncixiu-api-v3",
+    "projectName": "chuanmei-api-v3",
     "template": "typescript",
     "clone": false,
     "isMultiModule": false
