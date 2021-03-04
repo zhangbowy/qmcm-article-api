@@ -2,7 +2,7 @@
 import { think } from "thinkjs";
 export = {
   workers: 3,
-  port: 8002,
+  port: think.env == 'development' ? 8002 : 8003,
   errnoField: 'code',
   errmsgField: 'msg',
   defaultErrno: 0,
