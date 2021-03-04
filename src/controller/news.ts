@@ -1,5 +1,6 @@
 import Base from './base';
 import {ancestorWhere} from "tslint";
+import {think} from "thinkjs";
 // import {think} from "thinkjs";
 const path = require('path');
 const crypto = require('crypto');
@@ -11,15 +12,16 @@ export default class extends think.Controller {
      */
     async indexAction() {
         try {
+            const env = think.env;
             const article_no = this.get('article_id');
             const hot_list = await think.model('article').field('article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).cache('hot_list', {timeout: 2 * 60 * 1000}).order('pv DESC').page(1, 10).select();
+            }).cache(env + 'hot_list', {timeout: 2 * 60 * 1000}).order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').field('article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).cache('newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 10).select();
+            }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 10).select();
             // const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
             if (think.isEmpty(article_no)) {
                 /**
@@ -34,7 +36,7 @@ export default class extends think.Controller {
             /**
              * 当前文章
              */
-            const result = await think.model('article').cache(`article_no${article_no}`, {timeout: 1000 * 60}).where({del: 0, status: 2, article_no}).find();
+            const result = await think.model('article').cache(env + `article_no${article_no}`, {timeout: 1000 * 60}).where({del: 0, status: 2, article_no}).find();
             if (think.isEmpty(result)) {
                 return this.redirect('/news');
             }
@@ -47,8 +49,15 @@ export default class extends think.Controller {
                 id: result.category_id,
                 del: 0
             }).cache(`cate_id${result.category_id}`, {timeout: 5 * 60 * 1000}).find();
-            const next_article = await think.model('article').cache(`article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).where({del: 0, category_id: result.category_id, article_id: ['in', result.article_id]}).find();
-            const prev_article = await think.model('article').cache(`article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).field('max(article_id),title,full_path').order('created_at DESC').where({del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).group('article_id').find();
+            const next_article = await think.model('article').cache(env + `article_no${article_no}_next`, {timeout: 2 * 60 * 1000}).order('created_at DESC').where({status: 2, del: 0, category_id: result.category_id, article_id: ['<', result.article_id]}).find();
+            const prev_article = await think.model('article').cache(env + `article_no${article_no}_prev`, {timeout: 2 * 60 * 1000}).order('created_at ASC').where({status: 2, del: 0, category_id: result.category_id, article_id: ['>', result.article_id]}).group('article_id').find();
+            const list = await think.model('options').cache(env + `optionss`, {timeout: 2 * 60 * 1000}).select();
+            const options: any = {};
+            for (const item of list) {
+                // tslint:disable-next-line:no-unused-expression
+                options[item.key] = item.value;
+            }
+            this.assign('options', options);
             this.assign('current_cate', current_cate);
             this.assign('category', category);
             this.assign('current_article', result);
@@ -64,8 +73,13 @@ export default class extends think.Controller {
         }
     }
 
+
+    /**
+     * 文章分类
+     */
     async cateAction() {
         try {
+            const env = think.env;
             const cate_id = this.get('cate_id');
             const page = this.get('page') || 1;
             let current_cate = await think.model('item_category').field('id as category_id,category_name').where({
@@ -84,16 +98,16 @@ export default class extends think.Controller {
             const hot_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).cache('hot_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
+            }).cache(env + 'hot_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).cache('newest_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
+            }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
             const current_list = await think.model('article').where({
                 category_id: current_cate.category_id,
                 del: 0,
                 status: 2
-            }).cache('current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
+            }).cache(env + 'current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
             for (const new_item of current_list) {
                 if (!think.isEmpty(new_item.seo_keywords)) {
                     new_item.seo_keywords = new_item.seo_keywords.split(',');
