@@ -161,6 +161,7 @@
 
 .content_right-choose {
   display: flex;
+  cursor: pointer;
 }
 
 .content_right-choose li {
@@ -186,6 +187,7 @@
 .new-pmd-list li {
   margin: 20px 0;
   display: flex;
+  cursor: pointer;
 }
 
 .new-pmd-list li P {
