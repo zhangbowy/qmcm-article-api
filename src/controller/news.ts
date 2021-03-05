@@ -140,7 +140,7 @@ export default class extends think.Controller {
         const newest_list = await think.model('article').where({
             del: 0,
             status: 2
-        }).field('article_id,full_path,title').order('created_at DESC').page(page, limit).select();
+        }).field('article_id,full_path,title,summary,created_at,cover_image').order('created_at DESC').page(page, limit).select();
         this.success(newest_list, '新闻列表');
     }
 }
