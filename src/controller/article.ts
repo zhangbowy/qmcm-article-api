@@ -251,11 +251,6 @@ export default class extends Base {
      */
     async seoAction() {
         try {
-            const article_id = this.post('article_id');
-            const article = await think.model('article').where({article_id, del: 0}).find();
-            if (think.isEmpty(article.full_path)) {
-                return this.fail(-1, '链接不全!');
-            }
             const list = await think.model('options').select();
             const options: any = {};
             for (const item of list) {
@@ -265,7 +260,31 @@ export default class extends Base {
             if (think.isEmpty(options.baidu_seo_token)) {
                 return this.fail(-1, '请先配置百度seo token');
             }
-            const res: unknown = await pushUrl(article.full_path, options);
+            let urls = '';
+            const article_id = this.post('article_id');
+            if (think.isEmpty(article_id)) {
+                // tslint:disable-next-line:no-shadowed-variable
+                const list  = await think.model('article').where({del: 0, status: 2}).select();
+                if (think.isEmpty(list)) {
+                    return this.fail(-1, '没有符合条件的文章');
+                }
+                let i = 0;
+                for (const item of list) {
+                    ++i;
+                    if (i == list.length) {
+                        urls += `${item.full_path}`;
+                    } else {
+                        urls += `${item.full_path}\n`;
+                    }
+                }
+            } else {
+                const article = await think.model('article').where({article_id, del: 0}).find();
+                if (think.isEmpty(article.full_path)) {
+                    return this.fail(-1, '链接不全!');
+                }
+                urls = article.full_path;
+            }
+            const res: unknown = await pushUrl(urls, options);
             const result = JSON.parse(res);
             if (think.isEmpty(result)) {
                return this.fail(-1, '未知错误');
