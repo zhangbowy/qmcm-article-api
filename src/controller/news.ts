@@ -132,4 +132,15 @@ export default class extends think.Controller {
             this.fail(-1, $err.stack);
         }
     }
+
+
+    async newsListAction() {
+        const page: number = this.get('currentPage') || 1;
+        const limit: number = this.get('pageSize') || 4;
+        const newest_list = await think.model('article').where({
+            del: 0,
+            status: 2
+        }).field('article_id,full_path,title').order('created_at DESC').page(page, limit).select();
+        this.success(newest_list, '新闻列表');
+    }
 }
