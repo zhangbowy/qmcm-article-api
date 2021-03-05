@@ -205,7 +205,7 @@
         <div class="contact_us-scancode-img">
           <!-- 最热 -->
           <ul class="new-pmd-list new-pmd-list_active">
-            {% for item in hot_list %}
+            {% for item in newest_list %}
             <li>
               <span>
                 {% if 10>loop.index %}
@@ -220,7 +220,7 @@
           </ul>
           <!-- 最新 -->
           <ul class="new-pmd-list ">
-            {% for item in newest_list %}
+            {% for item in hot_list %}
             <li>
               <span>0{{loop.index}}</span>
               <p><a href="{{item.full_path}}">{{item.title}}</a></p>
