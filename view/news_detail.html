@@ -165,8 +165,8 @@
       <div class="content_left">
         <h2 class="activity-name">{{current_article.title}}</h2>
         <div class="meta_content">
-          <span>时间：2020-01-18 09:20 </span>
-          <span class="author">作者：微客到</span>
+          <span>时间：{{current_article.created_at}} </span>
+          <span class="author">作者：{{current_article.author}}</span>
         </div>
         <div data-content="{{current_article.content}}" id="details_content"></div>
         <ul class="internet_options">
