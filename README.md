@@ -1,6 +1,7 @@
-# chuanmei-api-v1.0
+# 官网新闻模块
 
-chuanmei api with Thinkjs (Typescript)   
+chuanmei article with Thinkjs (Typescript)   
+
 
 ## Install dependencies
 
