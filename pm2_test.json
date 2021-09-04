@@ -1,8 +1,8 @@
 {
   "apps": [{
     "name": "qmycm-article-dev",
-    "script": "development.js",
-    "cwd": "/home/workspace/qm-micro-api-v1.0",
+    "script": "production.js",
+    "cwd": "/home/wk/test/yuncixiu-website-api",
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
