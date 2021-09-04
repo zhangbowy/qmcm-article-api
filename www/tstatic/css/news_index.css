@@ -5,6 +5,9 @@
 .bg-c {
   background: #F7F7F7;
 }
+.BgImg_bai {
+  background: none!important;
+}
 
 .BannerNews {
   background: url(http://img.wkdao.com/image/46/2021/02/19/931f3d51373dad482401de4a0abf72d1.png) no-repeat center center;
