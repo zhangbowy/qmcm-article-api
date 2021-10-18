@@ -141,6 +141,6 @@ export default class extends restController {
    * @private
    */
   __call() {
-    return this.display('error/404.html');
+    return this.display('error/404_2.html');
   }
 }

@@ -30,7 +30,7 @@ export = [
     options: {
       debug: isDev,
       templates: {
-        404: path.join(think.ROOT_PATH, 'view/error/404.html'),
+        404: path.join(think.ROOT_PATH, 'view/error/404_2.html'),
         500: path.join(think.ROOT_PATH, 'view/error/500.html'),
         502: path.join(think.ROOT_PATH, 'view/error/502.html')
       }
