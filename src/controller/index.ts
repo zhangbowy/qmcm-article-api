@@ -7,7 +7,7 @@ const fs = require('fs');
 const AdmZip = require('adm-zip');
 export default class extends Base {
   indexAction() {
-    return this.display();
+    return this.redirect('/news');
     // return this.redirect('http://www.wkdao.com', '走错路发现世界,走对路发现自己');
     const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
     return this.success([], "请求成功!");
