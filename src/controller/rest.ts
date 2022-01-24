@@ -163,6 +163,7 @@ export default class extends think.Controller {
     }
 
     __call() {
+    return this.display();
     return this.fail(404, 'init_controller');
     }
 }

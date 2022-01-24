@@ -21,7 +21,7 @@ export = [
     enable: true,
     options: {
       root: path.join(think.ROOT_PATH, 'www'),
-      publicPath: /^\/(tstatic|static|favicon\.ico|MP_verify_mwTN1uvgPMv6HXzM\.txt)/
+      publicPath: /^\/(assets|tstatic|static|favicon\.ico|MP_verify_mwTN1uvgPMv6HXzM\.txt)/
     }
   },
   {
