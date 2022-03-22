@@ -5,7 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
-export default class extends Base {
+export default class extends think.Controller {
   indexAction() {
     // return this.redirect('/news');
     return this.display('index1');

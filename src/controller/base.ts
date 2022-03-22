@@ -14,7 +14,7 @@ export default class extends restController {
       this.header('Access-Control-Allow-Headers', ["x-requested-with", 'origin', 'content-type', 'adm_sign']);
       this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
       this.header('Access-Control-Allow-Credentials', true);
-      const whiteList = ['/', '/article/options','/order/exportExcel', '/admin/login', '/admin/getCaptcha', '/admin/logOut', '/index/downLoad', '/index/getDst'];
+      const whiteList = ['/','/index', '/article/options','/order/exportExcel', '/admin/login', '/admin/getCaptcha', '/admin/logOut', '/index/downLoad', '/index/getDst'];
       if (whiteList.indexOf(this.ctx.path) === -1) {
         const adm_sign = this.header("adm_sign");
         if (think.isEmpty(adm_sign)) {
