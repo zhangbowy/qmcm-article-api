@@ -6,13 +6,44 @@ const crypto = require('crypto');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
 export default class extends think.Controller {
-  indexAction() {
-    // return this.redirect('/news');
+  async indexAction() {
+    const env = think.env;
+    const cate_id = this.get('cate_id') || 45;
+    const page = this.get('page') || 1;
+    let current_cate = await think.model('item_category').field('id as category_id,category_name').where({
+      id: cate_id,
+      del: 0
+    }).find();
+    const category = await think.model('item_category').cache('category', {timeout: 2 * 60 * 1000}).field('id as category_id,category_name').where({del: 0}).select();
+    if (think.isEmpty(current_cate)) {
+      current_cate = category[0];
+    } else {
+      // current_cate = current_cate.category_id;
+    }
+    for (const item of category) {
+      item.url = `/news/cate/${item.category_id}.html`;
+    }
+    const current_list = await think.model('article').where({
+      del: 0,
+      status: 2
+    }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 6).select();
+    for (const new_item of current_list) {
+      if (!think.isEmpty(new_item.seo_keywords)) {
+        new_item.seo_keywords = new_item.seo_keywords.split(',');
+      } else {
+        new_item.seo_keywords = [];
+      }
+    }
+    const count = await think.model('article').where({del: 0, status: 2, category_id: cate_id  }).count('*');
+    this.assign({
+      current_list,
+      count,
+      page,
+      pageSize: 6,
+      current_cate,
+      category
+    });
     return this.display('index1');
-
-    // return this.redirect('http://www.wkdao.com', '走错路发现世界,走对路发现自己');
-    const filepath = path.join(think.ROOT_PATH, 'view/index_index.html');
-    return this.success([], "请求成功!");
   }
 
   /**

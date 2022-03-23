@@ -5,21 +5,28 @@
   <meta http-equiv="Content-Type" content="text/html" ; charset="utf-8">
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=1200">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
-  <title>云易绣-所见即所绣-刺绣定制解决方案</title>
+  <title>新闻中心-所见即所绣-刺绣定制解决方案-云易绣</title>
   <meta name="baidu-site-verification" content="code-wSIR3VITlK" />
   <meta name="keywords" content="易绣科技,刺绣机,刺绣软件,刺绣解决方案" />
   <meta name="description" content="云易绣（刺绣定制SAAS服务系统，发明专利），让您在这个行业没有难做的刺绣，走出模式困惑，感兴趣致电联系：易绣科技 18257539757" />
   <link rel="shortcut icon" href="http://test.qmycm.com/images/media/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/assets/css/vendor.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" type="text/css" href="/assets/vendor/aos/dist/aos.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/theme.minc619.css?v=1.0">
+
+
   <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/homecss/Reset.css">
-  <!-- <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/homecss/Index.css"> -->
+   <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/homecss/Index.css">
   <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/css/ShareStyle.css">
   <link href="http://test.qmycm.com/homecss/jquery.bxslider.css?v=20190528" rel="stylesheet" type="text/css">
-  <!-- <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/NewCss/home/newHome.css"> -->
-  <!-- <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/iconFont/iconfont.css"> -->
+   <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/NewCss/home/newHome.css">
+   <link rel="stylesheet" type="text/css" href="http://test.qmycm.com/iconFont/iconfont.css">
   <link rel="stylesheet" href="http://test.qmycm.com/NewCss/animate.css-master/animate.min.css?v=20200327">
   <link rel="stylesheet" type="text/css" href="/tstatic/css/news_index.css">
   <link rel="stylesheet" type="text/css" href="/tstatic/css/empty.css">
@@ -32,21 +39,13 @@
   <script type="text/javascript" src="http://test.qmycm.com/homejs/jquery.bxslider.js"></script>
   <script type="text/javascript" src="http://test.qmycm.com/homejs/index.js"></script>
   <script language="javascript" src="http://test.qmycm.com/js/common.js"></script>
-  <!--
-    <script type="text/javascript">var pvs={}; var pvm={}; </script>
-<script>
-    pvs[{$ms.0.id}]={$data1|array_to_number|json_encode};
-    pvs[{$ms.1.id}]={$data2|array_to_number|json_encode};
-    pvm[{$ms.0.id}]={$data1|array_to_number|max};
-    pvm[{$ms.1.id}]={$data2|array_to_number|max};
-</script>
--->
-  <!-- 备注 -->
+
+  <link rel="stylesheet" href="/tstatic/page/page.css">
 </head>
 
 <body>
-
-  <div id="NewHome_Main">
+{% include "header.html" %}
+<div id="NewHome_Main">
     <div class="body_all">
       <div class="frame_right">
         <div class="contact bg-01">
@@ -98,7 +97,6 @@
         </div>
       </div>
     </div>
-    {% include "header.html" %}
     <div class="BannerNews"></div>
     <div class="news_option">
       {% for item in category %}
@@ -197,82 +195,84 @@
         </div>
       </div>
     </div>
-    {% include "footer.html" %}
-    <link rel="stylesheet" href="/tstatic/page/page.css">
-    <script src="/tstatic/page/page.js"></script>
-    <script type="text/javascript">
-      function tabs(tabTit, on, tabCon) {
-        $(tabCon).each(function() {
-          $(this).children().eq(0).show();
+  </div>
 
-        });
-        $(tabTit).each(function() {
-          $(this).children().eq(0).addClass(on);
-        });
-        $(tabTit).children().click(function() {
-          $(this).addClass(on).siblings().removeClass(on);
-          var index = $(tabTit).children().index(this);
-          $(tabCon).children().eq(index).show().siblings().hide();
-        });
+
+{% include "footer.html" %}
+<script src="/tstatic/page/page.js"></script>
+<script type="text/javascript">
+  function tabs(tabTit, on, tabCon) {
+    $(tabCon).each(function() {
+      $(this).children().eq(0).show();
+
+    });
+    $(tabTit).each(function() {
+      $(this).children().eq(0).addClass(on);
+    });
+    $(tabTit).children().click(function() {
+      $(this).addClass(on).siblings().removeClass(on);
+      var index = $(tabTit).children().index(this);
+      $(tabCon).children().eq(index).show().siblings().hide();
+    });
+  }
+  tabs(".content_right-choose", "right_active", ".contact_us-scancode-img");
+  $(function() {
+    let page = $("#myPage").data('page');
+    let total = $("#myPage").data('total');
+    let pageSize = $("#myPage").data('page_size');
+    // 示例1
+    $("#myPage").sPage({
+      page: page, //当前页码，必填
+      total: total, //数据总条数，必填
+      pageSize: pageSize, //每页显示多少条数据，默认10条
+      showTotal: false, //是否显示总条数，默认关闭：false
+      totalTxt: "共{total}条", //数据总条数文字描述，{total}为占位符，默认"共{total}条"
+      noData: false, //没有数据时是否显示分页，默认false不显示，true显示第一页
+      showSkip: true, //是否显示跳页，默认关闭：false
+      showPN: true, //是否显示上下翻页，默认开启：true
+      prevPage: "上一页", //上翻页文字描述，默认“上一页”
+      nextPage: "下一页", //下翻页文字描述，默认“下一页”
+      fastForward: 5, //快进快退页数，默认0表示不开启快进快退
+      backFun: function(page) {
+        //点击分页按钮回调函数，返回当前页码
+        $("#pNum").text(page);
+        window.location.href = getUrl(page)
       }
-      tabs(".content_right-choose", "right_active", ".contact_us-scancode-img");
-      $(function() {
-        let page = $("#myPage").data('page');
-        let total = $("#myPage").data('total');
-        let pageSize = $("#myPage").data('page_size');
-        // 示例1
-        $("#myPage").sPage({
-          page: page, //当前页码，必填
-          total: total, //数据总条数，必填
-          pageSize: pageSize, //每页显示多少条数据，默认10条
-          showTotal: false, //是否显示总条数，默认关闭：false
-          totalTxt: "共{total}条", //数据总条数文字描述，{total}为占位符，默认"共{total}条"
-          noData: false, //没有数据时是否显示分页，默认false不显示，true显示第一页
-          showSkip: true, //是否显示跳页，默认关闭：false
-          showPN: true, //是否显示上下翻页，默认开启：true
-          prevPage: "上一页", //上翻页文字描述，默认“上一页”
-          nextPage: "下一页", //下翻页文字描述，默认“下一页”
-          fastForward: 5, //快进快退页数，默认0表示不开启快进快退
-          backFun: function(page) {
-            //点击分页按钮回调函数，返回当前页码
-            $("#pNum").text(page);
-            window.location.href = getUrl(page)
-          }
-        });
-      });
+    });
+  });
 
-      function getUrl(no) {
-        var str = window.location.href
-        var search = window.location.search
-        var parmasUrl = '?'
-        var parmasJson = getJson()
-        parmasJson.page = no
-        for (var i in parmasJson) {
-          parmasUrl += i + '=' + parmasJson[i] + '&'
-        }
-        var endstr = ''
-        if (search == '') {
-          endstr = str + parmasUrl
-        } else {
-          endstr = str.replace(search, parmasUrl)
-        }
-        return endstr.substr(0, endstr.length - 1)
+  function getUrl(no) {
+    var str = window.location.href
+    var search = window.location.search
+    var parmasUrl = '?'
+    var parmasJson = getJson()
+    parmasJson.page = no
+    for (var i in parmasJson) {
+      parmasUrl += i + '=' + parmasJson[i] + '&'
+    }
+    var endstr = ''
+    if (search == '') {
+      endstr = str + parmasUrl
+    } else {
+      endstr = str.replace(search, parmasUrl)
+    }
+    return endstr.substr(0, endstr.length - 1)
+  }
+
+  function getJson() {
+    var url = decodeURI(location.search);
+    var res = {}
+    if (url.indexOf("?") != -1) {
+      var str = url.substr(1);
+      var strs = str.split("&");
+      for (var i = 0; i < strs.length; i++) {
+        res[strs[i].split("=")[0]] = strs[i].split("=")[1]
       }
+    }
+    return res
+  }
 
-      function getJson() {
-        var url = decodeURI(location.search);
-        var res = {}
-        if (url.indexOf("?") != -1) {
-          var str = url.substr(1);
-          var strs = str.split("&");
-          for (var i = 0; i < strs.length; i++) {
-            res[strs[i].split("=")[0]] = strs[i].split("=")[1]
-          }
-        }
-        return res
-      }
-
-    </script>
+</script>
 </body>
 
 </html>
