@@ -26,7 +26,7 @@ export default class extends think.Controller {
     const current_list = await think.model('article').where({
       del: 0,
       status: 2
-    }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 6).select();
+    }).cache(env + 'index_news', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 6).select();
     for (const new_item of current_list) {
       if (!think.isEmpty(new_item.seo_keywords)) {
         new_item.seo_keywords = new_item.seo_keywords.split(',');
