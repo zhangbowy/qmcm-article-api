@@ -35,8 +35,8 @@
   <link rel="stylesheet" type="text/css" href="/assets/css/theme.minc619.css?v=1.0">
 </head>
 <body>
-  <div id="NewHome_Main">
-    {% include "header.html" %}
+{% include "header.html" %}
+<div id="NewHome_Main">
     <div class="BannerNews"></div>
     <div class="news_option news_option_detaile">
       <div class="news_option_detaile—warpeer">
@@ -144,7 +144,6 @@
         </div>
       </div>
     </div>
-    {% include "footer.html" %}
     <script type="text/javascript">
       function tabs(tabTit, on, tabCon) {
         $(tabCon).each(function() {
@@ -165,5 +164,6 @@
       $("#details_content").html(content)
     </script>
   </div>
+{% include "footer.html" %}
 </body>
 </html>
