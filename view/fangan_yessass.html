@@ -623,7 +623,6 @@
   <!-- ========== END MAIN CONTENT ========== -->
 
   <!-- ========== FOOTER ========== -->
-  {% include "footer.html" %}
   <!-- ========== END FOOTER ========== -->
 
   <!-- Go To -->
@@ -645,86 +644,13 @@
     <i class="bi-chevron-up"></i>
   </a>
   <!-- ========== END SECONDARY CONTENTS ========== -->
+  {% include "footer.html" %}
 
 
-  <!-- JS Implementing Plugins -->
-  <script src="/assets/js/vendor.min.js"></script>
-  <script src="/assets/vendor/aos/dist/aos.js"></script>
-
-  <!-- JS Front -->
-  <script src="/assets/js/theme.min.js"></script>
 
   <!-- JS Plugins Init. -->
   <script>
     (function() {
-      // INITIALIZATION OF HEADER
-      // =======================================================
-      new HSHeader('#header').init()
-
-
-      // INITIALIZATION OF MEGA MENU
-      // =======================================================
-      new HSMegaMenu('.js-mega-menu', {
-          desktop: {
-            position: 'left'
-          }
-        })
-
-
-      // INITIALIZATION OF SHOW ANIMATIONS
-      // =======================================================
-      new HSShowAnimation('.js-animation-link')
-
-
-      // INITIALIZATION OF BOOTSTRAP VALIDATION
-      // =======================================================
-      HSBsValidation.init('.js-validate', {
-        onSubmit: data => {
-          data.event.preventDefault()
-          alert('Submited')
-        }
-      })
-
-
-      // INITIALIZATION OF GO TO
-      // =======================================================
-      new HSGoTo('.js-go-to')
-
-
-      // INITIALIZATION OF AOS
-      // =======================================================
-      AOS.init({
-        duration: 650,
-        once: true
-      });
-
-
-      // INITIALIZATION OF TEXT ANIMATION (TYPING)
-      // =======================================================
-      HSCore.components.HSTyped.init('.js-typedjs')
-
-
-      // SCROLLSPY
-      // =======================================================
-      new bootstrap.ScrollSpy(document.body, {
-        target: '#navbarNavDropdownNav'
-      })
-
-      new HSScrollspy('#navbarNavDropdown', {
-        breakpoint: 'lg',
-        scrollOffset: -10
-      })
-
-
-      // INITIALIZATION OF BOOTSTRAP VALIDATION
-      // =======================================================
-      HSBsValidation.init('.js-validate', {
-        onSubmit: data => {
-          data.event.preventDefault()
-          alert('Submited')
-        }
-      })
-
 
       // INITIALIZATION OF LEAFLET
       // =======================================================
