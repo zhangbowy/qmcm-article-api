@@ -3,7 +3,8 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html" ; charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta http-equiv="pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+s  <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
   <title>{{current_article.title}}-{{options.title}}</title>
@@ -19,7 +20,7 @@
   <link rel="stylesheet" href="http://test.qmycm.com/NewCss/animate.css-master/animate.min.css?v=20200327">
   <link rel="stylesheet" type="text/css" href="/tstatic/css/news_index.css">
   <!-- 矢量图库地址 -->
-  <link rel="stylesheet" href="http://test.qmycm.com/css/IconFont.css" />
+  <link rel="stylesheet" href="http://test.qmycm.com/css/IconFont.css" />x
   <script type="text/javascript" src="http://test.qmycm.com/homejs/Jquery-2.0.3.min.js"></script>
   <script type="text/javascript" src="http://test.qmycm.com/homejs/Alljquery.js"></script>
   <script type="text/javascript" src="http://test.qmycm.com/homejs/Highcharts (2).js"></script>
@@ -58,8 +59,8 @@
         </div>
       </div>
     </div>
-    <div class="feed_wrapper">
-      <div class="content_left">
+    <div class="feed_wrapper row">
+      <div class="content_left col-lg-8 mb-10 mb-lg-0">
         <h2 class="activity-name">{{current_article.title}}</h2>
         <div class="meta_content">
           <span>时间：{{current_article.created_at}} </span>
@@ -90,7 +91,7 @@
           </li>
         </ul>
       </div>
-      <div class="content_right">
+      <div class="content_right col-lg-3">
         <ul class="content_right-choose">
           <li class="right_active">
             最新

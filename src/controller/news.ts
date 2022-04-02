@@ -17,11 +17,11 @@ export default class extends think.Controller {
             const hot_list = await think.model('article').field('article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).cache(env + 'hot_list', {timeout: 2 * 60 * 1000}).order('pv DESC').page(1, 10).select();
-            const newest_list = await think.model('article').field('article_id,full_path,title').where({
+            }).order('pv DESC').page(1, 10).select();
+            const newest_list = await think.model('article').field('cover_image,article_id,full_path,title').where({
                 del: 0,
                 status: 2
-            }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).order('created_at DESC').page(1, 10).select();
+            }).order('created_at DESC').page(1, 10).select();
             // const current_list = await think.model('article').where({del: 0, status: 2}).order('created_at DESC').page(1, 10).select();
             if (think.isEmpty(article_no)) {
                 /**
@@ -29,7 +29,7 @@ export default class extends think.Controller {
                  */
                 // return  this.display();
                 // return this.success({newest_list, hot_list});
-                this.redirect('/news/cate/45.html');
+                this.redirect('/news/cate/index.html');
             }
             this.assign('hot_list', hot_list);
             this.assign('newest_list', newest_list);
@@ -67,7 +67,7 @@ export default class extends think.Controller {
             // 增加阅读
             think.model('article').where({article_no}).increment('pv', 1);
             think.model('article').where({article_no}).increment('real_pv', 1);
-            return this.display('news_detail');
+            return this.display('blog-article');
         } catch ($err) {
             this.fail(-1, $err.stack);
         }
@@ -82,32 +82,33 @@ export default class extends think.Controller {
             const env = think.env;
             const cate_id = this.get('cate_id');
             const page = this.get('page') || 1;
-            let current_cate = await think.model('item_category').field('id as category_id,category_name').where({
-                id: cate_id,
-                del: 0
-            }).find();
-            const category = await think.model('item_category').cache('category', {timeout: 2 * 60 * 1000}).field('id as category_id,category_name').where({del: 0}).select();
-            if (think.isEmpty(current_cate)) {
-                current_cate = category[0];
-            } else {
-                // current_cate = current_cate.category_id;
+            let current_cate = null;
+            if(cate_id && cate_id != 'index') {
+                current_cate = await think.model('item_category').field('id as category_id,category_name').where({
+                    id: cate_id,
+                    del: 0
+                }).find();
             }
+            const category = await think.model('item_category').cache('category', {timeout: 2 * 60 * 1000}).field('id as category_id,category_name').where({del: 0}).select();
             for (const item of category) {
                 item.url = `/news/cate/${item.category_id}.html`;
             }
             const hot_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).cache(env + 'hot_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('pv DESC').page(1, 10).select();
+            }).field('cover_image,article_id,full_path,title').order('pv DESC').page(1, 10).select();
             const newest_list = await think.model('article').where({
                 del: 0,
                 status: 2
-            }).cache(env + 'newest_list', {timeout: 2 * 60 * 1000}).field('article_id,full_path,title').order('created_at DESC').page(1, 10).select();
-            const current_list = await think.model('article').where({
-                category_id: current_cate.category_id,
+            }).field('cover_image,article_id,full_path,title').order('created_at DESC').page(1, 10).select();
+            const articleWhere = {
                 del: 0,
                 status: 2
-            }).cache(env + 'current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
+            };
+            if (current_cate) {
+                articleWhere.category_id = current_cate.category_id;
+            }
+            const current_list = await think.model('article').where(articleWhere).cache(env + 'current_list' + page + '_' + cate_id, {timeout: 30 * 1000}).order('created_at DESC').page(page, 5).select();
             for (const new_item of current_list) {
                 if (!think.isEmpty(new_item.seo_keywords)) {
                     new_item.seo_keywords = new_item.seo_keywords.split(',');
@@ -115,19 +116,18 @@ export default class extends think.Controller {
                     new_item.seo_keywords = [];
                 }
             }
-            const count = await think.model('article').where({del: 0, status: 2, category_id: cate_id  }).count('*');
+            const count = await think.model('article').where(articleWhere).count('*');
             this.assign({
                 hot_list,
                 newest_list,
                 current_list,
                 count,
-                page,
+                page: Number(page),
                 pageSize: 5,
                 current_cate,
                 category
             });
-            await this.display('news_index');
-            // this.success({hot_list, newest_list, current_list, count, page, pageSize: 5, current_cate, category});
+            await this.display('blog-journal');
         } catch ($err) {
             this.fail(-1, $err.stack);
         }

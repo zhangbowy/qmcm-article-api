@@ -74,7 +74,8 @@ export const view = {
   common: {
     viewPath: path.join(think.ROOT_PATH, 'view'),
     sep: '_',
-    extname: '.html'
+    extname: '.html',
+    autoescape: false
   },
   nunjucks: {
     handle: nunjucks
