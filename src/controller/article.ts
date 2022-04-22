@@ -294,14 +294,14 @@ export default class extends Base {
              */
             if (result.error) {
                 return this.fail(-1, result.message);
-            }
-            if (result.success > 0) {
+            }if (result.success > 0 && article_id) {
                 await think.model('article').where({article_id}).update({
                     is_push_success: 1
                 });
                 await think.model('article').where({article_id}).increment('push_success_count', 1);
             }
             const msg = `成功${result.success},当日剩余推送次数${result.remain}`;
+            console.log(msg);
             return this.success(result, msg);
         } catch ($err) {
             this.dealErr($err);
