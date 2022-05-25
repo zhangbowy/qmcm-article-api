@@ -80,7 +80,7 @@ export default class extends think.Controller {
     async cateAction() {
         try {
             const env = think.env;
-            const cate_id = this.get('cate_id');
+            let cate_id = this.get('cate_id');
             const page = this.get('page') || 1;
             let current_cate = null;
             if(cate_id && cate_id != 'index') {
@@ -88,6 +88,9 @@ export default class extends think.Controller {
                     id: cate_id,
                     del: 0
                 }).find();
+                if (think.isEmpty(current_cate)) {
+                    cate_id = 'index';
+                }
             }
             const category = await think.model('item_category').cache('category', {timeout: 2 * 60 * 1000}).field('id as category_id,category_name').where({del: 0}).select();
             for (const item of category) {
@@ -129,7 +132,8 @@ export default class extends think.Controller {
             });
             await this.display('blog-journal');
         } catch ($err) {
-            this.fail(-1, $err.stack);
+            // this.fail(-1, $err.stack);
+            this.ctx.redirect('/news/cate/index.html');
         }
     }
 

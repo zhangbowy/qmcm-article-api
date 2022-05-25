@@ -8,7 +8,7 @@
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
   {% if current_cate %}<title>{{current_cate.category_name}}-所见即所绣-刺绣定制解决方案-云易绣</title>{% else %}<title>新闻中心-所见即所绣-刺绣定制解决方案-云易绣</title>{% endif %}
-  <meta name="keywords" content="刺绣机,扫码刺绣，刺绣软件,刺绣解决方案" />
+  <meta name="keywords" content="刺绣创业,刺绣开店,刺绣机,扫码刺绣，刺绣软件,刺绣定制解决方案" />
   <meta name="description" content="云易绣系统解决了一直困扰刺绣定制服务的难点： 刺绣设计管理后台→解决花样生成，区别一般定制模板与刺绣设计定制分类以及对应不同客户体验的解决方案，云易绣（刺绣定制SAAS服务系统，发明专利），让您在这个行业没有难做的刺绣，走出模式困惑，感兴趣致电联系：易绣科技 18257539757" />
   <link rel="shortcut icon" href="http://admin.e-sewing.vip/favicon.ico" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
                   </div>
 
                   <div class="flex-grow-1 ms-3">
-                    <a class="text-white" href="blog-article.html">易绣科技</a>
+                    <a class="text-white" href="{{newest_list[0].full_path}}">易绣科技</a>
                   </div>
                 </div>
                 <div class="mb-5">
@@ -61,7 +61,7 @@
                   </div>
 
                   <div class="flex-grow-1 ms-3">
-                    <a class="text-white" href="blog-article.html">Christina Kray</a>
+                    <a class="text-white" href="{{newest_list[0].full_path}}">Christina Kray</a>
                   </div>
                 </div>
                 <!-- End Media -->
@@ -70,7 +70,7 @@
                   <h2 class="h1 text-white">Front Corporate - let's work together</h2>
                 </div>
 
-                <a class="btn btn-primary btn-transition" href="blog-article.html">Read article <i class="bi-chevron-right small ms-1"></i></a>
+                <a class="btn btn-primary btn-transition" href="{{newest_list[0].full_path}}">Read article <i class="bi-chevron-right small ms-1"></i></a>
               </div>
             </div>
             <!-- End Container -->
@@ -88,7 +88,7 @@
                     </div>
                   </div>
                   <div class="flex-grow-1 ms-3">
-                    <a class="text-white" href="blog-article.html">Jeff Fisher</a>
+                    <a class="text-white" href="{{newest_list[0].full_path}}">Jeff Fisher</a>
                   </div>
                 </div>
                 <!-- End Media -->
@@ -97,7 +97,7 @@
                   <h2 class="h1 text-white">How Google Assistant now helps you record stories</h2>
                 </div>
 
-                <a class="btn btn-primary btn-transition" href="blog-article.html">Read article <i class="bi-chevron-right small ms-1"></i></a>
+                <a class="btn btn-primary btn-transition" href="{{newest_list[0].full_path}}">Read article <i class="bi-chevron-right small ms-1"></i></a>
               </div>
             </div>
             <!-- End Container -->
@@ -211,6 +211,7 @@
                   </span>
                 </a>
               </li>
+              <li class="page-item active"><a class="page-link" href="?page=1">首页</a></li>
               <li class="page-item active"><a class="page-link" href="?page={{page}}">{{page}}</a></li>
               <li class="page-item"><a class="page-link" href="?page={{page+1}}">{{page+1}}</a></li>
               <li class="page-item"><a class="page-link" href="?page={{page+2}}">{{page+2}}</a></li>
