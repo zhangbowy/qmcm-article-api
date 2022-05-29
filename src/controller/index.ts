@@ -35,13 +35,18 @@ export default class extends think.Controller {
       }
     }
     const count = await think.model('article').where({del: 0, status: 2, category_id: cate_id  }).count('*');
+
+    const video_info = await this.fetch('https://lens.zhihu.com/api/v4/videos/1514381586749947904').then(t=> t.json());
+    const { playlist: {HD: {play_url}} } = video_info;
+    console.log(play_url, '-');
     this.assign({
       current_list,
       count,
       page,
       pageSize: 6,
       current_cate,
-      category
+      category,
+      play_url
     });
     return this.display('index1');
   }
